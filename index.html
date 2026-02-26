@@ -15,11 +15,11 @@
     <div class="max-w-6xl mx-auto space-y-8">
         <header class="flex flex-col md:flex-row justify-between items-center bg-slate-800/50 p-8 rounded-[2rem] border border-slate-700">
             <div>
-                <h1 class="text-3xl font-black tracking-tighter italic text-indigo-400">Planning Dashboard</h1>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Dual-Income & Multi-Asset Strategy</p>
+                <h1 class="text-3xl font-black tracking-tighter italic text-indigo-400 uppercase">Planning Dashboard</h1>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Multi-Year Wealth Forecast & SIP Engine</p>
             </div>
-            <div class="mt-4 md:mt-0">
-                <button onclick="resetToDefaults()" class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Reset Defaults</button>
+            <div class="mt-4 md:mt-0 flex gap-4">
+                <button onclick="resetToDefaults()" class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Reset</button>
             </div>
         </header>
 
@@ -27,23 +27,23 @@
             <div class="lg:col-span-8 space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">S1 Salary (Annual ₹)</label>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest italic">S1 Salary (Annual ₹)</label>
                         <input type="text" id="b1" value="20,00,000" oninput="handleInput(this); calculate()" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl font-black text-xl text-indigo-300 outline-none">
                     </div>
                     <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">S2 Salary (Annual ₹)</label>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest italic">S2 Salary (Annual ₹)</label>
                         <input type="text" id="b2" value="0" oninput="handleInput(this); calculate()" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl font-black text-xl text-emerald-300 outline-none">
                     </div>
                     <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
-                        <label class="block text-[10px] font-black text-rose-500 uppercase mb-4 tracking-widest">Annual Expense (₹)</label>
+                        <label class="block text-[10px] font-black text-rose-500 uppercase mb-4 tracking-widest italic">Expenses (Annual ₹)</label>
                         <input type="text" id="exp" value="10,50,000" oninput="handleInput(this); calculate()" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl font-black text-xl text-rose-400 outline-none">
                     </div>
                 </div>
 
                 <div class="bg-slate-800 p-8 rounded-[2rem] border border-slate-700">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest italic">Investment Matrix</h3>
-                        <button onclick="addRow()" class="text-[10px] font-black text-indigo-400 hover:text-indigo-300 uppercase underline">+ Add Row</button>
+                        <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">Investment Matrix</h3>
+                        <button onclick="addRow()" class="text-[10px] font-black text-indigo-400 hover:text-indigo-300 uppercase underline">+ Add Asset</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
@@ -51,34 +51,44 @@
                         </table>
                     </div>
                 </div>
-            </div>
 
-            <div class="lg:col-span-4 space-y-6">
-                <div class="bg-indigo-600 p-10 rounded-[2.5rem] shadow-2xl">
-                    <div class="text-center mb-6">
-                        <p class="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1">Total Yearly Surplus</p>
-                        <h2 class="text-4xl font-black tracking-tighter text-white" id="yearlySurplus">₹0</h2>
-                    </div>
-                    
-                    <div class="text-center pt-6 border-t border-indigo-500/50">
-                        <p class="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1">Net Monthly Surplus</p>
-                        <h2 class="text-4xl font-black tracking-tighter text-white" id="monthlySurplus">₹0</h2>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-indigo-500/50 space-y-3">
-                        <div class="flex justify-between text-[10px] font-bold opacity-80 uppercase">
-                            <span>Total Gross</span>
-                            <span id="statGross">₹0</span>
+                <div class="bg-indigo-900/20 p-8 rounded-[2rem] border border-indigo-500/30">
+                    <h3 class="text-xs font-black uppercase text-indigo-400 tracking-widest mb-6">SIP & Reinvestment Strategy</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div>
+                            <label class="block text-[10px] font-black text-indigo-300 uppercase mb-4 tracking-widest">Surplus Reinvested: <span id="reinvestLabel">50</span>%</label>
+                            <input type="range" id="reinvestRate" min="0" max="100" value="50" oninput="document.getElementById('reinvestLabel').innerText=this.value; calculate()" class="w-full h-2 bg-indigo-900 rounded-lg appearance-none cursor-pointer">
                         </div>
-                        <div class="flex justify-between text-[10px] font-bold opacity-80 uppercase">
-                            <span>Combined Tax</span>
-                            <span id="statTax" class="text-rose-200">₹0</span>
+                        <div>
+                            <label class="block text-[10px] font-black text-indigo-300 uppercase mb-4 tracking-widest italic">Avg. SIP Returns (%)</label>
+                            <input type="number" id="sipReturn" value="12" step="0.5" oninput="calculate()" class="w-full bg-slate-900 border-2 border-indigo-800/50 p-4 rounded-2xl font-black text-xl text-indigo-300 outline-none">
                         </div>
                     </div>
                 </div>
-                
-                <div id="audit" class="bg-slate-800 p-6 rounded-3xl border border-slate-700 text-[10px] font-mono leading-relaxed text-slate-400">
+            </div>
+
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-indigo-600 p-8 rounded-[2.5rem] shadow-2xl space-y-6">
+                    <div class="text-center">
+                        <p class="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1">Monthly Surplus</p>
+                        <h2 class="text-4xl font-black tracking-tighter text-white" id="monthlySurplus">₹0</h2>
                     </div>
+                    <div class="text-center pt-6 border-t border-indigo-500/50">
+                        <p class="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1">Yearly Surplus</p>
+                        <h2 class="text-4xl font-black tracking-tighter text-white" id="yearlySurplus">₹0</h2>
+                    </div>
+                    <div class="bg-black/20 p-4 rounded-2xl text-center">
+                        <p class="text-[9px] font-black text-indigo-100 uppercase mb-1">Monthly SIP Amount</p>
+                        <h2 class="text-2xl font-black text-emerald-300" id="sipValueDisplay">₹0</h2>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4">Wealth Forecast (Total Portfolio)</h3>
+                    <div id="forecastTable" class="space-y-3">
+                        </div>
+                    <p class="text-[8px] text-slate-500 mt-6 italic">*Forecast includes Initial Principal + compounding SIPs.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -90,7 +100,7 @@
             el.value = parseFloat(val).toLocaleString('en-IN');
         }
 
-        function addRow(name="Investment", principal=15000000, yield=7, owner="2") {
+        function addRow(name="Portfolio", principal=15000000, yield=7, owner="2") {
             const tr = document.createElement('tr');
             tr.className = "asset-row";
             tr.innerHTML = `
@@ -103,7 +113,7 @@
                         <option value="2" ${owner==="2"?"selected":""}>S2</option>
                     </select>
                 </td>
-                <td class="py-4 text-right"><button onclick="this.closest('tr').remove(); calculate()" class="text-slate-600 hover:text-rose-500">✕</button></td>
+                <td class="py-4 text-right"><button onclick="this.closest('tr').remove(); calculate()" class="text-slate-600 hover:text-rose-500 font-bold">✕</button></td>
             `;
             document.getElementById('assetBody').appendChild(tr);
             calculate();
@@ -112,10 +122,7 @@
         function calculateTax(income, isSalaried) {
             let taxable = income;
             if (isSalaried && income > 0) taxable = Math.max(0, income - 75000); 
-            
-            // FY 2026-27 Rule: Rebate makes tax zero if taxable income <= 12L
             if (taxable <= 1200000) return 0;
-
             let tax = 0;
             if (taxable > 400000) tax += (Math.min(taxable, 800000) - 400000) * 0.05;
             if (taxable > 800000) tax += (Math.min(taxable, 1200000) - 800000) * 0.10;
@@ -130,44 +137,59 @@
             const b1 = parseFloat(document.getElementById('b1').value.replace(/,/g, '')) || 0;
             const b2 = parseFloat(document.getElementById('b2').value.replace(/,/g, '')) || 0;
             const expense = parseFloat(document.getElementById('exp').value.replace(/,/g, '')) || 0;
+            const reinvestRate = parseFloat(document.getElementById('reinvestRate').value) / 100;
+            const sipReturns = parseFloat(document.getElementById('sipReturn').value) / 100;
             
-            let s1_int = 0, s2_int = 0;
+            let totP = 0, s1_total = b1, s2_total = b2, avgMatrixYield = 0;
             document.querySelectorAll('.asset-row').forEach(row => {
                 const p = parseFloat(row.querySelector('.p_in').value.replace(/,/g, '')) || 0;
                 const y = parseFloat(row.querySelector('.y_in').value) || 0;
                 const owner = row.querySelector('.o_in').value;
-                if (owner === "1") s1_int += (p * y) / 100; else s2_int += (p * y) / 100;
+                const returns = (p * y) / 100;
+                totP += p;
+                avgMatrixYield += (p/100)*y;
+                if (owner === "1") s1_total += returns; else s2_total += returns;
             });
 
-            const tax1 = calculateTax(b1 + s1_int, b1 > 0);
-            const tax2 = calculateTax(b2 + s2_int, b2 > 0);
-            
-            const totalGross = b1 + b2 + s1_int + s2_int;
-            const totalTax = tax1 + tax2;
-            const annualSurplus = totalGross - totalTax - expense;
+            const tax1 = calculateTax(s1_total, b1 > 0);
+            const tax2 = calculateTax(s2_total, b2 > 0);
+            const annualSurplus = (s1_total + s2_total - tax1 - tax2) - expense;
             const monthlySurplus = annualSurplus / 12;
+            const monthlySIP = monthlySurplus * reinvestRate;
 
-            document.getElementById('yearlySurplus').innerText = '₹' + Math.round(annualSurplus).toLocaleString('en-IN');
-            document.getElementById('monthlySurplus').innerText = '₹' + Math.round(monthlySurplus).toLocaleString('en-IN');
-            document.getElementById('statGross').innerText = '₹' + totalGross.toLocaleString('en-IN');
-            document.getElementById('statTax').innerText = '₹' + Math.round(totalTax).toLocaleString('en-IN');
+            document.getElementById('yearlySurplus').innerText = '₹' + Math.max(0, Math.round(annualSurplus)).toLocaleString('en-IN');
+            document.getElementById('monthlySurplus').innerText = '₹' + Math.max(0, Math.round(monthlySurplus)).toLocaleString('en-IN');
+            document.getElementById('sipValueDisplay').innerText = '₹' + Math.max(0, Math.round(monthlySIP)).toLocaleString('en-IN');
+
+            // FORECASTING
+            let forecastHTML = "";
+            const years = [5, 10, 15, 20, 25, 30];
+            const matrixReturnRate = totP > 0 ? (avgMatrixYield / totP) : 0.07;
             
-            document.getElementById('audit').innerHTML = `
-                MATH AUDIT (ANNUAL):<br>
-                ----------------------<br>
-                S1 Income: ₹${(b1 + s1_int).toLocaleString('en-IN')}<br>
-                S2 Income: ₹${(b2 + s2_int).toLocaleString('en-IN')}<br>
-                Total Tax: ₹${Math.round(tax1 + tax2).toLocaleString('en-IN')}<br>
-                Expenses:  ₹${expense.toLocaleString('en-IN')}<br>
-                ----------------------<br>
-                Yearly Net: ₹${Math.round(annualSurplus).toLocaleString('en-IN')}
-            `;
+            years.forEach(yr => {
+                // Future Value of Initial Principal: P * (1+r)^t
+                const fvPrincipal = totP * Math.pow(1 + matrixReturnRate, yr);
+                // Future Value of Monthly SIP: P * [ ((1+r)^n - 1) / r ] * (1+r)
+                const n = yr * 12;
+                const r = sipReturns / 12;
+                const fvSIP = monthlySIP * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+                
+                const totalWealth = fvPrincipal + fvSIP;
+                
+                forecastHTML += `
+                    <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">${yr} Years</span>
+                        <span class="text-sm font-black text-emerald-400">₹${Math.round(totalWealth/10000000).toLocaleString('en-IN')} Cr</span>
+                    </div>
+                `;
+            });
+            document.getElementById('forecastTable').innerHTML = forecastHTML;
         }
 
         function resetToDefaults() {
             document.getElementById('assetBody').innerHTML = '';
-            addRow("Investment A", 15000000, 7.0, "1");
-            addRow("Investment B", 15000000, 7.0, "2");
+            addRow("Core FD", 15000000, 7.0, "1");
+            addRow("Core FD", 15000000, 7.0, "2");
             document.getElementById('b1').value = "20,00,000";
             document.getElementById('b2').value = "0";
             document.getElementById('exp').value = "10,50,000";
