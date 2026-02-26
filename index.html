@@ -8,6 +8,8 @@
     <style>
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         input:focus { border-color: #4f46e5 !important; ring: 2px #4f46e5; }
+        /* Remove arrows from number inputs for cleaner look */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans min-h-screen">
@@ -29,7 +31,7 @@
                 </div>
                 <div class="mt-8 md:mt-0 grid grid-cols-2 gap-6 bg-black/20 p-6 rounded-3xl border border-white/10 backdrop-blur">
                     <div class="text-center border-r border-white/10 pr-6">
-                        <p class="text-4xl font-black text-indigo-400" id="daysToResign">11</p>
+                        <p class="text-4xl font-black text-indigo-400">11</p>
                         <p class="text-[10px] uppercase font-bold opacity-60">Months to Resign</p>
                     </div>
                     <div class="text-center">
@@ -41,9 +43,7 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
             <div class="lg:col-span-8 space-y-8">
-                
                 <section class="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200">
                     <h2 class="text-lg font-black text-slate-800 uppercase tracking-tight mb-6 flex items-center">
                         <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg mr-3">🏠</span> 1. Family Baseline
@@ -54,9 +54,8 @@
                             <input type="number" id="baseIncome" value="800000" oninput="calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-black text-xl">
                         </div>
                         <div class="bg-rose-50 p-6 rounded-2xl border border-rose-100">
-                            <label class="block text-[10px] font-black text-rose-400 uppercase mb-2">Hyderabad Int. School Budget (Annual ₹)</label>
+                            <label class="block text-[10px] font-black text-rose-400 uppercase mb-2">School Budget (Annual ₹)</label>
                             <input type="number" id="kidsFees" value="1050000" oninput="calculate()" class="w-full bg-transparent border-b-2 border-rose-200 focus:border-rose-500 outline-none font-black text-xl text-rose-900">
-                            <p class="text-[10px] text-rose-400 mt-2 font-bold italic">Estimated for 2 Children</p>
                         </div>
                     </div>
                 </section>
@@ -70,10 +69,15 @@
                         <table class="w-full text-left">
                             <tbody id="assetBody" class="divide-y divide-slate-50">
                                 <tr class="asset-row group">
-                                    <td class="py-4"><input type="text" value="High-Yield SFB (FD)" class="w-full p-2 bg-transparent font-bold outline-none text-sm"></td>
-                                    <td class="py-4"><input type="number" value="3000000" class="principal w-32 p-2 border-b-2 border-slate-100 outline-none text-sm font-black" oninput="calculate()"></td>
+                                    <td class="py-4"><input type="text" value="Bank A (SFB)" class="w-full p-2 bg-transparent font-bold outline-none text-sm"></td>
+                                    <td class="py-4"><input type="number" value="3000000" class="principal w-36 p-2 border-b-2 border-slate-100 outline-none text-sm font-black" oninput="calculate()"></td>
                                     <td class="py-4"><input type="number" value="9.0" step="0.1" class="yield w-16 p-2 border-b-2 border-slate-100 outline-none text-sm font-bold text-indigo-600" oninput="calculate()"></td>
-                                    <td class="py-4"><select class="type p-2 bg-slate-50 rounded-lg text-[10px] font-black" onchange="calculate()"><option value="FD">FD (Slab Tax)</option><option value="ARB">Arbitrage (12.5%)</option></select></td>
+                                    <td class="py-4 text-center">
+                                        <select class="type p-2 bg-slate-50 rounded-lg text-[10px] font-black" onchange="calculate()">
+                                            <option value="FD">FD (Slab)</option>
+                                            <option value="ARB">ARB (Equity)</option>
+                                        </select>
+                                    </td>
                                     <td class="py-4 text-right"><button onclick="this.closest('tr').remove(); calculate();" class="text-slate-300 hover:text-red-500">✕</button></td>
                                 </tr>
                             </tbody>
@@ -83,134 +87,12 @@
             </div>
 
             <div class="lg:col-span-4 space-y-8 text-white">
-                
                 <div class="bg-slate-900 rounded-[2.5rem] p-10 shadow-2xl sticky top-8 space-y-8">
                     <div class="text-center space-y-2">
                         <p class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em]">Net Monthly Surplus</p>
-                        <h2 class="text-6xl font-black tracking-tighter" id="netMonthlySurplus">₹0</h2>
+                        <h2 class="text-5xl font-black tracking-tighter" id="netMonthlySurplus">₹0</h2>
                         <p class="text-xs font-bold text-slate-500" id="usdEquivalent">$0 USD</p>
                     </div>
 
                     <div class="space-y-4 pt-8 border-t border-slate-800">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] font-bold text-slate-500 uppercase">Gross Monthly</span>
-                            <span class="text-sm font-black text-slate-300" id="statGross">₹0</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] font-bold text-slate-500 uppercase">Tax & Cess</span>
-                            <span class="text-sm font-black text-rose-500" id="statTax">₹0</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">School Sinking Fund</span>
-                            <span class="text-sm font-black text-rose-300" id="statEdu">₹0</span>
-                        </div>
-                    </div>
-
-                    <div id="alertBox"></div>
-
-                    <div class="bg-white/5 p-6 rounded-3xl border border-white/10 space-y-4">
-                        <h3 class="text-[10px] font-black text-indigo-300 uppercase tracking-widest text-center">🇺🇸 US College Legacy Fund</h3>
-                        <div class="space-y-2">
-                            <div class="flex justify-between text-[10px] font-bold text-slate-400">
-                                <span>Projected Goal (2036)</span>
-                                <span>$215,000</span>
-                            </div>
-                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                                <div class="bg-indigo-500 h-full w-[35%]"></div>
-                            </div>
-                            <div class="flex justify-between pt-2">
-                                <div class="text-center"><p class="text-xs font-black" id="usdCollegeMo">$850</p><p class="text-[8px] opacity-40 uppercase">Monthly $</p></div>
-                                <div class="text-center"><p class="text-xs font-black text-indigo-300" id="inrCollegeMo">₹77k</p><p class="text-[8px] opacity-40 uppercase">In Rupees</p></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let isUSD = false;
-
-        function toggleCurrency() {
-            isUSD = !isUSD;
-            document.getElementById('currBtn').innerText = isUSD ? "VIEW IN INR" : "VIEW IN USD";
-            calculate();
-        }
-
-        function addRow() {
-            const tr = document.createElement('tr');
-            tr.className = "asset-row group";
-            tr.innerHTML = `
-                <td class="py-4"><input type="text" placeholder="New Asset" class="w-full p-2 bg-transparent font-bold outline-none text-sm"></td>
-                <td class="py-4"><input type="number" value="1000000" class="principal w-32 p-2 border-b-2 border-slate-100 outline-none text-sm font-black" oninput="calculate()"></td>
-                <td class="py-4"><input type="number" value="7.5" step="0.1" class="yield w-16 p-2 border-b-2 border-slate-100 outline-none text-sm font-bold text-indigo-600" oninput="calculate()"></td>
-                <td class="py-4"><select class="type p-2 bg-slate-50 rounded-lg text-[10px] font-black" onchange="calculate()"><option value="FD">FD (Slab Tax)</option><option value="ARB">Arbitrage (12.5%)</option></select></td>
-                <td class="py-4 text-right"><button onclick="this.closest('tr').remove(); calculate();" class="text-slate-300 hover:text-red-500">✕</button></td>
-            `;
-            document.getElementById('assetBody').appendChild(tr);
-            calculate();
-        }
-
-        function calculateSlabTax(income) {
-            if (income <= 1200000) return 0;
-            let tax = 0;
-            if (income > 400000) tax += (Math.min(income, 800000) - 400000) * 0.05;
-            if (income > 800000) tax += (Math.min(income, 1200000) - 800000) * 0.10;
-            if (income > 1200000) tax += (Math.min(income, 1600000) - 1200000) * 0.15;
-            if (income > 1600000) tax += (Math.min(income, 2000000) - 1600000) * 0.20;
-            if (income > 2000000) tax += (Math.min(income, 2400000) - 2000000) * 0.25;
-            if (income > 2400000) tax += (income - 2400000) * 0.30;
-            return Math.min(tax, (income - 1200000));
-        }
-
-        function fmt(v, rate) {
-            if (isUSD) return '$' + (v / rate).toLocaleString('en-US', {maximumFractionDigits:0});
-            return '₹' + v.toLocaleString('en-IN');
-        }
-
-        function calculate() {
-            const currentFX = parseFloat(document.getElementById('fxRateInput').value) || 91.0;
-            const base = parseFloat(document.getElementById('baseIncome').value) || 0;
-            const eduGoal = parseFloat(document.getElementById('kidsFees').value) || 0;
-            
-            let totP = 0, fdInt = 0, arbInt = 0, risky = 0;
-            document.querySelectorAll('.asset-row').forEach(row => {
-                const p = parseFloat(row.querySelector('.principal').value) || 0;
-                const y = parseFloat(row.querySelector('.yield').value) || 0;
-                const type = row.querySelector('.type').value;
-                totP += p;
-                const r = (p * y) / 100;
-                if (type === "FD") { fdInt += r; if (p > 500000) risky++; }
-                else { arbInt += r; }
-            });
-
-            const slabTax = calculateSlabTax(base + fdInt) - calculateSlabTax(base);
-            const arbTax = arbInt > 125000 ? (arbInt - 125000) * 0.125 : 0;
-            const netMonthly = (fdInt + arbInt - slabTax - arbTax) / 12;
-            const surplus = netMonthly - (eduGoal / 12);
-
-            // UI Updates
-            document.getElementById('netMonthlySurplus').innerText = fmt(Math.round(surplus), currentFX);
-            document.getElementById('usdEquivalent').innerText = isUSD ? "View in INR for local context" : "$" + Math.round(surplus / currentFX).toLocaleString() + " USD / mo";
-            document.getElementById('statGross').innerText = fmt(Math.round((fdInt + arbInt) / 12), currentFX);
-            document.getElementById('statTax').innerText = fmt(Math.round((slabTax + arbTax) / 12), currentFX);
-            document.getElementById('statEdu').innerText = fmt(Math.round(eduGoal / 12), currentFX);
-
-            // US College Section
-            const usdMonthlyNeed = 850;
-            document.getElementById('usdCollegeMo').innerText = "$" + usdMonthlyNeed;
-            document.getElementById('inrCollegeMo').innerText = "₹" + Math.round(usdMonthlyNeed * currentFX).toLocaleString('en-IN');
-
-            // Alerts & SWR
-            const swr = totP > 0 ? ((netMonthly * 12) / totP) * 100 : 0;
-            let alertHTML = "";
-            if (risky > 0) alertHTML += `<div class="p-3 bg-orange-500/10 text-orange-400 text-[9px] font-black rounded-xl border border-orange-500/20 text-center uppercase tracking-widest mb-2">⚠️ ${risky} Banks Uninsured (>₹5L)</div>`;
-            if (swr > 4.5) alertHTML += `<div class="p-3 bg-red-500/10 text-red-400 text-[9px] font-black rounded-xl border border-red-500/20 text-center uppercase tracking-widest">🚨 SWR High (${swr.toFixed(1)}%) - Wealth Erosion Risk</div>`;
-            else alertHTML += `<div class="p-3 bg-emerald-500/10 text-emerald-400 text-[9px] font-black rounded-xl border border-emerald-500/20 text-center uppercase tracking-widest">✅ Safe Withdrawal Rate: ${swr.toFixed(1)}%</div>`;
-            document.getElementById('alertBox').innerHTML = alertHTML;
-        }
-        calculate();
-    </script>
-</body>
-</html>
+                        <div class="flex justify-between items-center text-[10px] font-bold uppercase text-slate-5
