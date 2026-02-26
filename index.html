@@ -8,7 +8,6 @@
     <style>
         @media print { .no-print { display: none; } body { background: white; padding: 0; } }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans min-h-screen">
@@ -19,15 +18,11 @@
             <div class="relative z-10 flex flex-col md:flex-row justify-between items-center">
                 <div class="text-center md:text-left">
                     <h1 class="text-4xl font-black tracking-tighter italic">Planning Dashboard</h1>
-                    <p class="text-indigo-300 font-bold uppercase tracking-widest text-[10px] mt-1">Spouse-Split Wealth Strategy</p>
+                    <p class="text-indigo-300 font-bold uppercase tracking-widest text-[10px] mt-1">Split-Tax Logic & Cashflow</p>
                     
                     <div class="mt-6 flex flex-wrap gap-3 no-print text-slate-900">
                         <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/10 flex items-center space-x-3 text-white">
-                            <p class="text-[9px] text-indigo-200 font-bold uppercase tracking-tighter">Target Date</p>
-                            <input type="date" id="targetDate" value="2027-02-01" onchange="updateCountdown(); calculate()" class="bg-transparent border-b border-indigo-400 text-sm font-black outline-none focus:border-white transition-all invert">
-                        </div>
-                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/10 flex items-center space-x-3 text-white">
-                            <p class="text-[9px] text-indigo-200 font-bold uppercase tracking-tighter">1 USD = ₹</p>
+                            <p class="text-[9px] text-indigo-200 font-bold uppercase">1 USD = ₹</p>
                             <input type="text" id="fxRateInput" value="91.0" oninput="handleInput(this); calculate()" class="bg-transparent border-b border-indigo-400 w-16 text-lg font-black outline-none focus:border-white transition-all">
                         </div>
                         <button onclick="toggleCurrency()" id="currBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-xl font-black text-sm transition-all shadow-lg">VIEW IN USD</button>
@@ -50,39 +45,36 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8 space-y-8">
-                <section class="bg-white rounded-[2rem] p-8 card-shadow border border-slate-200">
-                    <h2 class="text-lg font-black text-slate-800 uppercase tracking-tight mb-6 flex items-center">
-                         <span class="mr-2">🏠</span> 1. Spouse Incomes & Budget
-                    </h2>
+                <section class="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-black text-slate-800 uppercase tracking-tight mb-6">1. Spouse Incomes & Budget</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Spouse 1 Salary (Annual ₹)</label>
-                            <input type="text" id="baseIncome1" value="8,00,000" oninput="handleInput(this); calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-black text-xl">
+                            <input type="text" id="baseIncome1" value="20,00,000" oninput="handleInput(this); calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-black text-xl">
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Spouse 2 Salary (Annual ₹)</label>
-                            <input type="text" id="baseIncome2" value="0" oninput="handleInput(this); calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-black text-xl text-slate-400">
+                            <input type="text" id="baseIncome2" value="0" oninput="handleInput(this); calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-black text-xl">
                         </div>
                         <div class="bg-rose-50 p-6 rounded-2xl border border-rose-100">
-                            <label class="block text-[10px] font-black text-rose-400 uppercase mb-2 font-bold">Annual Expense Budget (₹)</label>
-                            <input type="text" id="kidsFees" value="10,50,000" oninput="handleInput(this); calculate()" class="w-full bg-transparent border-b-2 border-rose-200 focus:border-rose-500 outline-none font-black text-xl text-rose-900">
+                            <label class="block text-[10px] font-black text-rose-400 uppercase mb-2">Annual Expense Budget (₹)</label>
+                            <input type="text" id="kidsFees" value="10,50,000" oninput="handleInput(this); calculate()" class="w-full bg-transparent border-b-2 border-rose-200 outline-none font-black text-xl text-rose-900">
                         </div>
                     </div>
                 </section>
 
-                <section class="bg-white rounded-[2rem] p-8 card-shadow border border-slate-200">
+                <section class="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-lg font-black text-slate-800 uppercase tracking-tight">2. Investment Matrix</h2>
-                        <button onclick="addRow()" class="no-print bg-slate-900 text-white px-6 py-2 rounded-xl text-[10px] font-black shadow-xl">ADD ASSET</button>
+                        <button onclick="addRow()" class="no-print bg-slate-900 text-white px-6 py-2 rounded-xl text-[10px] font-black shadow-xl italic underline">+ Add Row</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
-                            <thead>
-                                <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
+                            <thead class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
+                                <tr>
                                     <th class="pb-4">Asset Name</th>
                                     <th class="pb-4">Principal (₹)</th>
                                     <th class="pb-4">Yield %</th>
-                                    <th class="pb-4">Asset Type</th>
                                     <th class="pb-4 text-center">Owner</th>
                                     <th class="pb-4 no-print"></th>
                                 </tr>
@@ -104,19 +96,23 @@
                     
                     <div class="pt-8 border-t border-slate-800 space-y-6">
                         <div>
-                            <p class="text-[10px] font-bold uppercase text-slate-500 mb-2 tracking-widest">Monthly Tax Impact</p>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-slate-400 font-bold uppercase text-[10px]">Spouse 1:</span>
-                                <span class="font-black text-rose-400" id="statTax1">₹0</span>
+                            <p class="text-[10px] font-bold uppercase text-slate-500 mb-2 tracking-widest">Household Annual Summary</p>
+                            <div class="flex justify-between text-xs py-1 border-b border-slate-800/50">
+                                <span class="text-slate-400">Gross Income:</span>
+                                <span class="font-black text-emerald-400" id="sumGross">₹0</span>
                             </div>
-                            <div class="flex justify-between items-center text-sm mt-1">
-                                <span class="text-slate-400 font-bold uppercase text-[10px]">Spouse 2:</span>
-                                <span class="font-black text-rose-400" id="statTax2">₹0</span>
+                            <div class="flex justify-between text-xs py-1 border-b border-slate-800/50">
+                                <span class="text-slate-400">Total Taxes Paid:</span>
+                                <span class="font-black text-rose-400" id="sumTax">₹0</span>
+                            </div>
+                            <div class="flex justify-between text-xs py-1">
+                                <span class="text-slate-400">Annual Expense:</span>
+                                <span class="font-black text-slate-300" id="sumExp">₹0</span>
                             </div>
                         </div>
                     </div>
 
-                    <div id="alertBox" class="pt-4"></div>
+                    <div id="alertBox"></div>
                 </div>
             </div>
         </div>
@@ -124,14 +120,6 @@
 
     <script>
         let isUSD = false;
-
-        const ASSET_TYPES = {
-            'SFB': { label: 'High-Yield SFB', rate: 9.0 },
-            'TRAD': { label: 'Traditional FD', rate: 7.0 },
-            'POTD': { label: 'Post Office TD', rate: 7.5 },
-            'SGB': { label: 'SGB (Interest)', rate: 2.5 },
-            'CUSTOM': { label: 'Custom Asset', rate: 5.0 }
-        };
 
         function handleInput(el) {
             let val = el.value.replace(/,/g, '');
@@ -155,30 +143,25 @@
             if(!targetDateInput) return;
             const targetDate = new Date(targetDateInput);
             const today = new Date();
-            let months = (targetDate.getFullYear() - today.getFullYear()) * 12;
-            months -= today.getMonth();
-            months += targetDate.getMonth();
+            let months = (targetDate.getFullYear() - today.getFullYear()) * 12 + (targetDate.getMonth() - today.getMonth());
             document.getElementById('countdownMonths').innerText = Math.max(0, months);
             document.getElementById('targetYearDisplay').innerText = targetDate.getFullYear();
         }
 
-        function addRow(name = "New Asset", principal = 1000000, yield = 7.5, type = "TRAD", owner = "1") {
+        function addRow(name = "New Asset", principal = 10000000, yield = 7.0, owner = "1") {
             const tr = document.createElement('tr');
             tr.className = "asset-row group";
             tr.innerHTML = `
                 <td class="py-4"><input type="text" value="${name}" class="w-full p-2 bg-transparent font-bold outline-none text-sm italic"></td>
                 <td class="py-4"><input type="text" value="${principal.toLocaleString(isUSD ? 'en-US' : 'en-IN')}" class="principal w-48 p-2 border-b-2 border-slate-100 outline-none text-sm font-black" oninput="handleInput(this); calculate()"></td>
                 <td class="py-4"><input type="number" value="${yield}" step="0.1" class="yield w-16 p-2 border-b-2 border-slate-100 outline-none text-sm font-bold text-indigo-600" oninput="calculate()"></td>
-                <td class="py-4"><select class="type p-2 bg-slate-50 rounded-lg text-[10px] font-black uppercase" onchange="calculate()">
-                    ${Object.entries(ASSET_TYPES).map(([k, v]) => `<option value="${k}" ${k === type ? 'selected' : ''}>${v.label}</option>`).join('')}
-                </select></td>
                 <td class="py-4 text-center">
                     <select class="owner p-2 bg-slate-100 rounded-lg text-[10px] font-bold" onchange="calculate()">
                         <option value="1" ${owner === "1" ? "selected" : ""}>S1</option>
                         <option value="2" ${owner === "2" ? "selected" : ""}>S2</option>
                     </select>
                 </td>
-                <td class="py-4 text-right no-print"><button onclick="this.closest('tr').remove(); calculate();" class="text-slate-300 hover:text-red-500">✕</button></td>
+                <td class="py-4 text-right no-print"><button onclick="this.closest('tr').remove(); calculate();" class="text-slate-300 hover:text-red-500 font-bold">✕</button></td>
             `;
             document.getElementById('assetBody').appendChild(tr);
             calculate();
@@ -186,10 +169,10 @@
 
         function resetToDefaults() {
             document.getElementById('assetBody').innerHTML = '';
-            addRow("Unity SFB (S1)", 3000000, 9.0, "SFB", "1");
-            addRow("Traditional FD (S2)", 2000000, 7.0, "TRAD", "2");
-            addRow("Custom Asset (S1)", 1000000, 6.0, "CUSTOM", "1");
-            document.getElementById('baseIncome1').value = "8,00,000";
+            // To reach ~21L interest, we need ~3 Crore at 7%
+            addRow("Spouse 1 Assets", 15000000, 7.0, "1");
+            addRow("Spouse 2 Assets", 15000000, 7.0, "2");
+            document.getElementById('baseIncome1').value = "20,00,000";
             document.getElementById('baseIncome2').value = "0";
             document.getElementById('kidsFees').value = "10,50,000";
             updateCountdown();
@@ -205,48 +188,38 @@
             if (income > 1600000) tax += (Math.min(income, 2000000) - 1600000) * 0.20;
             if (income > 2000000) tax += (Math.min(income, 2400000) - 2000000) * 0.25;
             if (income > 2400000) tax += (income - 2400000) * 0.30;
-            return Math.min(tax, (income - 1200000));
+            return tax * 1.04; // Adding 4% Cess
         }
 
         function calculate() {
             const fx = parseFloat(document.getElementById('fxRateInput').value.replace(/,/g, '')) || 91.0;
-            const base1 = parseFloat(document.getElementById('baseIncome1').value.replace(/,/g, '')) || 0;
-            const base2 = parseFloat(document.getElementById('baseIncome2').value.replace(/,/g, '')) || 0;
-            const expense = parseFloat(document.getElementById('kidsFees').value.replace(/,/g, '')) || 0;
+            const b1 = parseFloat(document.getElementById('baseIncome1').value.replace(/,/g, '')) || 0;
+            const b2 = parseFloat(document.getElementById('baseIncome2').value.replace(/,/g, '')) || 0;
+            const exp = parseFloat(document.getElementById('kidsFees').value.replace(/,/g, '')) || 0;
             
-            let totP = 0, slabInc1 = base1, slabInc2 = base2;
-            let risky = 0;
-
+            let s1Inc = b1, s2Inc = b2;
             document.querySelectorAll('.asset-row').forEach(row => {
                 const p = parseFloat(row.querySelector('.principal').value.replace(/,/g, '')) || 0;
                 const y = parseFloat(row.querySelector('.yield').value) || 0;
-                const type = row.querySelector('.type').value;
                 const owner = row.querySelector('.owner').value;
-                const returns = (p * y) / 100;
-                
-                totP += p;
-                if (owner === "1") slabInc1 += returns; else slabInc2 += returns;
-                if (type === 'SFB' && p > 500000) risky++;
+                if (owner === "1") s1Inc += (p * y) / 100; else s2Inc += (p * y) / 100;
             });
 
-            const taxS1 = calculateSlabTax(slabInc1) - calculateSlabTax(base1);
-            const taxS2 = calculateSlabTax(slabInc2) - calculateSlabTax(base2);
+            const tax1 = calculateSlabTax(s1Inc) - calculateSlabTax(b1); // Marginal tax on interest
+            const tax2 = calculateSlabTax(s2Inc) - calculateSlabTax(b2);
             
-            const totalMonthlyNet = ((slabInc1 - base1) + (slabInc2 - base2) - taxS1 - taxS2) / 12;
-            const surplus = totalMonthlyNet - (expense / 12);
+            const totalAnnualNet = (s1Inc + s2Inc - calculateSlabTax(s1Inc) - calculateSlabTax(s2Inc));
+            const annualSurplus = totalAnnualNet - exp;
+            const monthlySurplus = annualSurplus / 12;
 
-            document.getElementById('netMonthlySurplus').innerText = isUSD ? '$' + Math.round(surplus / fx).toLocaleString('en-US') : '₹' + Math.round(surplus).toLocaleString('en-IN');
-            document.getElementById('usdEquivalent').innerText = isUSD ? "Dual-Taxpayer Breakdown" : "$" + Math.round(surplus / fx).toLocaleString('en-US') + " USD / mo";
-            document.getElementById('statTax1').innerText = isUSD ? '$' + Math.round((taxS1/12)/fx).toLocaleString('en-US') : '₹' + Math.round(taxS1/12).toLocaleString('en-IN');
-            document.getElementById('statTax2').innerText = isUSD ? '$' + Math.round((taxS2/12)/fx).toLocaleString('en-US') : '₹' + Math.round(taxS2/12).toLocaleString('en-IN');
-
-            const swr = totP > 0 ? ((totalMonthlyNet * 12) / totP) * 100 : 0;
-            let alerts = `<div class="p-3 bg-emerald-500/10 text-emerald-400 text-[10px] font-black rounded-xl border border-emerald-500/20 text-center uppercase tracking-widest mb-2">✅ Safe SWR: ${swr.toFixed(1)}%</div>`;
-            if (risky > 0) alerts += `<div class="p-3 bg-orange-500/10 text-orange-400 text-[10px] font-black rounded-xl border border-orange-500/20 text-center mb-2 uppercase">⚠️ ${risky} Banks Uninsured</div>`;
-            if (surplus < 0) alerts += `<div class="p-3 bg-red-500/10 text-red-400 text-[10px] font-black rounded-xl border border-red-500/20 text-center uppercase tracking-widest">🚨 Budget Shortfall</div>`;
-            document.getElementById('alertBox').innerHTML = alerts;
+            document.getElementById('netMonthlySurplus').innerText = isUSD ? '$' + Math.round(monthlySurplus / fx).toLocaleString('en-US') : '₹' + Math.round(monthlySurplus).toLocaleString('en-IN');
+            document.getElementById('sumGross').innerText = '₹' + (s1Inc + s2Inc).toLocaleString('en-IN');
+            document.getElementById('sumTax').innerText = '₹' + (calculateSlabTax(s1Inc) + calculateSlabTax(s2Inc)).toLocaleString('en-IN');
+            document.getElementById('sumExp').innerText = '₹' + exp.toLocaleString('en-IN');
+            
+            document.getElementById('alertBox').innerHTML = annualSurplus > 0 ? `<div class='p-3 bg-emerald-500/10 text-emerald-400 text-[10px] font-black rounded-xl border border-emerald-500/20 text-center uppercase tracking-widest'>✅ Cashflow Positive</div>` : `<div class='p-3 bg-red-500/10 text-red-400 text-[10px] font-black rounded-xl border border-red-500/20 text-center uppercase tracking-widest'>🚨 Deficit Detected</div>`;
         }
-        window.onload = function() { resetToDefaults(); updateCountdown(); };
+        window.onload = resetToDefaults;
     </script>
 </body>
 </html>
