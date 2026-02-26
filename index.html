@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shravan's Legacy & Income Command Center</title>
+    <title>Planning Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print { .no-print { display: none; } body { background: white; padding: 0; } }
@@ -15,48 +15,57 @@
 
     <div class="max-w-7xl mx-auto p-4 md:p-10 space-y-8">
         
-        <header class="bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
+        <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
             <div class="relative z-10 flex flex-col md:flex-row justify-between items-center">
                 <div class="text-center md:text-left">
-                    <h1 class="text-4xl font-black tracking-tighter italic">Legacy Dashboard</h1>
-                    <p class="text-indigo-300 font-bold uppercase tracking-widest text-[10px] mt-1">Feb 2027 Move-Back Strategy</p>
-                    <div class="mt-6 flex flex-wrap gap-3 no-print">
-                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/10 flex items-center space-x-3">
-                            <p class="text-[9px] text-indigo-200 font-bold uppercase">1 USD = ₹</p>
-                            <input type="number" id="fxRateInput" value="91.0" step="0.1" oninput="calculate()" class="bg-transparent border-b border-indigo-400 w-16 text-lg font-black outline-none focus:border-white transition-all">
+                    <h1 class="text-4xl font-black tracking-tighter italic">Planning Dashboard</h1>
+                    <p class="text-indigo-300 font-bold uppercase tracking-widest text-[10px] mt-1">Spouse-Split Wealth Strategy</p>
+                    
+                    <div class="mt-6 flex flex-wrap gap-3 no-print text-slate-900">
+                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/10 flex items-center space-x-3 text-white">
+                            <p class="text-[9px] text-indigo-200 font-bold uppercase tracking-tighter">Target Date</p>
+                            <input type="date" id="targetDate" value="2027-02-01" onchange="updateCountdown(); calculate()" class="bg-transparent border-b border-indigo-400 text-sm font-black outline-none focus:border-white transition-all invert">
                         </div>
-                        <button onclick="toggleCurrency()" id="currBtn" class="bg-indigo-600 hover:bg-indigo-500 px-6 py-2 rounded-xl font-black text-sm transition-all shadow-lg">VIEW IN USD</button>
-                        <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-xl font-black text-sm transition-all shadow-lg">EXPORT PDF</button>
+                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/10 flex items-center space-x-3 text-white">
+                            <p class="text-[9px] text-indigo-200 font-bold uppercase tracking-tighter">1 USD = ₹</p>
+                            <input type="text" id="fxRateInput" value="91.0" oninput="handleInput(this); calculate()" class="bg-transparent border-b border-indigo-400 w-16 text-lg font-black outline-none focus:border-white transition-all">
+                        </div>
+                        <button onclick="toggleCurrency()" id="currBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-xl font-black text-sm transition-all shadow-lg">VIEW IN USD</button>
+                        <button onclick="resetToDefaults()" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-xl font-black text-sm transition-all shadow-lg">RESET</button>
                     </div>
                 </div>
+                
                 <div class="mt-8 md:mt-0 grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-3xl border border-white/10 backdrop-blur">
                     <div class="text-center border-r border-white/10 pr-6">
-                        <p class="text-4xl font-black text-indigo-400">11</p>
-                        <p class="text-[10px] uppercase font-bold opacity-60 tracking-widest">Mo. to Resign</p>
+                        <p class="text-4xl font-black text-indigo-400" id="countdownMonths">--</p>
+                        <p class="text-[10px] uppercase font-bold opacity-60 tracking-widest">Months to Target</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-4xl font-black text-emerald-400">2027</p>
-                        <p class="text-[10px] uppercase font-bold opacity-60 tracking-widest">Hyd Move</p>
+                        <p class="text-4xl font-black text-emerald-400" id="targetYearDisplay">----</p>
+                        <p class="text-[10px] uppercase font-bold opacity-60 tracking-widest">Target Year</p>
                     </div>
                 </div>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
             <div class="lg:col-span-8 space-y-8">
-                
                 <section class="bg-white rounded-[2rem] p-8 card-shadow border border-slate-200">
-                    <h2 class="text-lg font-black text-slate-800 uppercase tracking-tight mb-6">1. Baseline & Local Schooling</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <h2 class="text-lg font-black text-slate-800 uppercase tracking-tight mb-6 flex items-center">
+                         <span class="mr-2">🏠</span> 1. Spouse Incomes & Budget
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Other Annual Income (₹)</label>
-                            <input type="number" id="baseIncome" value="800000" oninput="calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-black text-xl">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Spouse 1 Salary (Annual ₹)</label>
+                            <input type="text" id="baseIncome1" value="8,00,000" oninput="handleInput(this); calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-black text-xl">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Spouse 2 Salary (Annual ₹)</label>
+                            <input type="text" id="baseIncome2" value="0" oninput="handleInput(this); calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-black text-xl text-slate-400">
                         </div>
                         <div class="bg-rose-50 p-6 rounded-2xl border border-rose-100">
-                            <label class="block text-[10px] font-black text-rose-400 uppercase mb-2">Hyd School Budget (Annual ₹)</label>
-                            <input type="number" id="kidsFees" value="1050000" oninput="calculate()" class="w-full bg-transparent border-b-2 border-rose-200 focus:border-rose-500 outline-none font-black text-xl text-rose-900">
-                            <p class="text-[10px] text-rose-400 mt-2 font-bold italic">Budget for Suhaas & Adithi</p>
+                            <label class="block text-[10px] font-black text-rose-400 uppercase mb-2 font-bold">Annual Expense Budget (₹)</label>
+                            <input type="text" id="kidsFees" value="10,50,000" oninput="handleInput(this); calculate()" class="w-full bg-transparent border-b-2 border-rose-200 focus:border-rose-500 outline-none font-black text-xl text-rose-900">
                         </div>
                     </div>
                 </section>
@@ -64,18 +73,21 @@
                 <section class="bg-white rounded-[2rem] p-8 card-shadow border border-slate-200">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-lg font-black text-slate-800 uppercase tracking-tight">2. Investment Matrix</h2>
-                        <button onclick="addRow()" class="no-print bg-slate-900 text-white px-6 py-2 rounded-xl text-[10px] font-black hover:bg-indigo-600 transition-all shadow-xl">ADD ASSET</button>
+                        <button onclick="addRow()" class="no-print bg-slate-900 text-white px-6 py-2 rounded-xl text-[10px] font-black shadow-xl">ADD ASSET</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
-                            <tbody id="assetBody" class="divide-y divide-slate-50">
-                                <tr class="asset-row group">
-                                    <td class="py-4"><input type="text" value="High-Yield SFB (FD)" class="w-full p-2 bg-transparent font-bold outline-none text-sm italic"></td>
-                                    <td class="py-4"><input type="number" value="3000000" class="principal w-36 p-2 border-b-2 border-slate-100 outline-none text-sm font-black" oninput="calculate()"></td>
-                                    <td class="py-4"><input type="number" value="9.0" step="0.1" class="yield w-16 p-2 border-b-2 border-slate-100 outline-none text-sm font-bold text-indigo-600" oninput="calculate()"></td>
-                                    <td class="py-4"><select class="type p-2 bg-slate-50 rounded-lg text-[10px] font-black" onchange="calculate()"><option value="FD">FD (Slab)</option><option value="ARB">ARB (Equity)</option></select></td>
-                                    <td class="py-4 text-right no-print"><button onclick="this.closest('tr').remove(); calculate();" class="text-slate-300 hover:text-red-500">✕</button></td>
+                            <thead>
+                                <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
+                                    <th class="pb-4">Asset Name</th>
+                                    <th class="pb-4">Principal (₹)</th>
+                                    <th class="pb-4">Yield %</th>
+                                    <th class="pb-4">Asset Type</th>
+                                    <th class="pb-4 text-center">Owner</th>
+                                    <th class="pb-4 no-print"></th>
                                 </tr>
+                            </thead>
+                            <tbody id="assetBody" class="divide-y divide-slate-50">
                             </tbody>
                         </table>
                     </div>
@@ -83,38 +95,28 @@
             </div>
 
             <div class="lg:col-span-4 space-y-8 text-white">
-                
                 <div class="bg-slate-900 rounded-[2.5rem] p-10 shadow-2xl sticky top-8 space-y-8">
                     <div class="text-center space-y-2">
                         <p class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em]">Net Monthly Surplus</p>
                         <h2 class="text-5xl font-black tracking-tighter" id="netMonthlySurplus">₹0</h2>
-                        <p class="text-xs font-bold text-slate-500" id="usdEquivalent">$0.00 USD</p>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-tighter" id="usdEquivalent">$0.00 USD</p>
+                    </div>
+                    
+                    <div class="pt-8 border-t border-slate-800 space-y-6">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase text-slate-500 mb-2 tracking-widest">Monthly Tax Impact</p>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400 font-bold uppercase text-[10px]">Spouse 1:</span>
+                                <span class="font-black text-rose-400" id="statTax1">₹0</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm mt-1">
+                                <span class="text-slate-400 font-bold uppercase text-[10px]">Spouse 2:</span>
+                                <span class="font-black text-rose-400" id="statTax2">₹0</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="space-y-4 pt-8 border-t border-slate-800">
-                        <div class="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
-                            <span>Gross Interest</span>
-                            <span class="text-sm font-black text-slate-300" id="statGross">₹0</span>
-                        </div>
-                        <div class="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
-                            <span>Tax Liability</span>
-                            <span class="text-sm font-black text-rose-500" id="statTax">₹0</span>
-                        </div>
-                        <div class="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500 pb-4 border-b border-slate-800">
-                            <span>School Fund</span>
-                            <span class="text-sm font-black text-rose-300" id="statEdu">₹0</span>
-                        </div>
-                    </div>
-
-                    <div id="alertBox"></div>
-
-                    <div class="bg-white/5 p-6 rounded-3xl border border-white/10 space-y-4">
-                        <h3 class="text-[10px] font-black text-indigo-300 uppercase tracking-widest text-center">🇺🇸 US College Sinking Fund</h3>
-                        <div class="flex justify-between pt-2">
-                            <div class="text-center"><p class="text-sm font-black" id="usdCollegeMo">$850</p><p class="text-[8px] opacity-40 uppercase tracking-tighter">Mo. Need ($)</p></div>
-                            <div class="text-center"><p class="text-sm font-black text-indigo-300" id="inrCollegeMo">₹77k</p><p class="text-[8px] opacity-40 uppercase tracking-tighter">In Rupees</p></div>
-                        </div>
-                    </div>
+                    <div id="alertBox" class="pt-4"></div>
                 </div>
             </div>
         </div>
@@ -123,23 +125,74 @@
     <script>
         let isUSD = false;
 
+        const ASSET_TYPES = {
+            'SFB': { label: 'High-Yield SFB', rate: 9.0 },
+            'TRAD': { label: 'Traditional FD', rate: 7.0 },
+            'POTD': { label: 'Post Office TD', rate: 7.5 },
+            'SGB': { label: 'SGB (Interest)', rate: 2.5 },
+            'CUSTOM': { label: 'Custom Asset', rate: 5.0 }
+        };
+
+        function handleInput(el) {
+            let val = el.value.replace(/,/g, '');
+            if (val === '') return;
+            let num = parseFloat(val);
+            if (isNaN(num)) return;
+            el.value = isUSD ? num.toLocaleString('en-US') : num.toLocaleString('en-IN');
+        }
+
         function toggleCurrency() {
             isUSD = !isUSD;
             document.getElementById('currBtn').innerText = isUSD ? "VIEW IN INR" : "VIEW IN USD";
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                if (input.id !== 'fxRateInput') handleInput(input);
+            });
             calculate();
         }
 
-        function addRow() {
+        function updateCountdown() {
+            const targetDateInput = document.getElementById('targetDate').value;
+            if(!targetDateInput) return;
+            const targetDate = new Date(targetDateInput);
+            const today = new Date();
+            let months = (targetDate.getFullYear() - today.getFullYear()) * 12;
+            months -= today.getMonth();
+            months += targetDate.getMonth();
+            document.getElementById('countdownMonths').innerText = Math.max(0, months);
+            document.getElementById('targetYearDisplay').innerText = targetDate.getFullYear();
+        }
+
+        function addRow(name = "New Asset", principal = 1000000, yield = 7.5, type = "TRAD", owner = "1") {
             const tr = document.createElement('tr');
             tr.className = "asset-row group";
             tr.innerHTML = `
-                <td class="py-4"><input type="text" placeholder="Asset Name" class="w-full p-2 bg-transparent font-bold outline-none text-sm"></td>
-                <td class="py-4"><input type="number" value="1000000" class="principal w-36 p-2 border-b-2 border-slate-100 outline-none text-sm font-black" oninput="calculate()"></td>
-                <td class="py-4"><input type="number" value="7.5" step="0.1" class="yield w-16 p-2 border-b-2 border-slate-100 outline-none text-sm font-bold text-indigo-600" oninput="calculate()"></td>
-                <td class="py-4"><select class="type p-2 bg-slate-50 rounded-lg text-[10px] font-black" onchange="calculate()"><option value="FD">FD</option><option value="ARB">ARB</option></select></td>
+                <td class="py-4"><input type="text" value="${name}" class="w-full p-2 bg-transparent font-bold outline-none text-sm italic"></td>
+                <td class="py-4"><input type="text" value="${principal.toLocaleString(isUSD ? 'en-US' : 'en-IN')}" class="principal w-48 p-2 border-b-2 border-slate-100 outline-none text-sm font-black" oninput="handleInput(this); calculate()"></td>
+                <td class="py-4"><input type="number" value="${yield}" step="0.1" class="yield w-16 p-2 border-b-2 border-slate-100 outline-none text-sm font-bold text-indigo-600" oninput="calculate()"></td>
+                <td class="py-4"><select class="type p-2 bg-slate-50 rounded-lg text-[10px] font-black uppercase" onchange="calculate()">
+                    ${Object.entries(ASSET_TYPES).map(([k, v]) => `<option value="${k}" ${k === type ? 'selected' : ''}>${v.label}</option>`).join('')}
+                </select></td>
+                <td class="py-4 text-center">
+                    <select class="owner p-2 bg-slate-100 rounded-lg text-[10px] font-bold" onchange="calculate()">
+                        <option value="1" ${owner === "1" ? "selected" : ""}>S1</option>
+                        <option value="2" ${owner === "2" ? "selected" : ""}>S2</option>
+                    </select>
+                </td>
                 <td class="py-4 text-right no-print"><button onclick="this.closest('tr').remove(); calculate();" class="text-slate-300 hover:text-red-500">✕</button></td>
             `;
             document.getElementById('assetBody').appendChild(tr);
+            calculate();
+        }
+
+        function resetToDefaults() {
+            document.getElementById('assetBody').innerHTML = '';
+            addRow("Unity SFB (S1)", 3000000, 9.0, "SFB", "1");
+            addRow("Traditional FD (S2)", 2000000, 7.0, "TRAD", "2");
+            addRow("Custom Asset (S1)", 1000000, 6.0, "CUSTOM", "1");
+            document.getElementById('baseIncome1').value = "8,00,000";
+            document.getElementById('baseIncome2').value = "0";
+            document.getElementById('kidsFees').value = "10,50,000";
+            updateCountdown();
             calculate();
         }
 
@@ -155,55 +208,45 @@
             return Math.min(tax, (income - 1200000));
         }
 
-        function fmt(v, rate) {
-            if (isUSD) {
-                return '$' + (v / rate).toLocaleString('en-US', { maximumFractionDigits: 0 });
-            } else {
-                return '₹' + v.toLocaleString('en-IN', { maximumFractionDigits: 0 });
-            }
-        }
-
         function calculate() {
-            const currentFX = parseFloat(document.getElementById('fxRateInput').value) || 91.0;
-            const base = parseFloat(document.getElementById('baseIncome').value) || 0;
-            const eduGoal = parseFloat(document.getElementById('kidsFees').value) || 0;
+            const fx = parseFloat(document.getElementById('fxRateInput').value.replace(/,/g, '')) || 91.0;
+            const base1 = parseFloat(document.getElementById('baseIncome1').value.replace(/,/g, '')) || 0;
+            const base2 = parseFloat(document.getElementById('baseIncome2').value.replace(/,/g, '')) || 0;
+            const expense = parseFloat(document.getElementById('kidsFees').value.replace(/,/g, '')) || 0;
             
-            let totP = 0, fdInt = 0, arbInt = 0, risky = 0;
+            let totP = 0, slabInc1 = base1, slabInc2 = base2;
+            let risky = 0;
+
             document.querySelectorAll('.asset-row').forEach(row => {
-                const p = parseFloat(row.querySelector('.principal').value) || 0;
+                const p = parseFloat(row.querySelector('.principal').value.replace(/,/g, '')) || 0;
                 const y = parseFloat(row.querySelector('.yield').value) || 0;
                 const type = row.querySelector('.type').value;
+                const owner = row.querySelector('.owner').value;
+                const returns = (p * y) / 100;
+                
                 totP += p;
-                const r = (p * y) / 100;
-                if (type === "FD") { fdInt += r; if (p > 500000) risky++; }
-                else { arbInt += r; }
+                if (owner === "1") slabInc1 += returns; else slabInc2 += returns;
+                if (type === 'SFB' && p > 500000) risky++;
             });
 
-            const slabTax = calculateSlabTax(base + fdInt) - calculateSlabTax(base);
-            const arbTax = arbInt > 125000 ? (arbInt - 125000) * 0.125 : 0;
-            const netMonthly = (fdInt + arbInt - slabTax - arbTax) / 12;
-            const surplus = netMonthly - (eduGoal / 12);
+            const taxS1 = calculateSlabTax(slabInc1) - calculateSlabTax(base1);
+            const taxS2 = calculateSlabTax(slabInc2) - calculateSlabTax(base2);
+            
+            const totalMonthlyNet = ((slabInc1 - base1) + (slabInc2 - base2) - taxS1 - taxS2) / 12;
+            const surplus = totalMonthlyNet - (expense / 12);
 
-            document.getElementById('netMonthlySurplus').innerText = fmt(Math.round(surplus), currentFX);
-            document.getElementById('usdEquivalent').innerText = isUSD ? "Indian Numerical System (Lakhs/Crores)" : "$" + Math.round(surplus / currentFX).toLocaleString('en-US') + " USD / mo";
-            document.getElementById('statGross').innerText = fmt(Math.round((fdInt + arbInt) / 12), currentFX);
-            document.getElementById('statTax').innerText = fmt(Math.round((slabTax + arbTax) / 12), currentFX);
-            document.getElementById('statEdu').innerText = fmt(Math.round(eduGoal / 12), currentFX);
+            document.getElementById('netMonthlySurplus').innerText = isUSD ? '$' + Math.round(surplus / fx).toLocaleString('en-US') : '₹' + Math.round(surplus).toLocaleString('en-IN');
+            document.getElementById('usdEquivalent').innerText = isUSD ? "Dual-Taxpayer Breakdown" : "$" + Math.round(surplus / fx).toLocaleString('en-US') + " USD / mo";
+            document.getElementById('statTax1').innerText = isUSD ? '$' + Math.round((taxS1/12)/fx).toLocaleString('en-US') : '₹' + Math.round(taxS1/12).toLocaleString('en-IN');
+            document.getElementById('statTax2').innerText = isUSD ? '$' + Math.round((taxS2/12)/fx).toLocaleString('en-US') : '₹' + Math.round(taxS2/12).toLocaleString('en-IN');
 
-            const usdNeed = 850;
-            document.getElementById('usdCollegeMo').innerText = "$" + usdNeed.toLocaleString('en-US');
-            document.getElementById('inrCollegeMo').innerText = "₹" + Math.round(usdNeed * currentFX).toLocaleString('en-IN');
-
-            const swr = totP > 0 ? ((netMonthly * 12) / totP) * 100 : 0;
-            let alertHTML = "";
-            if (risky > 0) alertHTML += `<div class="p-3 bg-orange-500/10 text-orange-400 text-[9px] font-black rounded-xl border border-orange-500/20 text-center mb-2 uppercase">⚠️ ${risky} BANKS UNINSURED (>₹5L)</div>`;
-            if (swr > 4.5) alertHTML += `<div class="p-3 bg-red-500/10 text-red-400 text-[9px] font-black rounded-xl border border-red-500/20 text-center uppercase tracking-widest">🚨 SWR HIGH (${swr.toFixed(1)}%)</div>`;
-            else alertHTML += `<div class="p-3 bg-emerald-500/10 text-emerald-400 text-[9px] font-black rounded-xl border border-emerald-500/20 text-center tracking-widest uppercase font-black">✅ SAFE SWR: ${swr.toFixed(1)}%</div>`;
-            document.getElementById('alertBox').innerHTML = alertHTML;
+            const swr = totP > 0 ? ((totalMonthlyNet * 12) / totP) * 100 : 0;
+            let alerts = `<div class="p-3 bg-emerald-500/10 text-emerald-400 text-[10px] font-black rounded-xl border border-emerald-500/20 text-center uppercase tracking-widest mb-2">✅ Safe SWR: ${swr.toFixed(1)}%</div>`;
+            if (risky > 0) alerts += `<div class="p-3 bg-orange-500/10 text-orange-400 text-[10px] font-black rounded-xl border border-orange-500/20 text-center mb-2 uppercase">⚠️ ${risky} Banks Uninsured</div>`;
+            if (surplus < 0) alerts += `<div class="p-3 bg-red-500/10 text-red-400 text-[10px] font-black rounded-xl border border-red-500/20 text-center uppercase tracking-widest">🚨 Budget Shortfall</div>`;
+            document.getElementById('alertBox').innerHTML = alerts;
         }
-        
-        // Load default calculations immediately
-        window.onload = calculate;
+        window.onload = function() { resetToDefaults(); updateCountdown(); };
     </script>
 </body>
 </html>
