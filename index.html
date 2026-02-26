@@ -19,10 +19,10 @@
                 <div class="text-center md:text-left">
                     <h1 class="text-4xl font-black tracking-tighter italic">Legacy Dashboard</h1>
                     <p class="text-indigo-300 font-bold uppercase tracking-widest text-[10px] mt-1">Feb 2027 Move-Back Strategy</p>
-                    <div class="mt-6 flex space-x-3">
-                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/10">
-                            <p class="text-[9px] text-indigo-200 font-bold">FX RATE</p>
-                            <p class="text-lg font-black">$1 = ₹91</p>
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/10 flex items-center space-x-3">
+                            <p class="text-[9px] text-indigo-200 font-bold">1 USD = ₹</p>
+                            <input type="number" id="fxRateInput" value="91.0" step="0.1" oninput="calculate()" class="bg-transparent border-b border-indigo-400 w-16 text-lg font-black outline-none focus:border-white transition-all">
                         </div>
                         <button onclick="toggleCurrency()" id="currBtn" class="bg-indigo-500 hover:bg-indigo-400 px-6 py-2 rounded-xl font-black text-sm transition-all shadow-lg">VIEW IN USD</button>
                     </div>
@@ -56,7 +56,7 @@
                         <div class="bg-rose-50 p-6 rounded-2xl border border-rose-100">
                             <label class="block text-[10px] font-black text-rose-400 uppercase mb-2">Hyderabad Int. School Budget (Annual ₹)</label>
                             <input type="number" id="kidsFees" value="1050000" oninput="calculate()" class="w-full bg-transparent border-b-2 border-rose-200 focus:border-rose-500 outline-none font-black text-xl text-rose-900">
-                            <p class="text-[10px] text-rose-400 mt-2 font-bold italic">Estimated for 2 Children (International Baccalaureate)</p>
+                            <p class="text-[10px] text-rose-400 mt-2 font-bold italic">Estimated for 2 Children</p>
                         </div>
                     </div>
                 </section>
@@ -131,7 +131,6 @@
 
     <script>
         let isUSD = false;
-        const FX = 91.0;
 
         function toggleCurrency() {
             isUSD = !isUSD;
@@ -165,12 +164,13 @@
             return Math.min(tax, (income - 1200000));
         }
 
-        function fmt(v) {
-            if (isUSD) return '$' + (v / FX).toLocaleString('en-US', {maximumFractionDigits:0});
+        function fmt(v, rate) {
+            if (isUSD) return '$' + (v / rate).toLocaleString('en-US', {maximumFractionDigits:0});
             return '₹' + v.toLocaleString('en-IN');
         }
 
         function calculate() {
+            const currentFX = parseFloat(document.getElementById('fxRateInput').value) || 91.0;
             const base = parseFloat(document.getElementById('baseIncome').value) || 0;
             const eduGoal = parseFloat(document.getElementById('kidsFees').value) || 0;
             
@@ -190,17 +190,17 @@
             const netMonthly = (fdInt + arbInt - slabTax - arbTax) / 12;
             const surplus = netMonthly - (eduGoal / 12);
 
-            // UI
-            document.getElementById('netMonthlySurplus').innerText = fmt(Math.round(surplus));
-            document.getElementById('usdEquivalent').innerText = isUSD ? "View in INR for local context" : "$" + Math.round(surplus / FX).toLocaleString() + " USD / mo";
-            document.getElementById('statGross').innerText = fmt(Math.round((fdInt + arbInt) / 12));
-            document.getElementById('statTax').innerText = fmt(Math.round((slabTax + arbTax) / 12));
-            document.getElementById('statEdu').innerText = fmt(Math.round(eduGoal / 12));
+            // UI Updates
+            document.getElementById('netMonthlySurplus').innerText = fmt(Math.round(surplus), currentFX);
+            document.getElementById('usdEquivalent').innerText = isUSD ? "View in INR for local context" : "$" + Math.round(surplus / currentFX).toLocaleString() + " USD / mo";
+            document.getElementById('statGross').innerText = fmt(Math.round((fdInt + arbInt) / 12), currentFX);
+            document.getElementById('statTax').innerText = fmt(Math.round((slabTax + arbTax) / 12), currentFX);
+            document.getElementById('statEdu').innerText = fmt(Math.round(eduGoal / 12), currentFX);
 
             // US College Section
             const usdMonthlyNeed = 850;
             document.getElementById('usdCollegeMo').innerText = "$" + usdMonthlyNeed;
-            document.getElementById('inrCollegeMo').innerText = "₹" + Math.round(usdMonthlyNeed * FX).toLocaleString('en-IN');
+            document.getElementById('inrCollegeMo').innerText = "₹" + Math.round(usdMonthlyNeed * currentFX).toLocaleString('en-IN');
 
             // Alerts & SWR
             const swr = totP > 0 ? ((netMonthly * 12) / totP) * 100 : 0;
