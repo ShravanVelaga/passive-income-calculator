@@ -3,62 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>India Passive Income Calculator</title>
+    <title>India Portfolio & Passive Income Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-6 min-h-screen">
+<body class="bg-slate-100 p-4 md:p-8 font-sans min-h-screen">
 
-    <div class="max-w-2xl mx-auto bg-white shadow-2xl rounded-2xl p-8 mt-10">
-        <h1 class="text-3xl font-bold text-indigo-700 mb-6 text-center border-b pb-4">Passive Income Calc</h1>
-        
-        <div class="space-y-6">
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">Total Principal (₹)</label>
-                <input type="number" id="principal" value="2000000" oninput="calculate()" class="w-full p-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+    <div class="max-w-5xl mx-auto space-y-6">
+        <div class="bg-indigo-800 rounded-2xl p-6 text-white shadow-lg text-center">
+            <h1 class="text-3xl font-bold">Portfolio Passive Income Planner</h1>
+            <p class="text-indigo-200 mt-1">2026-27 New Tax Regime Optimized</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-xl p-6 shadow-md border border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">1. Annual Baseline</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Other Income (Salary/Rent) ₹</label>
+                            <input type="number" id="baseIncome" value="800000" oninput="calculatePortfolio()" class="w-full p-2 bg-slate-50 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div class="flex items-center space-x-2 pt-5">
+                            <input type="checkbox" id="isSenior" onchange="calculatePortfolio()" class="h-5 w-5 rounded border-slate-300">
+                            <label for="isSenior" class="text-sm font-bold text-slate-700">Senior Citizen (60+)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-md border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-slate-800 uppercase tracking-tight">2. Your Investment Assets</h2>
+                        <button onclick="addRow()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700">+ Add Asset</button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-slate-400 border-b">
+                                    <th class="pb-2 font-semibold">Name / Bank</th>
+                                    <th class="pb-2 font-semibold">Principal (₹)</th>
+                                    <th class="pb-2 font-semibold">Yield (%)</th>
+                                    <th class="pb-2 font-semibold text-center">Type</th>
+                                    <th class="pb-2"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="assetBody" class="divide-y divide-slate-100">
+                                <tr class="asset-row py-3">
+                                    <td class="py-3"><input type="text" value="Bank A (SFB)" class="p-2 border rounded-md w-full"></td>
+                                    <td><input type="number" value="1000000" class="principal p-2 border rounded-md w-28 md:w-40" oninput="calculatePortfolio()"></td>
+                                    <td><input type="number" value="9.0" step="0.1" class="yield p-2 border rounded-md w-16" oninput="calculatePortfolio()"></td>
+                                    <td class="text-center">
+                                        <select class="type p-2 border rounded-md bg-white" onchange="calculatePortfolio()">
+                                            <option value="FD">FD</option>
+                                            <option value="ARB">Arbitrage</option>
+                                        </select>
+                                    </td>
+                                    <td class="text-right"><button onclick="this.closest('tr').remove(); calculatePortfolio();" class="text-red-400 hover:text-red-600">✕</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div class="p-4 bg-orange-50 rounded-xl border border-orange-200">
-                    <p class="text-xs font-bold text-orange-600 uppercase">SFB FD (9%)</p>
-                    <p class="text-2xl font-black text-orange-900 mt-1" id="fdResult">₹0</p>
-                    <p class="text-[10px] text-orange-700 mt-1">Monthly In-Hand</p>
-                </div>
-                <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                    <p class="text-xs font-bold text-blue-600 uppercase">Arbitrage (7.5%)</p>
-                    <p class="text-2xl font-black text-blue-900 mt-1" id="arbResult">₹0</p>
-                    <p class="text-[10px] text-blue-700 mt-1">Monthly In-Hand</p>
-                </div>
-            </div>
+            <div class="space-y-6">
+                <div class="bg-indigo-900 text-white rounded-xl p-8 shadow-xl sticky top-8">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-indigo-300 mb-6">Consolidated Monthly Summary</h2>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-sm opacity-60">Total Gross Monthly</p>
+                            <p class="text-2xl font-black" id="totalGrossMo">₹0</p>
+                        </div>
+                        <div>
+                            <p class="text-sm opacity-60">Est. Tax Liability (Monthly)</p>
+                            <p class="text-2xl font-black text-red-400" id="totalTaxMo">₹0</p>
+                        </div>
+                        <div class="pt-6 border-t border-indigo-700">
+                            <p class="text-xs font-bold uppercase tracking-widest text-indigo-300">Net Take-Home Monthly</p>
+                            <p class="text-4xl font-black text-green-400 mt-2" id="totalNetMo">₹0</p>
+                        </div>
+                    </div>
 
-            <div class="bg-indigo-900 text-white p-4 rounded-xl">
-                <p class="text-xs opacity-70">Goal Finder: "I want ₹50,000 / month"</p>
-                <input type="number" id="target" placeholder="Enter Target ₹" oninput="calcGoal()" class="w-full bg-indigo-800 border-none rounded-lg mt-2 p-2 text-white placeholder-indigo-400">
-                <p id="goalOut" class="text-xs mt-2 font-bold text-indigo-300"></p>
+                    <div id="safetyWarning" class="mt-8"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        function calculate() {
-            const p = parseFloat(document.getElementById('principal').value) || 0;
-            
-            // Simplified Net Monthly (approx. after tax for 20L corpus)
-            const fdMonthly = (p * 0.09) / 12;
-            const arbMonthly = (p * 0.075) / 12;
-
-            document.getElementById('fdResult').innerText = "₹" + Math.round(fdMonthly).toLocaleString('en-IN');
-            document.getElementById('arbResult').innerText = "₹" + Math.round(arbMonthly).toLocaleString('en-IN');
+        function addRow() {
+            const tbody = document.getElementById('assetBody');
+            const newRow = document.createElement('tr');
+            newRow.className = "asset-row py-3 divide-y divide-slate-100";
+            newRow.innerHTML = `
+                <td class="py-3"><input type="text" placeholder="Bank Name" class="p-2 border rounded-md w-full"></td>
+                <td><input type="number" value="500000" class="principal p-2 border rounded-md w-28 md:w-40" oninput="calculatePortfolio()"></td>
+                <td><input type="number" value="7.5" step="0.1" class="yield p-2 border rounded-md w-16" oninput="calculatePortfolio()"></td>
+                <td class="text-center">
+                    <select class="type p-2 border rounded-md bg-white" onchange="calculatePortfolio()">
+                        <option value="FD">FD</option>
+                        <option value="ARB">Arbitrage</option>
+                    </select>
+                </td>
+                <td class="text-right"><button onclick="this.closest('tr').remove(); calculatePortfolio();" class="text-red-400 hover:text-red-600">✕</button></td>
+            `;
+            tbody.appendChild(newRow);
+            calculatePortfolio();
         }
 
-        function calcGoal() {
-            const t = parseFloat(document.getElementById('target').value) || 0;
-            if (t > 0) {
-                const req = (t * 12) / 0.085;
-                document.getElementById('goalOut').innerText = "Required Principal: ₹" + Math.round(req).toLocaleString('en-IN');
+        function calculateSlabTax(income) {
+            // New Regime FY 2026-27 rules (Rebate up to 12L)
+            if (income <= 1200000) return 0;
+            let tax = 0;
+            // 4-8L: 5%, 8-12L: 10%, 12-16L: 15%, 16-20L: 20%, 20-24L: 25%, 24L+: 30%
+            if (income > 400000) tax += (Math.min(income, 800000) - 400000) * 0.05;
+            if (income > 800000) tax += (Math.min(income, 1200000) - 800000) * 0.10;
+            if (income > 1200000) tax += (Math.min(income, 1600000) - 1200000) * 0.15;
+            if (income > 1600000) tax += (Math.min(income, 2000000) - 1600000) * 0.20;
+            if (income > 2000000) tax += (Math.min(income, 2400000) - 2000000) * 0.25;
+            if (income > 2400000) tax += (income - 2400000) * 0.30;
+            return Math.min(tax, (income - 1200000)); // Simple marginal relief
+        }
+
+        function calculatePortfolio() {
+            const baseInc = parseFloat(document.getElementById('baseIncome').value) || 0;
+            const isSenior = document.getElementById('isSenior').checked;
+            
+            let totalPrincipal = 0;
+            let fdInterestTotal = 0;
+            let arbGainsTotal = 0;
+            let safetyAlerts = [];
+
+            // Read all rows
+            document.querySelectorAll('.asset-row').forEach(row => {
+                const p = parseFloat(row.querySelector('.principal').value) || 0;
+                const r = parseFloat(row.querySelector('.yield').value) || 0;
+                const type = row.querySelector('.type').value;
+
+                totalPrincipal += p;
+                const annualReturn = (p * r) / 100;
+
+                if (type === "FD") {
+                    fdInterestTotal += annualReturn;
+                    if (p > 500000) safetyAlerts.push(p);
+                } else {
+                    arbGainsTotal += annualReturn;
+                }
+            });
+
+            // 1. Calculate Tax on FDs (Slab Rates)
+            const totalSlabIncome = baseInc + fdInterestTotal;
+            // Apply 80TTB for seniors if using Old Regime logic (New Regime has no 80TTB, but 12L rebate is better)
+            const taxWithInvestments = calculateSlabTax(totalSlabIncome);
+            const taxBaseline = calculateSlabTax(baseInc);
+            const netFDTax = taxWithInvestments - taxBaseline;
+
+            // 2. Calculate Tax on Arbitrage (Equity LTCG - 12.5% after 1.25L)
+            const arbTax = arbGainsTotal > 125000 ? (arbGainsTotal - 125000) * 0.125 : 0;
+
+            // Total Calculations
+            const grossAnnual = fdInterestTotal + arbGainsTotal;
+            const taxAnnual = netFDTax + arbTax;
+            const netAnnual = grossAnnual - taxAnnual;
+
+            // Update UI
+            document.getElementById('totalGrossMo').innerText = '₹' + Math.round(grossAnnual / 12).toLocaleString('en-IN');
+            document.getElementById('totalTaxMo').innerText = '₹' + Math.round(taxAnnual / 12).toLocaleString('en-IN');
+            document.getElementById('totalNetMo').innerText = '₹' + Math.round(netAnnual / 12).toLocaleString('en-IN');
+
+            // Update Safety Warning
+            const warningBox = document.getElementById('safetyWarning');
+            if (safetyAlerts.length > 0) {
+                warningBox.innerHTML = `
+                    <div class="p-4 bg-orange-400 bg-opacity-20 border border-orange-400 rounded-lg text-xs text-orange-200">
+                        ⚠️ <b>DICGC Alert:</b> ${safetyAlerts.length} bank(s) exceed the ₹5 Lakh insurance limit.
+                    </div>
+                `;
+            } else {
+                warningBox.innerHTML = "";
             }
         }
-        calculate();
+        
+        calculatePortfolio();
     </script>
 </body>
 </html>
