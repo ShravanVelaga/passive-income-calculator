@@ -3,21 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planning Dashboard - Financial Report</title>
+    <title>Master Planning Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .toggle-bg:after { content: ''; position: absolute; top: 2px; left: 2px; background: white; border: 1px solid #cbd5e1; border-radius: 99px; height: 16px; width: 16px; transition: all .3s; }
         input:checked + .toggle-bg:after { transform: translateX(20px); border-color: #4f46e5; }
         input:checked + .toggle-bg { background-color: #4f46e5; }
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; color: black !important; padding: 0 !important; }
-            .bg-slate-800, .bg-slate-900, .bg-indigo-600 { background: white !important; border: 1px solid #eee !important; color: black !important; }
-            .text-indigo-400, .text-emerald-400, .text-rose-400 { color: black !important; font-weight: bold !important; }
-            input, select { border: none !important; background: transparent !important; color: black !important; }
-            .card-shadow { box-shadow: none !important; }
-        }
+        @media print { .no-print { display: none !important; } body { background: white !important; color: black !important; } }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen p-4 md:p-10">
@@ -25,12 +18,12 @@
     <div class="max-w-6xl mx-auto space-y-8">
         <header class="flex flex-col md:flex-row justify-between items-center bg-slate-800/50 p-8 rounded-[2rem] border border-slate-700">
             <div>
-                <h1 class="text-3xl font-black tracking-tighter italic text-indigo-400 uppercase">Planning Dashboard</h1>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1 italic">Verified 2026-27 Tax Logic • Household Report</p>
+                <h1 class="text-3xl font-black tracking-tighter italic text-indigo-400 uppercase">Master Planning Dashboard</h1>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1 italic">All Inputs Restored • Auto-Save Active</p>
             </div>
             <div class="mt-4 md:mt-0 flex gap-3 no-print">
-                <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-500 px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg transition-all">Export PDF</button>
-                <button onclick="resetToZero()" class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest border border-slate-600">Clear All</button>
+                <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-500 px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg">Export PDF</button>
+                <button onclick="resetToZero()" class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest">Clear All</button>
             </div>
         </header>
 
@@ -38,15 +31,15 @@
             <div class="lg:col-span-8 space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-4">Spouse 1 Salary (Annual ₹)</label>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Spouse 1 Salary (Annual ₹)</label>
                         <input type="text" id="b1" value="0" oninput="handleInput(this); calculate(); saveToLocal()" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl font-black text-xl text-indigo-300 outline-none">
                     </div>
                     <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
-                        <label class="block text-[10px] font-black text-emerald-500 uppercase mb-4">Spouse 2 Salary (Annual ₹)</label>
+                        <label class="block text-[10px] font-black text-emerald-500 uppercase mb-4 tracking-widest">Spouse 2 Salary (Annual ₹)</label>
                         <input type="text" id="b2" value="0" oninput="handleInput(this); calculate(); saveToLocal()" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl font-black text-xl text-emerald-300 outline-none">
                     </div>
-                    <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
-                        <label class="block text-[10px] font-black text-rose-500 uppercase mb-4">Expenses (Annual ₹)</label>
+                    <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 border-rose-900/30">
+                        <label class="block text-[10px] font-black text-rose-500 uppercase mb-4 tracking-widest">Expenses (Annual ₹)</label>
                         <input type="text" id="exp" value="0" oninput="handleInput(this); calculate(); saveToLocal()" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl font-black text-xl text-rose-400 outline-none">
                     </div>
                 </div>
@@ -55,16 +48,16 @@
                     <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest mb-6 italic">Tax & Take-Home Analysis</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="space-y-3 p-6 bg-slate-900/50 rounded-2xl border border-slate-700/50">
-                            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Spouse 1</p>
+                            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Spouse 1 Summary</p>
                             <div class="flex justify-between text-xs font-bold text-slate-500"><span>Gross:</span><span id="s1_gross">₹0</span></div>
                             <div class="flex justify-between text-xs font-bold text-rose-400"><span>Tax:</span><span id="s1_tax">₹0</span></div>
-                            <div class="flex justify-between text-sm font-black text-emerald-400 pt-2 border-t border-slate-700"><span>Annual Net:</span><span id="s1_net">₹0</span></div>
+                            <div class="flex justify-between text-sm font-black text-emerald-400 pt-2 border-t border-slate-700"><span>Net Income:</span><span id="s1_net">₹0</span></div>
                         </div>
                         <div class="space-y-3 p-6 bg-slate-900/50 rounded-2xl border border-slate-700/50">
-                            <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Spouse 2</p>
+                            <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Spouse 2 Summary</p>
                             <div class="flex justify-between text-xs font-bold text-slate-500"><span>Gross:</span><span id="s2_gross">₹0</span></div>
                             <div class="flex justify-between text-xs font-bold text-rose-400"><span>Tax:</span><span id="s2_tax">₹0</span></div>
-                            <div class="flex justify-between text-sm font-black text-emerald-400 pt-2 border-t border-slate-700"><span>Annual Net:</span><span id="s2_net">₹0</span></div>
+                            <div class="flex justify-between text-sm font-black text-emerald-400 pt-2 border-t border-slate-700"><span>Net Income:</span><span id="s2_net">₹0</span></div>
                         </div>
                     </div>
                 </div>
@@ -73,13 +66,12 @@
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">Investment Matrix</h3>
                         <div class="flex gap-2 no-print">
-                            <select id="categorySelector" class="bg-slate-700 text-[9px] font-bold uppercase p-2 rounded-xl outline-none border border-slate-600">
-                                <option value="FD_MAJ" data-rate="7.0">FD (Major Bank)</option>
-                                <option value="FD_SFB" data-rate="8.5">Small Finance Bank</option>
-                                <option value="GOVT" data-rate="7.5">Post Office / Govt</option>
-                                <option value="BOND" data-rate="10.0">Corporate Bonds</option>
-                                <option value="RENT" data-rate="3.0">Rental Property</option>
-                                <option value="GOLD" data-rate="2.5">Gold (SGB)</option>
+                            <select id="categorySelector" class="bg-slate-700 text-[9px] font-bold uppercase p-2 rounded-xl border border-slate-600">
+                                <option value="7.0">FD (Major Bank)</option>
+                                <option value="8.5">Small Finance Bank</option>
+                                <option value="7.5">Post Office / Govt</option>
+                                <option value="10.0">Corporate Bonds</option>
+                                <option value="3.5">Rental Property</option>
                             </select>
                             <button onclick="addCategorizedRow()" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest">+ Add</button>
                         </div>
@@ -93,15 +85,19 @@
                     <p class="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1">Monthly Surplus</p>
                     <h2 class="text-5xl font-black tracking-tighter" id="monthlySurplusDisplay">₹0</h2>
                     <div class="grid grid-cols-2 gap-2 mt-4">
-                        <div class="bg-black/20 p-3 rounded-2xl text-center"><p class="text-[8px] font-bold text-indigo-200 uppercase">To FD</p><p class="text-xs font-black" id="fdVal">₹0</p></div>
-                        <div class="bg-black/20 p-3 rounded-2xl text-center"><p class="text-[8px] font-bold text-emerald-200 uppercase">To SIP</p><p class="text-xs font-black text-emerald-300" id="sipVal">₹0</p></div>
+                        <div class="bg-black/20 p-3 rounded-2xl text-center"><p class="text-[8px] font-bold text-indigo-200">TO FD</p><p class="text-xs font-black" id="fdVal">₹0</p></div>
+                        <div class="bg-black/20 p-3 rounded-2xl text-center"><p class="text-[8px] font-bold text-emerald-200">TO SIP</p><p class="text-xs font-black text-emerald-300" id="sipVal">₹0</p></div>
                     </div>
                 </div>
 
                 <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 space-y-6">
-                    <h3 class="text-[10px] font-black uppercase text-indigo-400 tracking-widest">Strategy</h3>
+                    <h3 class="text-[10px] font-black uppercase text-indigo-400 tracking-widest">Strategy & Variables</h3>
                     <div class="space-y-4">
-                        <div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[8px] text-slate-500 uppercase mb-1">SIP Returns %</label><input type="number" id="sipRet" value="12" oninput="calculate(); saveToLocal()" class="w-full bg-slate-900 p-2 rounded-xl text-indigo-300 font-bold outline-none border border-slate-700"></div>
+                            <div><label class="block text-[8px] text-slate-500 uppercase mb-1">Inflation %</label><input type="number" id="infRet" value="5" oninput="calculate(); saveToLocal()" class="w-full bg-slate-900 p-2 rounded-xl text-rose-300 font-bold outline-none border border-slate-700"></div>
+                        </div>
+                        <div class="pt-4 border-t border-slate-700/50">
                             <div class="flex justify-between mb-2"><label class="text-[9px] font-black text-slate-400 uppercase">FD Reinvest</label><span class="text-[9px] font-black text-indigo-400" id="fdLabel">40%</span></div>
                             <input type="range" id="fdRate" min="0" max="100" value="40" oninput="validateSplit('fd'); calculate(); saveToLocal()" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500 no-print">
                         </div>
@@ -148,7 +144,7 @@
 
         function addCategorizedRow() {
             const selector = document.getElementById('categorySelector');
-            addRow(selector.options[selector.selectedIndex].text, 0, parseFloat(selector.options[selector.selectedIndex].getAttribute('data-rate')));
+            addRow(selector.options[selector.selectedIndex].text, 0, parseFloat(selector.value));
             saveToLocal();
         }
 
@@ -156,7 +152,7 @@
             const tr = document.createElement('tr');
             tr.className = "asset-row";
             tr.innerHTML = `
-                <td class="py-4"><input type="text" value="${name}" class="name_in bg-transparent font-bold text-[10px] outline-none w-24 italic text-slate-400"></td>
+                <td class="py-4"><input type="text" value="${name}" oninput="saveToLocal()" class="name_in bg-transparent font-bold text-[10px] outline-none w-24 italic text-slate-400"></td>
                 <td class="py-4"><input type="text" value="${principal.toLocaleString('en-IN')}" class="p_in bg-transparent border-b border-slate-700 font-black text-xs w-28 outline-none text-indigo-300" oninput="handleInput(this); calculate(); saveToLocal()"></td>
                 <td class="py-4"><input type="number" value="${yield}" class="y_in bg-transparent border-b border-slate-700 font-black text-xs w-10 outline-none text-emerald-400" oninput="calculate(); saveToLocal()"></td>
                 <td class="py-4"><select class="o_in bg-slate-700 p-1 rounded font-bold text-[9px]" onchange="calculate(); saveToLocal()"><option value="1" ${owner==="1"?"selected":""}>Spouse 1</option><option value="2" ${owner==="2"?"selected":""}>Spouse 2</option></select></td>
@@ -182,15 +178,16 @@
             const exp = parseFloat(document.getElementById('exp').value.replace(/,/g, '')) || 0;
             const fdPct = parseInt(document.getElementById('fdRate').value) / 100;
             const sipPct = parseInt(document.getElementById('sipRate').value) / 100;
+            const sipRet = parseFloat(document.getElementById('sipRet').value) / 100;
+            const infRate = parseFloat(document.getElementById('infRet').value) / 100;
             const isAdj = document.getElementById('adjToggle').checked;
 
             let totP = 0, s1G = b1, s2G = b2, avgY = 0;
             document.querySelectorAll('.asset-row').forEach(row => {
                 const p = parseFloat(row.querySelector('.p_in').value.replace(/,/g, '')) || 0;
                 const y = parseFloat(row.querySelector('.y_in').value) || 0;
-                const o = row.querySelector('.o_in').value;
                 totP += p; avgY += (p/100)*y;
-                if (o === "1") s1G += (p*y)/100; else s2G += (p*y)/100;
+                if (row.querySelector('.o_in').value === "1") s1G += (p*y)/100; else s2G += (p*y)/100;
             });
 
             const t1 = calculateTax(s1G, b1 > 0); const t2 = calculateTax(s2G, b2 > 0);
@@ -211,10 +208,10 @@
                 let cFD = totP; let cSIP = 0;
                 for (let i = 1; i <= yr; i++) {
                     cFD = (cFD + (netM * fdPct * 12)) * (1 + yrR);
-                    cSIP = (cSIP + (netM * sipPct * 12)) * (1.12);
+                    cSIP = (cSIP + (netM * sipPct * 12)) * (1 + sipRet);
                 }
                 let total = cFD + cSIP;
-                if (isAdj) total = total / Math.pow(1.05, yr);
+                if (isAdj) total = total / Math.pow(1 + infRate, yr);
                 html += `<div class="flex justify-between items-center py-2 border-b border-slate-700/50"><span class="text-[9px] font-bold text-slate-500 uppercase">${yr} Years</span><span class="text-sm font-black text-emerald-400">₹${Math.round(total/10000000).toLocaleString('en-IN')} Cr</span></div>`;
             });
             document.getElementById('forecastTable').innerHTML = html || "Add data for forecast";
@@ -224,27 +221,30 @@
         function saveToLocal() {
             const data = {
                 b1: document.getElementById('b1').value, b2: document.getElementById('b2').value, exp: document.getElementById('exp').value,
-                fdRate: document.getElementById('fdRate').value, sipRate: document.getElementById('sipRate').value, adjToggle: document.getElementById('adjToggle').checked,
-                assets: []
+                fdRate: document.getElementById('fdRate').value, sipRate: document.getElementById('sipRate').value,
+                sipRet: document.getElementById('sipRet').value, infRet: document.getElementById('infRet').value,
+                adjToggle: document.getElementById('adjToggle').checked, assets: []
             };
             document.querySelectorAll('.asset-row').forEach(row => {
                 data.assets.push({ name: row.querySelector('.name_in').value, p: row.querySelector('.p_in').value, y: row.querySelector('.y_in').value, o: row.querySelector('.o_in').value });
             });
-            localStorage.setItem('shravan_plan_v2', JSON.stringify(data));
+            localStorage.setItem('shravan_master_v3', JSON.stringify(data));
         }
 
         function loadFromLocal() {
-            const saved = localStorage.getItem('shravan_plan_v2');
+            const saved = localStorage.getItem('shravan_master_v3');
             if (!saved) return;
             const data = JSON.parse(saved);
             document.getElementById('b1').value = data.b1; document.getElementById('b2').value = data.b2; document.getElementById('exp').value = data.exp;
-            document.getElementById('fdRate').value = data.fdRate; document.getElementById('sipRate').value = data.sipRate; document.getElementById('adjToggle').checked = data.adjToggle;
+            document.getElementById('fdRate').value = data.fdRate; document.getElementById('sipRate').value = data.sipRate;
+            document.getElementById('sipRet').value = data.sipRet; document.getElementById('infRet').value = data.infRet;
+            document.getElementById('adjToggle').checked = data.adjToggle;
             document.getElementById('assetBody').innerHTML = '';
             data.assets.forEach(a => addRow(a.name, parseFloat(a.p.replace(/,/g,'')), parseFloat(a.y), a.o));
             validateSplit('fd'); calculate();
         }
 
-        function resetToZero() { localStorage.removeItem('shravan_plan_v2'); location.reload(); }
+        function resetToZero() { localStorage.removeItem('shravan_master_v3'); location.reload(); }
         window.onload = loadFromLocal;
     </script>
 </body>
