@@ -19,10 +19,10 @@
         <header class="flex flex-col md:flex-row justify-between items-center bg-slate-800/50 p-8 rounded-[2rem] border border-slate-700">
             <div>
                 <h1 class="text-3xl font-black tracking-tighter italic text-indigo-400 uppercase">Master Planning Dashboard</h1>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1 italic">All Inputs Restored • Auto-Save Active</p>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1 italic">Tax-Free Toggle & Custom Assets Enabled</p>
             </div>
             <div class="mt-4 md:mt-0 flex gap-3 no-print">
-                <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-500 px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg">Export PDF</button>
+                <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-500 px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg transition-all">Export PDF</button>
                 <button onclick="resetToZero()" class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest">Clear All</button>
             </div>
         </header>
@@ -38,26 +38,27 @@
                         <label class="block text-[10px] font-black text-emerald-500 uppercase mb-4 tracking-widest">Spouse 2 Salary (Annual ₹)</label>
                         <input type="text" id="b2" value="0" oninput="handleInput(this); calculate(); saveToLocal()" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl font-black text-xl text-emerald-300 outline-none">
                     </div>
-                    <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 border-rose-900/30">
+                    <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
                         <label class="block text-[10px] font-black text-rose-500 uppercase mb-4 tracking-widest">Expenses (Annual ₹)</label>
                         <input type="text" id="exp" value="0" oninput="handleInput(this); calculate(); saveToLocal()" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl font-black text-xl text-rose-400 outline-none">
                     </div>
                 </div>
 
                 <div class="bg-slate-800 p-8 rounded-[2rem] border border-slate-700">
-                    <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest mb-6 italic">Tax & Take-Home Analysis</h3>
+                    <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest mb-6 italic">Detailed Tax & Take-Home Analysis</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="space-y-3 p-6 bg-slate-900/50 rounded-2xl border border-slate-700/50">
-                            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Spouse 1 Summary</p>
-                            <div class="flex justify-between text-xs font-bold text-slate-500"><span>Gross:</span><span id="s1_gross">₹0</span></div>
-                            <div class="flex justify-between text-xs font-bold text-rose-400"><span>Tax:</span><span id="s1_tax">₹0</span></div>
-                            <div class="flex justify-between text-sm font-black text-emerald-400 pt-2 border-t border-slate-700"><span>Net Income:</span><span id="s1_net">₹0</span></div>
+                            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Spouse 1 Audit</p>
+                            <div class="flex justify-between text-xs font-bold text-slate-500"><span>Total Gross (Reported):</span><span id="s1_gross">₹0</span></div>
+                            <div class="flex justify-between text-[9px] text-slate-600 italic"><span>Std. Deduction (Fixed):</span><span>- ₹75,000</span></div>
+                            <div class="flex justify-between text-xs font-bold text-rose-400 border-t border-slate-800 pt-2"><span>Estimated Income Tax:</span><span id="s1_tax">₹0</span></div>
+                            <div class="flex justify-between text-sm font-black text-emerald-400 pt-1"><span>Net In-Hand (Annual):</span><span id="s1_net">₹0</span></div>
                         </div>
                         <div class="space-y-3 p-6 bg-slate-900/50 rounded-2xl border border-slate-700/50">
-                            <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Spouse 2 Summary</p>
-                            <div class="flex justify-between text-xs font-bold text-slate-500"><span>Gross:</span><span id="s2_gross">₹0</span></div>
-                            <div class="flex justify-between text-xs font-bold text-rose-400"><span>Tax:</span><span id="s2_tax">₹0</span></div>
-                            <div class="flex justify-between text-sm font-black text-emerald-400 pt-2 border-t border-slate-700"><span>Net Income:</span><span id="s2_net">₹0</span></div>
+                            <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Spouse 2 Audit</p>
+                            <div class="flex justify-between text-xs font-bold text-slate-500"><span>Total Gross (Reported):</span><span id="s2_gross">₹0</span></div>
+                            <div class="flex justify-between text-xs font-bold text-rose-400 border-t border-slate-800 pt-2"><span>Estimated Income Tax:</span><span id="s2_tax">₹0</span></div>
+                            <div class="flex justify-between text-sm font-black text-emerald-400 pt-1"><span>Net In-Hand (Annual):</span><span id="s2_net">₹0</span></div>
                         </div>
                     </div>
                 </div>
@@ -69,20 +70,34 @@
                             <select id="categorySelector" class="bg-slate-700 text-[9px] font-bold uppercase p-2 rounded-xl border border-slate-600">
                                 <option value="7.0">FD (Major Bank)</option>
                                 <option value="8.5">Small Finance Bank</option>
-                                <option value="7.5">Post Office / Govt</option>
-                                <option value="10.0">Corporate Bonds</option>
+                                <option value="7.5">Govt Schemes</option>
                                 <option value="3.5">Rental Property</option>
+                                <option value="0.0">Custom Asset</option>
                             </select>
                             <button onclick="addCategorizedRow()" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest">+ Add</button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto"><table class="w-full text-left"><tbody id="assetBody" class="divide-y divide-slate-700"></tbody></table></div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="text-[9px] text-slate-500 uppercase tracking-widest border-b border-slate-700">
+                                <tr>
+                                    <th class="pb-2">Name / Category</th>
+                                    <th class="pb-2">Principal</th>
+                                    <th class="pb-2 text-center">ROI %</th>
+                                    <th class="pb-2">Owner</th>
+                                    <th class="pb-2 text-center">Tax Free?</th>
+                                    <th class="pb-2 no-print"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="assetBody" class="divide-y divide-slate-700"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <div class="lg:col-span-4 space-y-6">
                 <div class="bg-indigo-600 p-8 rounded-[2.5rem] shadow-2xl space-y-4 text-center">
-                    <p class="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1">Monthly Surplus</p>
+                    <p class="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1 italic">Monthly Surplus</p>
                     <h2 class="text-5xl font-black tracking-tighter" id="monthlySurplusDisplay">₹0</h2>
                     <div class="grid grid-cols-2 gap-2 mt-4">
                         <div class="bg-black/20 p-3 rounded-2xl text-center"><p class="text-[8px] font-bold text-indigo-200">TO FD</p><p class="text-xs font-black" id="fdVal">₹0</p></div>
@@ -91,30 +106,25 @@
                 </div>
 
                 <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 space-y-6">
-                    <h3 class="text-[10px] font-black uppercase text-indigo-400 tracking-widest">Strategy & Variables</h3>
+                    <h3 class="text-[10px] font-black uppercase text-indigo-400 tracking-widest italic">Reinvestment Strategy</h3>
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-[8px] text-slate-500 uppercase mb-1">SIP Returns %</label><input type="number" id="sipRet" value="12" oninput="calculate(); saveToLocal()" class="w-full bg-slate-900 p-2 rounded-xl text-indigo-300 font-bold outline-none border border-slate-700"></div>
-                            <div><label class="block text-[8px] text-slate-500 uppercase mb-1">Inflation %</label><input type="number" id="infRet" value="5" oninput="calculate(); saveToLocal()" class="w-full bg-slate-900 p-2 rounded-xl text-rose-300 font-bold outline-none border border-slate-700"></div>
+                            <div><label class="text-[8px] text-slate-500 uppercase">SIP Returns %</label><input type="number" id="sipRet" value="12" oninput="calculate(); saveToLocal()" class="w-full bg-slate-900 p-2 rounded-xl text-indigo-300 font-bold border border-slate-700"></div>
+                            <div><label class="text-[8px] text-slate-500 uppercase">Inflation %</label><input type="number" id="infRet" value="5" oninput="calculate(); saveToLocal()" class="w-full bg-slate-900 p-2 rounded-xl text-rose-300 font-bold border border-slate-700"></div>
                         </div>
-                        <div class="pt-4 border-t border-slate-700/50">
-                            <div class="flex justify-between mb-2"><label class="text-[9px] font-black text-slate-400 uppercase">FD Reinvest</label><span class="text-[9px] font-black text-indigo-400" id="fdLabel">40%</span></div>
-                            <input type="range" id="fdRate" min="0" max="100" value="40" oninput="validateSplit('fd'); calculate(); saveToLocal()" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500 no-print">
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-2"><label class="text-[9px] font-black text-slate-400 uppercase">SIP Reinvest</label><span class="text-[9px] font-black text-emerald-400" id="sipLabel">40%</span></div>
-                            <input type="range" id="sipRate" min="0" max="100" value="40" oninput="validateSplit('sip'); calculate(); saveToLocal()" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500 no-print">
-                        </div>
+                        <div class="flex justify-between mb-2"><label class="text-[9px] font-black text-slate-400 uppercase">FD Split</label><span class="text-[9px] font-black text-indigo-400" id="fdLabel">40%</span></div>
+                        <input type="range" id="fdRate" min="0" max="100" value="40" oninput="validateSplit('fd'); calculate(); saveToLocal()" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500 no-print">
+                        <div class="flex justify-between mb-2"><label class="text-[9px] font-black text-slate-400 uppercase">SIP Split</label><span class="text-[9px] font-black text-emerald-400" id="sipLabel">40%</span></div>
+                        <input type="range" id="sipRate" min="0" max="100" value="40" oninput="validateSplit('sip'); calculate(); saveToLocal()" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500 no-print">
                     </div>
                 </div>
                 
                 <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Wealth Forecast</h3>
+                        <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">30-Year Wealth Path</h3>
                         <label class="relative inline-flex items-center cursor-pointer no-print">
                             <input type="checkbox" id="adjToggle" class="sr-only peer" onchange="calculate(); saveToLocal()">
                             <div class="w-10 h-5 bg-slate-700 rounded-full toggle-bg"></div>
-                            <span class="ml-2 text-[8px] font-black text-slate-500 italic uppercase">Inflation Adj</span>
                         </label>
                     </div>
                     <div id="forecastTable" class="space-y-3"></div>
@@ -148,14 +158,15 @@
             saveToLocal();
         }
 
-        function addRow(name="Asset", principal=0, yield=0, owner="1") {
+        function addRow(name="Asset", p=0, y=0, o="1", isTaxFree=false) {
             const tr = document.createElement('tr');
             tr.className = "asset-row";
             tr.innerHTML = `
-                <td class="py-4"><input type="text" value="${name}" oninput="saveToLocal()" class="name_in bg-transparent font-bold text-[10px] outline-none w-24 italic text-slate-400"></td>
-                <td class="py-4"><input type="text" value="${principal.toLocaleString('en-IN')}" class="p_in bg-transparent border-b border-slate-700 font-black text-xs w-28 outline-none text-indigo-300" oninput="handleInput(this); calculate(); saveToLocal()"></td>
-                <td class="py-4"><input type="number" value="${yield}" class="y_in bg-transparent border-b border-slate-700 font-black text-xs w-10 outline-none text-emerald-400" oninput="calculate(); saveToLocal()"></td>
-                <td class="py-4"><select class="o_in bg-slate-700 p-1 rounded font-bold text-[9px]" onchange="calculate(); saveToLocal()"><option value="1" ${owner==="1"?"selected":""}>Spouse 1</option><option value="2" ${owner==="2"?"selected":""}>Spouse 2</option></select></td>
+                <td class="py-4"><input type="text" value="${name}" class="name_in bg-transparent font-bold text-[10px] outline-none w-24 italic text-slate-400"></td>
+                <td class="py-4"><input type="text" value="${p.toLocaleString('en-IN')}" class="p_in bg-transparent border-b border-slate-700 font-black text-xs w-24 outline-none text-indigo-300" oninput="handleInput(this); calculate(); saveToLocal()"></td>
+                <td class="py-4 text-center"><input type="number" value="${y}" class="y_in bg-transparent border-b border-slate-700 font-black text-xs w-8 outline-none text-emerald-400" oninput="calculate(); saveToLocal()"></td>
+                <td class="py-4"><select class="o_in bg-slate-700 p-1 rounded font-bold text-[9px]" onchange="calculate(); saveToLocal()"><option value="1" ${o==="1"?"selected":""}>Spouse 1</option><option value="2" ${o==="2"?"selected":""}>Spouse 2</option></select></td>
+                <td class="py-4 text-center"><input type="checkbox" class="tf_in h-3 w-3 rounded accent-indigo-500" ${isTaxFree?"checked":""} onchange="calculate(); saveToLocal()"></td>
                 <td class="py-4 text-right no-print"><button onclick="this.closest('tr').remove(); calculate(); saveToLocal()" class="text-slate-600 hover:text-rose-500 font-bold">✕</button></td>
             `;
             document.getElementById('assetBody').appendChild(tr);
@@ -178,44 +189,47 @@
             const exp = parseFloat(document.getElementById('exp').value.replace(/,/g, '')) || 0;
             const fdPct = parseInt(document.getElementById('fdRate').value) / 100;
             const sipPct = parseInt(document.getElementById('sipRate').value) / 100;
-            const sipRet = parseFloat(document.getElementById('sipRet').value) / 100;
-            const infRate = parseFloat(document.getElementById('infRet').value) / 100;
+            const sipR = parseFloat(document.getElementById('sipRet').value) / 100;
+            const inf = parseFloat(document.getElementById('infRet').value) / 100;
             const isAdj = document.getElementById('adjToggle').checked;
 
-            let totP = 0, s1G = b1, s2G = b2, avgY = 0;
+            let totP = 0, s1G = b1, s2G = b2, totalYieldAmt = 0;
             document.querySelectorAll('.asset-row').forEach(row => {
                 const p = parseFloat(row.querySelector('.p_in').value.replace(/,/g, '')) || 0;
                 const y = parseFloat(row.querySelector('.y_in').value) || 0;
-                totP += p; avgY += (p/100)*y;
-                if (row.querySelector('.o_in').value === "1") s1G += (p*y)/100; else s2G += (p*y)/100;
+                const o = row.querySelector('.o_in').value;
+                const isTF = row.querySelector('.tf_in').checked;
+                const yieldAmt = (p * y) / 100;
+                totP += p; 
+                totalYieldAmt += yieldAmt;
+                if (!isTF) { if (o === "1") s1G += yieldAmt; else s2G += yieldAmt; }
             });
 
             const t1 = calculateTax(s1G, b1 > 0); const t2 = calculateTax(s2G, b2 > 0);
-            document.getElementById('s1_net').innerText = '₹'+Math.round(s1G-t1).toLocaleString('en-IN');
+            document.getElementById('s1_net').innerText = '₹'+Math.round(s1G - t1).toLocaleString('en-IN');
             document.getElementById('s1_gross').innerText = '₹'+Math.round(s1G).toLocaleString('en-IN');
             document.getElementById('s1_tax').innerText = '₹'+Math.round(t1).toLocaleString('en-IN');
+            document.getElementById('s2_net').innerText = '₹'+Math.round(s2G - t2).toLocaleString('en-IN');
             document.getElementById('s2_gross').innerText = '₹'+Math.round(s2G).toLocaleString('en-IN');
             document.getElementById('s2_tax').innerText = '₹'+Math.round(t2).toLocaleString('en-IN');
-            document.getElementById('s2_net').innerText = '₹'+Math.round(s2G-t2).toLocaleString('en-IN');
 
-            const netM = (s1G + s2G - t1 - t2 - exp) / 12;
-            document.getElementById('monthlySurplusDisplay').innerText = '₹'+Math.max(0, Math.round(netM)).toLocaleString('en-IN');
-            document.getElementById('fdVal').innerText = '₹'+Math.round(Math.max(0, netM*fdPct)).toLocaleString('en-IN');
-            document.getElementById('sipVal').innerText = '₹'+Math.round(Math.max(0, netM*sipPct)).toLocaleString('en-IN');
+            const netMonthly = (b1 + b2 + totalYieldAmt - t1 - t2 - exp) / 12;
+            document.getElementById('monthlySurplusDisplay').innerText = '₹'+Math.max(0, Math.round(netMonthly)).toLocaleString('en-IN');
+            document.getElementById('fdVal').innerText = '₹'+Math.round(Math.max(0, netMonthly * fdPct)).toLocaleString('en-IN');
+            document.getElementById('sipVal').innerText = '₹'+Math.round(Math.max(0, netMonthly * sipPct)).toLocaleString('en-IN');
 
-            let html = ""; const yrR = totP > 0 ? (avgY/totP) : 0.07;
+            let html = ""; const matrixR = totP > 0 ? (totalYieldAmt / totP) : 0.07;
             [5, 10, 15, 20, 25, 30].forEach(yr => {
                 let cFD = totP; let cSIP = 0;
                 for (let i = 1; i <= yr; i++) {
-                    cFD = (cFD + (netM * fdPct * 12)) * (1 + yrR);
-                    cSIP = (cSIP + (netM * sipPct * 12)) * (1 + sipRet);
+                    cFD = (cFD + (netMonthly * fdPct * 12)) * (1 + matrixR);
+                    cSIP = (cSIP + (netMonthly * sipPct * 12)) * (1 + sipR);
                 }
                 let total = cFD + cSIP;
-                if (isAdj) total = total / Math.pow(1 + infRate, yr);
+                if (isAdj) total = total / Math.pow(1 + inf, yr);
                 html += `<div class="flex justify-between items-center py-2 border-b border-slate-700/50"><span class="text-[9px] font-bold text-slate-500 uppercase">${yr} Years</span><span class="text-sm font-black text-emerald-400">₹${Math.round(total/10000000).toLocaleString('en-IN')} Cr</span></div>`;
             });
-            document.getElementById('forecastTable').innerHTML = html || "Add data for forecast";
-            document.getElementById('audit').innerText = `Total Tax: ₹${Math.round(t1+t2).toLocaleString('en-IN')} | Yield: ${(yrR*100).toFixed(1)}%`;
+            document.getElementById('forecastTable').innerHTML = html;
         }
 
         function saveToLocal() {
@@ -223,28 +237,28 @@
                 b1: document.getElementById('b1').value, b2: document.getElementById('b2').value, exp: document.getElementById('exp').value,
                 fdRate: document.getElementById('fdRate').value, sipRate: document.getElementById('sipRate').value,
                 sipRet: document.getElementById('sipRet').value, infRet: document.getElementById('infRet').value,
-                adjToggle: document.getElementById('adjToggle').checked, assets: []
+                adj: document.getElementById('adjToggle').checked, assets: []
             };
             document.querySelectorAll('.asset-row').forEach(row => {
-                data.assets.push({ name: row.querySelector('.name_in').value, p: row.querySelector('.p_in').value, y: row.querySelector('.y_in').value, o: row.querySelector('.o_in').value });
+                data.assets.push({ n: row.querySelector('.name_in').value, p: row.querySelector('.p_in').value, y: row.querySelector('.y_in').value, o: row.querySelector('.o_in').value, tf: row.querySelector('.tf_in').checked });
             });
-            localStorage.setItem('shravan_master_v3', JSON.stringify(data));
+            localStorage.setItem('master_plan_shravan', JSON.stringify(data));
         }
 
         function loadFromLocal() {
-            const saved = localStorage.getItem('shravan_master_v3');
+            const saved = localStorage.getItem('master_plan_shravan');
             if (!saved) return;
-            const data = JSON.parse(saved);
-            document.getElementById('b1').value = data.b1; document.getElementById('b2').value = data.b2; document.getElementById('exp').value = data.exp;
-            document.getElementById('fdRate').value = data.fdRate; document.getElementById('sipRate').value = data.sipRate;
-            document.getElementById('sipRet').value = data.sipRet; document.getElementById('infRet').value = data.infRet;
-            document.getElementById('adjToggle').checked = data.adjToggle;
+            const d = JSON.parse(saved);
+            document.getElementById('b1').value = d.b1; document.getElementById('b2').value = d.b2; document.getElementById('exp').value = d.exp;
+            document.getElementById('fdRate').value = d.fdRate; document.getElementById('sipRate').value = d.sipRate;
+            document.getElementById('sipRet').value = d.sipRet; document.getElementById('infRet').value = d.infRet;
+            document.getElementById('adjToggle').checked = d.adj;
             document.getElementById('assetBody').innerHTML = '';
-            data.assets.forEach(a => addRow(a.name, parseFloat(a.p.replace(/,/g,'')), parseFloat(a.y), a.o));
-            validateSplit('fd'); calculate();
+            d.assets.forEach(a => addRow(a.n, parseFloat(a.p.replace(/,/g,'')), parseFloat(a.y), a.o, a.tf));
+            calculate();
         }
 
-        function resetToZero() { localStorage.removeItem('shravan_master_v3'); location.reload(); }
+        function resetToZero() { localStorage.removeItem('master_plan_shravan'); location.reload(); }
         window.onload = loadFromLocal;
     </script>
 </body>
