@@ -1,265 +1,946 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Planning Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .toggle-bg:after { content: ''; position: absolute; top: 2px; left: 2px; background: white; border: 1px solid #cbd5e1; border-radius: 99px; height: 16px; width: 16px; transition: all .3s; }
-        input:checked + .toggle-bg:after { transform: translateX(20px); border-color: #4f46e5; }
-        input:checked + .toggle-bg { background-color: #4f46e5; }
-        @media print { .no-print { display: none !important; } body { background: white !important; color: black !important; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Planning Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F7F4EF; --surface:#FFFFFF; --border:#E8E2D9;
+  --text:#1C1917; --muted:#78716C; --faint:#A8A29E;
+  --teal:#0D9488; --teal-lt:#CCFBF1; --teal-dk:#0F766E;
+  --amber:#D97706; --amber-lt:#FEF3C7;
+  --rose:#E11D48;  --rose-lt:#FFE4E6;
+  --indigo:#4F46E5; --indigo-lt:#EEF2FF;
+  --green:#16A34A; --green-lt:#DCFCE7;
+  --purple:#7C3AED; --purple-lt:#EDE9FE;
+}
+*{font-family:'DM Sans',sans-serif;box-sizing:border-box;margin:0;padding:0;}
+.mono{font-family:'DM Mono',monospace;}
+body{background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;}
+.inset{background:var(--bg);border:1px solid var(--border);border-radius:12px;}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);}
+
+/* Inputs */
+.field-input{width:100%;background:transparent;border:none;border-bottom:2px solid var(--border);font-family:'DM Mono',monospace;font-size:1.35rem;font-weight:500;color:var(--text);outline:none;padding-bottom:4px;transition:border-color .2s;}
+.field-input:focus{border-color:var(--teal);}
+.small-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:0.9rem;font-weight:500;color:var(--text);outline:none;padding:8px 12px;transition:border-color .2s;}
+.small-input:focus{border-color:var(--teal);}
+
+/* Sliders */
+input[type=range]{-webkit-appearance:none;height:5px;border-radius:99px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:99px;cursor:pointer;transition:transform .15s;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.15);}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
+#fdRangeInput::-webkit-slider-thumb{background:var(--indigo);}
+#sipRangeInput::-webkit-slider-thumb{background:var(--teal);}
+
+/* Surplus hero */
+.hero-surplus{background:linear-gradient(135deg,#0F766E 0%,#0D9488 60%,#14B8A6 100%);border-radius:16px;}
+.hero-deficit{background:linear-gradient(135deg,#9F1239 0%,#E11D48 60%,#FB7185 100%);border-radius:16px;}
+
+/* Tabs */
+.tab-bar{display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:4px;}
+.tab-btn{flex:1;padding:8px 12px;border-radius:9px;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;white-space:nowrap;}
+.tab-btn.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.tab-panel{display:none;}.tab-panel.active{display:block;}
+
+/* Stat rows */
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;}
+.stat-row+.stat-row{border-top:1px solid var(--border);}
+
+/* Forecast */
+.forecast-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+.forecast-row:last-child{border-bottom:none;}
+
+/* Tags */
+.tag{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;letter-spacing:.04em;}
+
+/* Asset table */
+.asset-table th{font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.07em;padding-bottom:10px;}
+.asset-table td{padding:10px 4px;vertical-align:middle;}
+.asset-table tbody tr{border-bottom:1px solid var(--border);}
+.asset-table tbody tr:last-child{border-bottom:none;}
+
+/* Adj button */
+.adj-btn{font-size:12px;font-weight:600;padding:5px 14px;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;}
+.adj-btn.on{background:var(--indigo);color:white;border-color:var(--indigo);}
+
+/* Insight cards */
+.insight-card{border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid;}
+.insight-tip{background:#F0FDF4;border-color:#86EFAC;color:#14532D;}
+.insight-warn{background:#FFFBEB;border-color:#FCD34D;color:#78350F;}
+.insight-info{background:var(--indigo-lt);border-color:#C7D2FE;color:#312E81;}
+
+/* Scenario */
+.scenario-tab{padding:6px 16px;border-radius:8px;border:1.5px solid var(--border);background:transparent;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;}
+.scenario-tab.active{background:var(--purple);color:white;border-color:var(--purple);}
+
+/* Milestone pill */
+.milestone-dot{width:10px;height:10px;border-radius:99px;background:var(--amber);border:2px solid white;box-shadow:0 0 0 2px var(--amber);flex-shrink:0;}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.anim{animation:fadeUp .4s ease both;}
+
+@media print{.no-print{display:none!important;}}
+</style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen p-4 md:p-10">
+<body class="p-4 md:p-6">
+<div class="max-w-5xl mx-auto space-y-5 anim">
 
-    <div class="max-w-6xl mx-auto space-y-8">
-        <header class="flex flex-col md:flex-row justify-between items-center bg-slate-800/50 p-8 rounded-[2rem] border border-slate-700">
-            <div>
-                <h1 class="text-3xl font-black tracking-tighter italic text-indigo-400 uppercase">Master Planning Dashboard</h1>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1 italic">Tax-Free Toggle & Custom Assets Enabled</p>
-            </div>
-            <div class="mt-4 md:mt-0 flex gap-3 no-print">
-                <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-500 px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg transition-all">Export PDF</button>
-                <button onclick="resetToZero()" class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest">Clear All</button>
-            </div>
-        </header>
+<!-- HEADER -->
+<header class="card p-5 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+  <div>
+    <div class="flex flex-wrap gap-2 mb-2">
+      <span class="tag" style="background:var(--teal-lt);color:var(--teal-dk)">India · New Tax Regime</span>
+      <span class="tag" style="background:var(--indigo-lt);color:var(--indigo)">FY 2024–25</span>
+    </div>
+    <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Master Planning <span style="color:var(--teal)">Dashboard</span></h1>
+    <p class="text-sm mt-1" style="color:var(--muted)">Tax · Investments · Forecast · Goal Planner · What-If Scenarios</p>
+  </div>
+  <div class="flex gap-2 no-print shrink-0">
+    <button onclick="window.print()" class="text-sm font-semibold px-5 py-2.5 rounded-xl text-white" style="background:var(--teal)">↓ PDF</button>
+    <button onclick="resetToZero()" class="text-sm font-semibold px-5 py-2.5 rounded-xl border" style="border-color:var(--border);color:var(--muted)">Clear All</button>
+  </div>
+</header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-8 space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Spouse 1 Salary (Annual ₹)</label>
-                        <input type="text" id="b1" value="0" oninput="handleInput(this); calculate(); saveToLocal()" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl font-black text-xl text-indigo-300 outline-none">
-                    </div>
-                    <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
-                        <label class="block text-[10px] font-black text-emerald-500 uppercase mb-4 tracking-widest">Spouse 2 Salary (Annual ₹)</label>
-                        <input type="text" id="b2" value="0" oninput="handleInput(this); calculate(); saveToLocal()" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl font-black text-xl text-emerald-300 outline-none">
-                    </div>
-                    <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
-                        <label class="block text-[10px] font-black text-rose-500 uppercase mb-4 tracking-widest">Expenses (Annual ₹)</label>
-                        <input type="text" id="exp" value="0" oninput="handleInput(this); calculate(); saveToLocal()" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl font-black text-xl text-rose-400 outline-none">
-                    </div>
-                </div>
+<!-- ALWAYS-VISIBLE SURPLUS STRIP -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-                <div class="bg-slate-800 p-8 rounded-[2rem] border border-slate-700">
-                    <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest mb-6 italic">Detailed Tax & Take-Home Analysis</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="space-y-3 p-6 bg-slate-900/50 rounded-2xl border border-slate-700/50">
-                            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Spouse 1 Audit</p>
-                            <div class="flex justify-between text-xs font-bold text-slate-500"><span>Total Gross (Reported):</span><span id="s1_gross">₹0</span></div>
-                            <div class="flex justify-between text-[9px] text-slate-600 italic"><span>Std. Deduction (Fixed):</span><span>- ₹75,000</span></div>
-                            <div class="flex justify-between text-xs font-bold text-rose-400 border-t border-slate-800 pt-2"><span>Estimated Income Tax:</span><span id="s1_tax">₹0</span></div>
-                            <div class="flex justify-between text-sm font-black text-emerald-400 pt-1"><span>Net In-Hand (Annual):</span><span id="s1_net">₹0</span></div>
-                        </div>
-                        <div class="space-y-3 p-6 bg-slate-900/50 rounded-2xl border border-slate-700/50">
-                            <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Spouse 2 Audit</p>
-                            <div class="flex justify-between text-xs font-bold text-slate-500"><span>Total Gross (Reported):</span><span id="s2_gross">₹0</span></div>
-                            <div class="flex justify-between text-xs font-bold text-rose-400 border-t border-slate-800 pt-2"><span>Estimated Income Tax:</span><span id="s2_tax">₹0</span></div>
-                            <div class="flex justify-between text-sm font-black text-emerald-400 pt-1"><span>Net In-Hand (Annual):</span><span id="s2_net">₹0</span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-800 p-8 rounded-[2rem] border border-slate-700">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">Investment Matrix</h3>
-                        <div class="flex gap-2 no-print">
-                            <select id="categorySelector" class="bg-slate-700 text-[9px] font-bold uppercase p-2 rounded-xl border border-slate-600">
-                                <option value="7.0">FD (Major Bank)</option>
-                                <option value="8.5">Small Finance Bank</option>
-                                <option value="7.5">Govt Schemes</option>
-                                <option value="3.5">Rental Property</option>
-                                <option value="0.0">Custom Asset</option>
-                            </select>
-                            <button onclick="addCategorizedRow()" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest">+ Add</button>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="text-[9px] text-slate-500 uppercase tracking-widest border-b border-slate-700">
-                                <tr>
-                                    <th class="pb-2">Name / Category</th>
-                                    <th class="pb-2">Principal</th>
-                                    <th class="pb-2 text-center">ROI %</th>
-                                    <th class="pb-2">Owner</th>
-                                    <th class="pb-2 text-center">Tax Free?</th>
-                                    <th class="pb-2 no-print"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="assetBody" class="divide-y divide-slate-700"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-4 space-y-6">
-                <div class="bg-indigo-600 p-8 rounded-[2.5rem] shadow-2xl space-y-4 text-center">
-                    <p class="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1 italic">Monthly Surplus</p>
-                    <h2 class="text-5xl font-black tracking-tighter" id="monthlySurplusDisplay">₹0</h2>
-                    <div class="grid grid-cols-2 gap-2 mt-4">
-                        <div class="bg-black/20 p-3 rounded-2xl text-center"><p class="text-[8px] font-bold text-indigo-200">TO FD</p><p class="text-xs font-black" id="fdVal">₹0</p></div>
-                        <div class="bg-black/20 p-3 rounded-2xl text-center"><p class="text-[8px] font-bold text-emerald-200">TO SIP</p><p class="text-xs font-black text-emerald-300" id="sipVal">₹0</p></div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 space-y-6">
-                    <h3 class="text-[10px] font-black uppercase text-indigo-400 tracking-widest italic">Reinvestment Strategy</h3>
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><label class="text-[8px] text-slate-500 uppercase">SIP Returns %</label><input type="number" id="sipRet" value="12" oninput="calculate(); saveToLocal()" class="w-full bg-slate-900 p-2 rounded-xl text-indigo-300 font-bold border border-slate-700"></div>
-                            <div><label class="text-[8px] text-slate-500 uppercase">Inflation %</label><input type="number" id="infRet" value="5" oninput="calculate(); saveToLocal()" class="w-full bg-slate-900 p-2 rounded-xl text-rose-300 font-bold border border-slate-700"></div>
-                        </div>
-                        <div class="flex justify-between mb-2"><label class="text-[9px] font-black text-slate-400 uppercase">FD Split</label><span class="text-[9px] font-black text-indigo-400" id="fdLabel">40%</span></div>
-                        <input type="range" id="fdRate" min="0" max="100" value="40" oninput="validateSplit('fd'); calculate(); saveToLocal()" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500 no-print">
-                        <div class="flex justify-between mb-2"><label class="text-[9px] font-black text-slate-400 uppercase">SIP Split</label><span class="text-[9px] font-black text-emerald-400" id="sipLabel">40%</span></div>
-                        <input type="range" id="sipRate" min="0" max="100" value="40" oninput="validateSplit('sip'); calculate(); saveToLocal()" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500 no-print">
-                    </div>
-                </div>
-                
-                <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">30-Year Wealth Path</h3>
-                        <label class="relative inline-flex items-center cursor-pointer no-print">
-                            <input type="checkbox" id="adjToggle" class="sr-only peer" onchange="calculate(); saveToLocal()">
-                            <div class="w-10 h-5 bg-slate-700 rounded-full toggle-bg"></div>
-                        </label>
-                    </div>
-                    <div id="forecastTable" class="space-y-3"></div>
-                </div>
-                <div id="audit" class="bg-slate-800/30 p-4 rounded-2xl text-[8px] font-mono text-slate-600 italic text-center">Audit: Ready</div>
-            </div>
+  <!-- Income inputs -->
+  <div class="lg:col-span-2 card p-6 space-y-5">
+    <p class="section-label">Combined Household Income</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <div>
+        <p class="text-sm font-medium mb-2" style="color:var(--indigo)">Spouse 1 · Annual ₹</p>
+        <input type="text" id="b1" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="field-input mono">
+        <div class="flex gap-2 mt-2 items-center">
+          <span class="text-xs" style="color:var(--faint)">Growth %/yr</span>
+          <input type="number" id="g1" value="8" min="0" max="30" oninput="recalc();saveToLocal()" class="small-input mono" style="width:64px;padding:4px 8px;font-size:.8rem">
         </div>
+      </div>
+      <div>
+        <p class="text-sm font-medium mb-2" style="color:var(--teal)">Spouse 2 · Annual ₹</p>
+        <input type="text" id="b2" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="field-input mono">
+        <div class="flex gap-2 mt-2 items-center">
+          <span class="text-xs" style="color:var(--faint)">Growth %/yr</span>
+          <input type="number" id="g2" value="8" min="0" max="30" oninput="recalc();saveToLocal()" class="small-input mono" style="width:64px;padding:4px 8px;font-size:.8rem">
+        </div>
+      </div>
+      <div>
+        <p class="text-sm font-medium mb-2" style="color:var(--rose)">Total Expenses · Annual ₹</p>
+        <input type="text" id="expTotal" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="field-input mono" readonly style="color:var(--faint);cursor:default" title="Auto-summed from expense categories below">
+        <p class="text-xs mt-2" style="color:var(--faint)">← auto from categories</p>
+      </div>
+    </div>
+    <!-- Tax summary inline -->
+    <div class="grid grid-cols-2 gap-3 pt-1">
+      <div class="inset p-3 space-y-1">
+        <p class="text-xs font-semibold" style="color:var(--indigo)">Spouse 1 · Net In-Hand</p>
+        <div class="stat-row"><span class="text-xs" style="color:var(--muted)">Gross</span><span class="mono text-xs" id="s1_gross">₹0</span></div>
+        <div class="stat-row"><span class="text-xs" style="color:var(--faint)">Tax</span><span class="mono text-xs" style="color:var(--rose)" id="s1_tax">₹0</span></div>
+        <div class="stat-row"><span class="text-sm font-bold">Net</span><span class="mono text-sm font-bold" id="s1_net">₹0</span></div>
+        <div class="stat-row"><span class="text-xs" style="color:var(--faint)">Eff. Rate</span><span class="mono text-xs" id="s1_rate">0%</span></div>
+      </div>
+      <div class="inset p-3 space-y-1">
+        <p class="text-xs font-semibold" style="color:var(--teal)">Spouse 2 · Net In-Hand</p>
+        <div class="stat-row"><span class="text-xs" style="color:var(--muted)">Gross</span><span class="mono text-xs" id="s2_gross">₹0</span></div>
+        <div class="stat-row"><span class="text-xs" style="color:var(--faint)">Tax</span><span class="mono text-xs" style="color:var(--rose)" id="s2_tax">₹0</span></div>
+        <div class="stat-row"><span class="text-sm font-bold">Net</span><span class="mono text-sm font-bold" id="s2_net">₹0</span></div>
+        <div class="stat-row"><span class="text-xs" style="color:var(--faint)">Eff. Rate</span><span class="mono text-xs" id="s2_rate">0%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Surplus hero -->
+  <div class="hero-surplus p-6 flex flex-col justify-between text-white" id="surplusCard">
+    <p class="text-sm font-semibold opacity-80 uppercase tracking-widest" id="surplusLabel">Monthly Surplus</p>
+    <div class="my-4">
+      <p class="mono text-4xl font-bold leading-none" id="monthlySurplusDisplay">₹0</p>
+      <p class="mono text-sm opacity-60 mt-2" id="annualSurplusDisplay">₹0 / year</p>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div class="rounded-xl p-3 text-center" style="background:rgba(255,255,255,.15)">
+        <p class="text-xs font-semibold opacity-75 uppercase tracking-wider mb-1">To FD</p>
+        <p class="mono text-base font-bold" id="fdVal">₹0</p>
+      </div>
+      <div class="rounded-xl p-3 text-center" style="background:rgba(255,255,255,.15)">
+        <p class="text-xs font-semibold opacity-75 uppercase tracking-wider mb-1">To SIP</p>
+        <p class="mono text-base font-bold" id="sipVal">₹0</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar no-print" id="tabBar">
+  <button class="tab-btn active" onclick="switchTab('expenses')">💸 Expenses</button>
+  <button class="tab-btn" onclick="switchTab('investments')">📈 Investments</button>
+  <button class="tab-btn" onclick="switchTab('forecast')">🔭 Forecast</button>
+  <button class="tab-btn" onclick="switchTab('scenarios')">⚖️ What-If</button>
+  <button class="tab-btn" onclick="switchTab('insights')">💡 Insights</button>
+</div>
+
+<!-- ═══════════════════════════════════════ TAB: EXPENSES ═══ -->
+<div id="tab-expenses" class="tab-panel active space-y-4">
+  <div class="card p-6">
+    <div class="flex justify-between items-center mb-5">
+      <div>
+        <p class="section-label">Monthly Expense Breakdown</p>
+        <p class="text-sm mt-1" style="color:var(--muted)">All amounts are monthly — annual total is auto-calculated</p>
+      </div>
+      <div class="mono text-right">
+        <p class="text-xs" style="color:var(--faint)">Monthly Total</p>
+        <p class="text-xl font-bold" style="color:var(--rose)" id="expMonthlyTotal">₹0</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="expenseGrid">
+      <!-- Expense categories rendered by JS -->
+    </div>
+    <button onclick="addExpenseCategory()" class="mt-4 text-sm font-semibold px-4 py-2 rounded-lg border no-print" style="border-color:var(--border);color:var(--muted)">+ Add Category</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ TAB: INVESTMENTS ═══ -->
+<div id="tab-investments" class="tab-panel space-y-5">
+  <div class="card p-6">
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
+      <div>
+        <p class="section-label">Investment Matrix</p>
+        <p class="text-sm mt-1" style="color:var(--muted)">Yield from non-tax-free assets is added to each spouse's taxable gross</p>
+      </div>
+      <div class="flex gap-2 no-print">
+        <select id="categorySelector" class="small-input text-sm" style="max-width:230px">
+          <option value="7.0">FD — Major Bank (7%)</option>
+          <option value="8.5">FD — Small Finance (8.5%)</option>
+          <option value="7.5">Govt Schemes (7.5%)</option>
+          <option value="3.5">Rental Property (3.5%)</option>
+          <option value="0.0">Custom Asset</option>
+        </select>
+        <button onclick="addCategorizedRow()" class="text-sm font-semibold px-4 py-2 rounded-xl text-white shrink-0" style="background:var(--indigo)">+ Add</button>
+      </div>
+    </div>
+    <div id="roiWarning" class="hidden mb-4" style="background:#FFFBEB;border:1px solid #FCD34D;color:#92400E;border-radius:8px;padding:10px 14px;font-size:13px;">⚠ One or more assets have ROI above 30% — double-check.</div>
+    <div class="overflow-x-auto">
+      <table class="w-full asset-table">
+        <thead><tr>
+          <th class="text-left">Asset</th><th class="text-left">Principal (₹)</th>
+          <th class="text-center">ROI %</th><th class="text-left">Owner</th>
+          <th class="text-center">Tax-Free</th><th class="no-print"></th>
+        </tr></thead>
+        <tbody id="assetBody"></tbody>
+        <tfoot>
+          <tr style="border-top:2px solid var(--border)">
+            <td class="pt-3 text-sm font-semibold" style="color:var(--muted)">Portfolio Total</td>
+            <td class="pt-3 mono text-sm font-bold" id="totalPrincipal">₹0</td>
+            <td class="pt-3 mono text-sm font-bold text-center" style="color:var(--teal)" id="blendedROI">—</td>
+            <td colspan="3" class="pt-3 text-xs" style="color:var(--faint)">Blended yield</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Reinvestment strategy -->
+  <div class="card p-6">
+    <p class="section-label mb-5">Reinvestment Strategy</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
+      <div>
+        <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">SIP Returns %/yr</p>
+        <input type="number" id="sipRet" value="12" min="1" max="30" oninput="recalc();saveToLocal()" class="small-input mono">
+      </div>
+      <div>
+        <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">FD Rate %/yr</p>
+        <input type="number" id="fdRate" value="7" min="1" max="15" oninput="recalc();saveToLocal()" class="small-input mono">
+      </div>
+      <div>
+        <p class="text-sm font-medium mb-1.5" style="color:var(--rose)">Inflation %/yr</p>
+        <input type="number" id="infRet" value="5" min="1" max="15" oninput="recalc();saveToLocal()" class="small-input mono">
+      </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div>
+        <div class="flex justify-between mb-2"><p class="text-sm font-medium" style="color:var(--indigo)">FD Split</p><p class="mono text-sm font-bold" style="color:var(--indigo)" id="fdLabel">50%</p></div>
+        <input type="range" id="fdRangeInput" min="0" max="100" value="50" oninput="validateSplit('fd');recalc();saveToLocal()" class="w-full" style="background:linear-gradient(to right,var(--indigo) 50%,var(--border) 50%)">
+      </div>
+      <div>
+        <div class="flex justify-between mb-2"><p class="text-sm font-medium" style="color:var(--teal)">SIP Split</p><p class="mono text-sm font-bold" style="color:var(--teal)" id="sipLabel">50%</p></div>
+        <input type="range" id="sipRangeInput" min="0" max="100" value="50" oninput="validateSplit('sip');recalc();saveToLocal()" class="w-full" style="background:linear-gradient(to right,var(--teal) 50%,var(--border) 50%)">
+      </div>
+    </div>
+    <p class="text-xs mt-3 text-center" style="color:var(--faint)">Sliders always sum to 100%</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ TAB: FORECAST ═══ -->
+<div id="tab-forecast" class="tab-panel space-y-5">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+    <!-- 30-Year Wealth Path -->
+    <div class="card p-6">
+      <div class="flex justify-between items-center mb-4">
+        <p class="section-label">30-Year Wealth Path</p>
+        <button id="adjToggleBtn" onclick="toggleAdj()" class="adj-btn no-print">Inflation Adj.</button>
+      </div>
+      <div id="forecastTable"></div>
+      <p class="text-xs mt-3 text-center" style="color:var(--faint)" id="adjNote">Showing nominal values · includes salary growth</p>
     </div>
 
-    <script>
-        function handleInput(el) {
-            let val = el.value.replace(/,/g, '');
-            if (!val || isNaN(val)) { el.value = "0"; return; }
-            el.value = parseFloat(val).toLocaleString('en-IN');
-        }
+    <!-- Milestones -->
+    <div class="card p-6">
+      <div class="flex justify-between items-center mb-4">
+        <p class="section-label">Milestone Markers</p>
+        <button onclick="addMilestone()" class="text-xs font-semibold px-3 py-1.5 rounded-lg border no-print" style="border-color:var(--border);color:var(--muted)">+ Add</button>
+      </div>
+      <p class="text-sm mb-4" style="color:var(--muted)">Add financial goals — they'll appear on the forecast as markers.</p>
+      <div id="milestoneList" class="space-y-3"></div>
+      <div id="milestoneNone" class="text-center py-6" style="color:var(--faint)">
+        <p class="text-2xl mb-2">🎯</p>
+        <p class="text-sm">No milestones yet. Add goals like "Child's college", "Home purchase", "Retirement".</p>
+      </div>
+    </div>
+  </div>
 
-        function validateSplit(source) {
-            let fd = parseInt(document.getElementById('fdRate').value);
-            let sip = parseInt(document.getElementById('sipRate').value);
-            if (fd + sip > 100) {
-                if (source === 'fd') document.getElementById('sipRate').value = 100 - fd;
-                else document.getElementById('fdRate').value = 100 - sip;
-            }
-            document.getElementById('fdLabel').innerText = document.getElementById('fdRate').value + "%";
-            document.getElementById('sipLabel').innerText = document.getElementById('sipRate').value + "%";
-        }
+  <!-- Goal Planner + Drawdown -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="card p-6 space-y-4">
+      <div><p class="section-label">Goal Planner</p><p class="text-sm mt-1" style="color:var(--muted)">How much do you need to invest monthly to hit a target?</p></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Target Corpus (₹)</p>
+          <input type="text" id="goalCorpus" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="small-input mono">
+        </div>
+        <div>
+          <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">In (years)</p>
+          <input type="number" id="goalYears" value="20" min="1" max="40" oninput="recalc();saveToLocal()" class="small-input mono">
+        </div>
+      </div>
+      <div class="inset p-4 text-center">
+        <p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color:var(--faint)">Required Monthly SIP</p>
+        <p class="mono text-2xl font-bold" style="color:var(--amber)" id="goalSIP">₹0</p>
+        <p class="text-sm mt-2 font-medium" id="goalFeasibility"></p>
+      </div>
+    </div>
 
-        function addCategorizedRow() {
-            const selector = document.getElementById('categorySelector');
-            addRow(selector.options[selector.selectedIndex].text, 0, parseFloat(selector.value));
-            saveToLocal();
-        }
+    <div class="card p-6 space-y-4">
+      <div><p class="section-label">Corpus Drawdown Simulator</p><p class="text-sm mt-1" style="color:var(--muted)">If you retire with a corpus, how long will it last?</p></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Retirement Corpus (₹)</p>
+          <input type="text" id="ddCorpus" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="small-input mono">
+        </div>
+        <div>
+          <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Annual Withdraw (₹)</p>
+          <input type="text" id="ddWithdraw" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="small-input mono">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Portfolio Return %</p>
+          <input type="number" id="ddReturn" value="8" min="1" max="20" oninput="recalc();saveToLocal()" class="small-input mono">
+        </div>
+        <div>
+          <p class="text-sm font-medium mb-1.5" style="color:var(--rose)">Inflation %</p>
+          <input type="number" id="ddInflation" value="5" min="1" max="15" oninput="recalc();saveToLocal()" class="small-input mono">
+        </div>
+      </div>
+      <div class="inset p-4 text-center">
+        <p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color:var(--faint)">Corpus Lasts</p>
+        <p class="mono text-2xl font-bold" style="color:var(--purple)" id="ddResult">—</p>
+        <p class="text-sm mt-2" style="color:var(--muted)" id="ddNote"></p>
+      </div>
+    </div>
+  </div>
+</div>
 
-        function addRow(name="Asset", p=0, y=0, o="1", isTaxFree=false) {
-            const tr = document.createElement('tr');
-            tr.className = "asset-row";
-            tr.innerHTML = `
-                <td class="py-4"><input type="text" value="${name}" class="name_in bg-transparent font-bold text-[10px] outline-none w-24 italic text-slate-400"></td>
-                <td class="py-4"><input type="text" value="${p.toLocaleString('en-IN')}" class="p_in bg-transparent border-b border-slate-700 font-black text-xs w-24 outline-none text-indigo-300" oninput="handleInput(this); calculate(); saveToLocal()"></td>
-                <td class="py-4 text-center"><input type="number" value="${y}" class="y_in bg-transparent border-b border-slate-700 font-black text-xs w-8 outline-none text-emerald-400" oninput="calculate(); saveToLocal()"></td>
-                <td class="py-4"><select class="o_in bg-slate-700 p-1 rounded font-bold text-[9px]" onchange="calculate(); saveToLocal()"><option value="1" ${o==="1"?"selected":""}>Spouse 1</option><option value="2" ${o==="2"?"selected":""}>Spouse 2</option></select></td>
-                <td class="py-4 text-center"><input type="checkbox" class="tf_in h-3 w-3 rounded accent-indigo-500" ${isTaxFree?"checked":""} onchange="calculate(); saveToLocal()"></td>
-                <td class="py-4 text-right no-print"><button onclick="this.closest('tr').remove(); calculate(); saveToLocal()" class="text-slate-600 hover:text-rose-500 font-bold">✕</button></td>
-            `;
-            document.getElementById('assetBody').appendChild(tr);
-            calculate();
-        }
+<!-- ═══════════════════════════════════════ TAB: WHAT-IF SCENARIOS ═══ -->
+<div id="tab-scenarios" class="tab-panel space-y-5">
+  <div class="card p-6">
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
+      <div>
+        <p class="section-label">What-If Scenario Comparison</p>
+        <p class="text-sm mt-1" style="color:var(--muted)">Compare two different financial paths side by side over 30 years.</p>
+      </div>
+      <div class="flex gap-2 no-print">
+        <button class="scenario-tab active" id="scTab_A" onclick="switchScenario('A')">Scenario A</button>
+        <button class="scenario-tab" id="scTab_B" onclick="switchScenario('B')">Scenario B</button>
+      </div>
+    </div>
 
-        function calculateTax(income, isSalaried) {
-            let taxable = (isSalaried && income > 0) ? Math.max(0, income - 75000) : income;
-            if (taxable <= 1200000) return 0;
-            let tax = 0;
-            const slabs = [400000, 800000, 1200000, 1600000, 2000000, 2400000];
-            const rates = [0.05, 0.10, 0.15, 0.20, 0.25, 0.30];
-            slabs.forEach((s, i) => { if (taxable > s) tax += (Math.min(taxable, slabs[i+1] || 999999999) - s) * rates[i]; });
-            return tax * 1.04;
-        }
+    <!-- Scenario inputs -->
+    <div id="scenarioEditor" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div>
+        <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Scenario Name</p>
+        <input type="text" id="sc_name" placeholder="e.g. Buy a House" class="small-input" oninput="saveScenario()">
+      </div>
+      <div>
+        <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Expense (₹)</p>
+        <input type="text" id="sc_extraExp" value="0" oninput="handleInput(this);saveScenario();renderComparison()" class="small-input mono">
+      </div>
+      <div>
+        <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">One-Time Investment (₹)</p>
+        <input type="text" id="sc_lumpsum" value="0" oninput="handleInput(this);saveScenario();renderComparison()" class="small-input mono">
+      </div>
+      <div>
+        <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Income (₹)</p>
+        <input type="text" id="sc_extraInc" value="0" oninput="handleInput(this);saveScenario();renderComparison()" class="small-input mono">
+      </div>
+    </div>
 
-        function calculate() {
-            const b1 = parseFloat(document.getElementById('b1').value.replace(/,/g, '')) || 0;
-            const b2 = parseFloat(document.getElementById('b2').value.replace(/,/g, '')) || 0;
-            const exp = parseFloat(document.getElementById('exp').value.replace(/,/g, '')) || 0;
-            const fdPct = parseInt(document.getElementById('fdRate').value) / 100;
-            const sipPct = parseInt(document.getElementById('sipRate').value) / 100;
-            const sipR = parseFloat(document.getElementById('sipRet').value) / 100;
-            const inf = parseFloat(document.getElementById('infRet').value) / 100;
-            const isAdj = document.getElementById('adjToggle').checked;
+    <!-- Comparison table -->
+    <div id="scenarioComparison"></div>
+  </div>
+</div>
 
-            let totP = 0, s1G = b1, s2G = b2, totalYieldAmt = 0;
-            document.querySelectorAll('.asset-row').forEach(row => {
-                const p = parseFloat(row.querySelector('.p_in').value.replace(/,/g, '')) || 0;
-                const y = parseFloat(row.querySelector('.y_in').value) || 0;
-                const o = row.querySelector('.o_in').value;
-                const isTF = row.querySelector('.tf_in').checked;
-                const yieldAmt = (p * y) / 100;
-                totP += p; 
-                totalYieldAmt += yieldAmt;
-                if (!isTF) { if (o === "1") s1G += yieldAmt; else s2G += yieldAmt; }
-            });
+<!-- ═══════════════════════════════════════ TAB: INSIGHTS ═══ -->
+<div id="tab-insights" class="tab-panel">
+  <div class="card p-6">
+    <p class="section-label mb-5">Smart Insights & Tax Optimisation</p>
+    <div id="insightsPanel">
+      <p class="text-sm" style="color:var(--faint)">Fill in your income and assets to see personalised insights.</p>
+    </div>
+  </div>
+</div>
 
-            const t1 = calculateTax(s1G, b1 > 0); const t2 = calculateTax(s2G, b2 > 0);
-            document.getElementById('s1_net').innerText = '₹'+Math.round(s1G - t1).toLocaleString('en-IN');
-            document.getElementById('s1_gross').innerText = '₹'+Math.round(s1G).toLocaleString('en-IN');
-            document.getElementById('s1_tax').innerText = '₹'+Math.round(t1).toLocaleString('en-IN');
-            document.getElementById('s2_net').innerText = '₹'+Math.round(s2G - t2).toLocaleString('en-IN');
-            document.getElementById('s2_gross').innerText = '₹'+Math.round(s2G).toLocaleString('en-IN');
-            document.getElementById('s2_tax').innerText = '₹'+Math.round(t2).toLocaleString('en-IN');
+<p id="audit" class="mono text-xs text-center pb-4" style="color:var(--faint)">Audit: Ready</p>
+</div><!-- /max-w -->
 
-            const netMonthly = (b1 + b2 + totalYieldAmt - t1 - t2 - exp) / 12;
-            document.getElementById('monthlySurplusDisplay').innerText = '₹'+Math.max(0, Math.round(netMonthly)).toLocaleString('en-IN');
-            document.getElementById('fdVal').innerText = '₹'+Math.round(Math.max(0, netMonthly * fdPct)).toLocaleString('en-IN');
-            document.getElementById('sipVal').innerText = '₹'+Math.round(Math.max(0, netMonthly * sipPct)).toLocaleString('en-IN');
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────
+let isAdj = false;
+let activeScenario = 'A';
+let scenarios = {
+  A: { name:'Scenario A', extraExp:0, lumpsum:0, extraInc:0 },
+  B: { name:'Scenario B', extraExp:0, lumpsum:0, extraInc:0 }
+};
+let milestones = [];
 
-            let html = ""; const matrixR = totP > 0 ? (totalYieldAmt / totP) : 0.07;
-            [5, 10, 15, 20, 25, 30].forEach(yr => {
-                let cFD = totP; let cSIP = 0;
-                for (let i = 1; i <= yr; i++) {
-                    cFD = (cFD + (netMonthly * fdPct * 12)) * (1 + matrixR);
-                    cSIP = (cSIP + (netMonthly * sipPct * 12)) * (1 + sipR);
-                }
-                let total = cFD + cSIP;
-                if (isAdj) total = total / Math.pow(1 + inf, yr);
-                html += `<div class="flex justify-between items-center py-2 border-b border-slate-700/50"><span class="text-[9px] font-bold text-slate-500 uppercase">${yr} Years</span><span class="text-sm font-black text-emerald-400">₹${Math.round(total/10000000).toLocaleString('en-IN')} Cr</span></div>`;
-            });
-            document.getElementById('forecastTable').innerHTML = html;
-        }
+const EXP_CATEGORIES = [
+  {id:'rent',    label:'Rent / EMI',    icon:'🏠', val:0},
+  {id:'food',    label:'Food & Dining', icon:'🍽', val:0},
+  {id:'travel',  label:'Travel & Fuel', icon:'🚗', val:0},
+  {id:'health',  label:'Health & Med',  icon:'💊', val:0},
+  {id:'kids',    label:'Kids / School', icon:'👶', val:0},
+  {id:'leisure', label:'Leisure',       icon:'🎬', val:0},
+  {id:'savings', label:'LIC / Insurance',icon:'🛡', val:0},
+  {id:'other',   label:'Other',         icon:'📦', val:0},
+];
+let expCategories = JSON.parse(JSON.stringify(EXP_CATEGORIES));
 
-        function saveToLocal() {
-            const data = {
-                b1: document.getElementById('b1').value, b2: document.getElementById('b2').value, exp: document.getElementById('exp').value,
-                fdRate: document.getElementById('fdRate').value, sipRate: document.getElementById('sipRate').value,
-                sipRet: document.getElementById('sipRet').value, infRet: document.getElementById('infRet').value,
-                adj: document.getElementById('adjToggle').checked, assets: []
-            };
-            document.querySelectorAll('.asset-row').forEach(row => {
-                data.assets.push({ n: row.querySelector('.name_in').value, p: row.querySelector('.p_in').value, y: row.querySelector('.y_in').value, o: row.querySelector('.o_in').value, tf: row.querySelector('.tf_in').checked });
-            });
-            localStorage.setItem('master_plan_shravan', JSON.stringify(data));
-        }
+// ── TABS ───────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'scenarios') renderComparison();
+  if (name === 'insights')  renderInsights();
+  if (name === 'forecast')  renderForecast();
+}
 
-        function loadFromLocal() {
-            const saved = localStorage.getItem('master_plan_shravan');
-            if (!saved) return;
-            const d = JSON.parse(saved);
-            document.getElementById('b1').value = d.b1; document.getElementById('b2').value = d.b2; document.getElementById('exp').value = d.exp;
-            document.getElementById('fdRate').value = d.fdRate; document.getElementById('sipRate').value = d.sipRate;
-            document.getElementById('sipRet').value = d.sipRet; document.getElementById('infRet').value = d.infRet;
-            document.getElementById('adjToggle').checked = d.adj;
-            document.getElementById('assetBody').innerHTML = '';
-            d.assets.forEach(a => addRow(a.n, parseFloat(a.p.replace(/,/g,'')), parseFloat(a.y), a.o, a.tf));
-            calculate();
-        }
+// ── EXPENSE CATEGORIES ─────────────────────────────────────────────────
+function renderExpenses() {
+  const grid = document.getElementById('expenseGrid');
+  grid.innerHTML = '';
+  expCategories.forEach((cat, i) => {
+    const div = document.createElement('div');
+    div.className = 'inset p-4 flex items-center gap-3';
+    div.innerHTML = `
+      <span style="font-size:1.4rem">${cat.icon}</span>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium truncate">${cat.label}</p>
+        <div class="flex items-center gap-1 mt-1">
+          <span class="text-xs" style="color:var(--faint)">₹</span>
+          <input type="text" value="${cat.val.toLocaleString('en-IN')}"
+            class="bg-transparent mono text-sm font-medium outline-none w-full border-b"
+            style="border-color:var(--border)"
+            oninput="handleInput(this); expCategories[${i}].val=parseFloat(this.value.replace(/,/g,''))||0; sumExpenses(); recalc(); saveToLocal()"
+          >
+          <span class="text-xs shrink-0" style="color:var(--faint)">/mo</span>
+        </div>
+      </div>
+      <button onclick="expCategories.splice(${i},1); renderExpenses(); sumExpenses(); recalc(); saveToLocal()"
+        class="text-lg no-print" style="color:var(--faint)"
+        onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">×</button>
+    `;
+    grid.appendChild(div);
+  });
+  sumExpenses();
+}
 
-        function resetToZero() { localStorage.removeItem('master_plan_shravan'); location.reload(); }
-        window.onload = loadFromLocal;
-    </script>
+function addExpenseCategory() {
+  expCategories.push({id:'custom'+Date.now(), label:'Custom', icon:'📌', val:0});
+  renderExpenses(); saveToLocal();
+}
+
+function sumExpenses() {
+  const monthly = expCategories.reduce((s,c)=>s+(c.val||0),0);
+  document.getElementById('expMonthlyTotal').textContent = '₹'+Math.round(monthly).toLocaleString('en-IN');
+  document.getElementById('expTotal').value = Math.round(monthly*12).toLocaleString('en-IN');
+}
+
+// ── UTILS ──────────────────────────────────────────────────────────────
+function handleInput(el) {
+  const raw = el.value.replace(/,/g,'');
+  if (!raw || isNaN(raw)) { el.value='0'; return; }
+  el.value = parseFloat(raw).toLocaleString('en-IN');
+}
+
+function updateSliderTrack(id, color, val) {
+  document.getElementById(id).style.background =
+    `linear-gradient(to right,${color} ${val}%,var(--border) ${val}%)`;
+}
+
+function validateSplit(source) {
+  let fd  = parseInt(document.getElementById('fdRangeInput').value);
+  let sip = parseInt(document.getElementById('sipRangeInput').value);
+  if (source==='fd')  { sip=100-fd;  document.getElementById('sipRangeInput').value=sip; }
+  else                { fd =100-sip; document.getElementById('fdRangeInput').value=fd; }
+  document.getElementById('fdLabel').textContent  = fd+'%';
+  document.getElementById('sipLabel').textContent = sip+'%';
+  updateSliderTrack('fdRangeInput','var(--indigo)',fd);
+  updateSliderTrack('sipRangeInput','var(--teal)',sip);
+}
+
+function toggleAdj() {
+  isAdj = !isAdj;
+  document.getElementById('adjToggleBtn').classList.toggle('on',isAdj);
+  document.getElementById('adjNote').textContent = isAdj
+    ? 'Showing inflation-adjusted (real) values · includes salary growth'
+    : 'Showing nominal values · includes salary growth';
+  renderForecast(); saveToLocal();
+}
+
+function fmt(n) { return '₹'+Math.round(n).toLocaleString('en-IN'); }
+
+// ── TAX ────────────────────────────────────────────────────────────────
+function calculateTax(income, isSalaried) {
+  let taxable = (isSalaried&&income>0) ? Math.max(0,income-75000) : income;
+  if (taxable<=1200000) return 0;
+  let tax=0;
+  [{from:0,to:400000,rate:0},{from:400000,to:800000,rate:.05},
+   {from:800000,to:1200000,rate:.10},{from:1200000,to:1600000,rate:.15},
+   {from:1600000,to:2000000,rate:.20},{from:2000000,to:2400000,rate:.25},
+   {from:2400000,to:Infinity,rate:.30}]
+  .forEach(s=>{ if(taxable>s.from) tax+=(Math.min(taxable,s.to===Infinity?taxable:s.to)-s.from)*s.rate; });
+  return tax*1.04;
+}
+
+// ── ASSET TABLE ────────────────────────────────────────────────────────
+function addCategorizedRow() {
+  const sel=document.getElementById('categorySelector');
+  addRow(sel.options[sel.selectedIndex].text.split('(')[0].replace(/—.*/,'').trim(),0,parseFloat(sel.value));
+  saveToLocal();
+}
+
+function addRow(name='Asset',p=0,y=0,o='1',isTaxFree=false) {
+  const tr=document.createElement('tr');
+  tr.className='asset-row';
+  tr.innerHTML=`
+    <td><input type="text" value="${name}" class="name_in bg-transparent text-sm outline-none w-28 italic" style="color:var(--muted)" onchange="saveToLocal()"></td>
+    <td><input type="text" value="${p.toLocaleString('en-IN')}" class="p_in bg-transparent border-b mono text-sm font-medium w-32 outline-none" style="border-color:var(--border)" oninput="handleInput(this);recalc();saveToLocal()"></td>
+    <td class="text-center"><input type="number" value="${y}" class="y_in bg-transparent border-b mono text-sm font-medium w-12 outline-none text-center" style="border-color:var(--border);color:var(--teal)" oninput="validateROI(this);recalc();saveToLocal()"></td>
+    <td><select class="o_in text-sm rounded-lg px-2 py-1 border outline-none" style="background:var(--bg);border-color:var(--border)" onchange="recalc();saveToLocal()">
+      <option value="1" ${o==='1'?'selected':''}>Spouse 1</option>
+      <option value="2" ${o==='2'?'selected':''}>Spouse 2</option>
+    </select></td>
+    <td class="text-center"><input type="checkbox" class="tf_in w-4 h-4 cursor-pointer" style="accent-color:var(--teal)" ${isTaxFree?'checked':''} onchange="recalc();saveToLocal()"></td>
+    <td class="text-right no-print"><button onclick="this.closest('tr').remove();recalc();saveToLocal()" style="color:var(--faint);font-size:1rem" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕</button></td>`;
+  document.getElementById('assetBody').appendChild(tr);
+  recalc();
+}
+
+function validateROI(el) {
+  const v=parseFloat(el.value)||0;
+  el.style.color=v>30?'var(--amber)':'var(--teal)';
+  document.getElementById('roiWarning').classList.toggle('hidden',
+    !Array.from(document.querySelectorAll('.y_in')).some(i=>(parseFloat(i.value)||0)>30));
+}
+
+// ── MILESTONES ─────────────────────────────────────────────────────────
+function addMilestone() {
+  milestones.push({label:'Goal', year:10, amount:0});
+  renderMilestoneList(); renderForecast(); saveToLocal();
+}
+
+function renderMilestoneList() {
+  const list=document.getElementById('milestoneList');
+  const none=document.getElementById('milestoneNone');
+  none.style.display=milestones.length?'none':'block';
+  list.innerHTML='';
+  milestones.forEach((m,i)=>{
+    const div=document.createElement('div');
+    div.className='inset p-3 flex items-center gap-3';
+    div.innerHTML=`
+      <div class="milestone-dot"></div>
+      <div class="flex-1 grid grid-cols-3 gap-2">
+        <input type="text" value="${m.label}" class="small-input text-sm col-span-1" style="padding:5px 8px" oninput="milestones[${i}].label=this.value;renderForecast();saveToLocal()">
+        <input type="number" value="${m.year}" min="1" max="30" class="small-input mono text-sm" style="padding:5px 8px" oninput="milestones[${i}].year=parseInt(this.value)||1;renderForecast();saveToLocal()">
+        <input type="text" value="${m.amount?m.amount.toLocaleString('en-IN'):''}" placeholder="₹ Target" class="small-input mono text-sm" style="padding:5px 8px" oninput="handleInput(this);milestones[${i}].amount=parseFloat(this.value.replace(/,/g,''))||0;renderForecast();saveToLocal()">
+      </div>
+      <button onclick="milestones.splice(${i},1);renderMilestoneList();renderForecast();saveToLocal()" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕</button>`;
+    list.appendChild(div);
+  });
+}
+
+// ── CORE RECALC ────────────────────────────────────────────────────────
+function getBaseInputs() {
+  const b1  = parseFloat(document.getElementById('b1').value.replace(/,/g,''))  ||0;
+  const b2  = parseFloat(document.getElementById('b2').value.replace(/,/g,''))  ||0;
+  const g1  = (parseFloat(document.getElementById('g1').value)||0)/100;
+  const g2  = (parseFloat(document.getElementById('g2').value)||0)/100;
+  const exp = parseFloat(document.getElementById('expTotal').value.replace(/,/g,''))||0;
+  const fdSplitPct  = parseInt(document.getElementById('fdRangeInput').value)/100;
+  const sipSplitPct = parseInt(document.getElementById('sipRangeInput').value)/100;
+  const sipR = (parseFloat(document.getElementById('sipRet').value)||12)/100;
+  const fdR  = (parseFloat(document.getElementById('fdRate').value)||7)/100;
+  const inf  = (parseFloat(document.getElementById('infRet').value)||5)/100;
+  return {b1,b2,g1,g2,exp,fdSplitPct,sipSplitPct,sipR,fdR,inf};
+}
+
+function getAssetTotals(s1Base, s2Base) {
+  let totP=0, s1G=s1Base, s2G=s2Base, totalYield=0;
+  document.querySelectorAll('.asset-row').forEach(row=>{
+    const p=parseFloat(row.querySelector('.p_in').value.replace(/,/g,''))||0;
+    const y=parseFloat(row.querySelector('.y_in').value)||0;
+    const o=row.querySelector('.o_in').value;
+    const isTF=row.querySelector('.tf_in').checked;
+    const yAmt=(p*y)/100;
+    totP+=p; totalYield+=yAmt;
+    if(!isTF){if(o==='1')s1G+=yAmt;else s2G+=yAmt;}
+  });
+  return {totP,s1G,s2G,totalYield};
+}
+
+function recalc() {
+  const {b1,b2,g1,g2,exp,fdSplitPct,sipSplitPct,sipR,fdR,inf} = getBaseInputs();
+  const {totP,s1G,s2G,totalYield} = getAssetTotals(b1,b2);
+
+  const t1=calculateTax(s1G,b1>0), t2=calculateTax(s2G,b2>0);
+  document.getElementById('s1_gross').textContent=fmt(s1G);
+  document.getElementById('s1_tax').textContent=fmt(t1);
+  document.getElementById('s1_net').textContent=fmt(s1G-t1);
+  document.getElementById('s1_rate').textContent=s1G>0?((t1/s1G)*100).toFixed(1)+'%':'0%';
+  document.getElementById('s2_gross').textContent=fmt(s2G);
+  document.getElementById('s2_tax').textContent=fmt(t2);
+  document.getElementById('s2_net').textContent=fmt(s2G-t2);
+  document.getElementById('s2_rate').textContent=s2G>0?((t2/s2G)*100).toFixed(1)+'%':'0%';
+
+  const annualSurplus=b1+b2+totalYield-t1-t2-exp;
+  const netMonthly=annualSurplus/12;
+  const isDeficit=netMonthly<0;
+  const displayAbs=Math.abs(Math.round(netMonthly));
+
+  const card=document.getElementById('surplusCard');
+  card.className=(isDeficit?'hero-deficit':'hero-surplus')+' p-6 flex flex-col justify-between text-white';
+  document.getElementById('surplusLabel').textContent=isDeficit?'Monthly Deficit ⚠':'Monthly Surplus';
+  document.getElementById('monthlySurplusDisplay').textContent=(isDeficit?'−₹':'₹')+displayAbs.toLocaleString('en-IN');
+  document.getElementById('annualSurplusDisplay').textContent=(isDeficit?'−₹':'₹')+Math.abs(Math.round(annualSurplus)).toLocaleString('en-IN')+' / year';
+
+  const mFD=isDeficit?0:netMonthly*fdSplitPct;
+  const mSIP=isDeficit?0:netMonthly*sipSplitPct;
+  document.getElementById('fdVal').textContent=fmt(mFD);
+  document.getElementById('sipVal').textContent=fmt(mSIP);
+  document.getElementById('totalPrincipal').textContent=fmt(totP);
+  document.getElementById('blendedROI').textContent=totP>0?((totalYield/totP)*100).toFixed(2)+'%':'—';
+
+  // only re-render forecast if that tab is visible
+  if (document.getElementById('tab-forecast').classList.contains('active')) renderForecast();
+  if (document.getElementById('tab-insights').classList.contains('active')) renderInsights();
+  if (document.getElementById('tab-scenarios').classList.contains('active')) renderComparison();
+
+  // Goal planner
+  const goalCorpus=parseFloat(document.getElementById('goalCorpus').value.replace(/,/g,''))||0;
+  const goalYears=parseInt(document.getElementById('goalYears').value)||20;
+  const feasEl=document.getElementById('goalFeasibility');
+  if(goalCorpus>0){
+    const r=sipR/12, n=goalYears*12;
+    const reqSIP=r===0?goalCorpus/n:goalCorpus*r/(Math.pow(1+r,n)-1);
+    const avail=isDeficit?0:mSIP;
+    const feasible=!isDeficit&&reqSIP<=avail;
+    document.getElementById('goalSIP').textContent=fmt(reqSIP);
+    feasEl.textContent=feasible?'✓ Achievable with current surplus':`⚠ Needs ₹${Math.round(reqSIP-avail).toLocaleString('en-IN')} more/month`;
+    feasEl.style.color=feasible?'var(--green)':'var(--rose)';
+  } else { document.getElementById('goalSIP').textContent='₹0'; feasEl.textContent=''; }
+
+  // Drawdown
+  const ddC=parseFloat(document.getElementById('ddCorpus').value.replace(/,/g,''))||0;
+  const ddW=parseFloat(document.getElementById('ddWithdraw').value.replace(/,/g,''))||0;
+  const ddR=(parseFloat(document.getElementById('ddReturn').value)||8)/100;
+  const ddI=(parseFloat(document.getElementById('ddInflation').value)||5)/100;
+  if(ddC>0&&ddW>0){
+    let corpus=ddC, yr=0, maxYr=100;
+    while(corpus>0&&yr<maxYr){
+      const withdraw=ddW*Math.pow(1+ddI,yr);
+      corpus=(corpus-withdraw)*(1+ddR);
+      yr++;
+    }
+    document.getElementById('ddResult').textContent=yr>=maxYr?'100+ years':yr+' years';
+    document.getElementById('ddNote').textContent=yr>=maxYr?'Your corpus outlasts a 100-year horizon 🎉':`Depleted at age ~${yr} from retirement · real withdrawal grows with inflation`;
+  } else { document.getElementById('ddResult').textContent='—'; document.getElementById('ddNote').textContent=''; }
+
+  document.getElementById('audit').textContent=
+    `b1=${b1.toLocaleString()} · b2=${b2.toLocaleString()} · t1=${Math.round(t1).toLocaleString()} · t2=${Math.round(t2).toLocaleString()} · yield=${Math.round(totalYield).toLocaleString()} · ${isDeficit?'deficit':'surplus'}/mo=${displayAbs.toLocaleString()}`;
+}
+
+// ── FORECAST (with salary growth + milestones) ─────────────────────────
+function renderForecast() {
+  const {b1,b2,g1,g2,exp,fdSplitPct,sipSplitPct,sipR,fdR,inf} = getBaseInputs();
+  const {totP,totalYield} = getAssetTotals(b1,b2);
+
+  // Pre-simulate 30 years to get maxTotal for bar scaling
+  function simulate(years, extraExpMo=0, lumpsumAdd=0, extraIncMo=0) {
+    let cFD=totP+lumpsumAdd, cSIP=0;
+    let salary1=b1, salary2=b2, annualExp=exp;
+    for(let yr=1;yr<=years;yr++){
+      salary1*=(1+g1); salary2*=(1+g2);
+      annualExp*=(1+inf);
+      const s1G=salary1+totalYield/2; const s2G=salary2+totalYield/2;
+      const t1=calculateTax(s1G,true), t2=calculateTax(s2G,true);
+      const surplus=(salary1+salary2+totalYield-t1-t2-annualExp)/12+(extraIncMo-extraExpMo);
+      const mFD=Math.max(0,surplus)*fdSplitPct;
+      const mSIP=Math.max(0,surplus)*sipSplitPct;
+      cFD=(cFD+mFD*12)*(1+fdR);
+      cSIP=(cSIP+mSIP*12)*(1+sipR);
+    }
+    return cFD+cSIP;
+  }
+
+  const max30=simulate(30)||1;
+  let fHtml='';
+
+  [5,10,15,20,25,30].forEach(yr=>{
+    let total=simulate(yr);
+    if(isAdj) total=total/Math.pow(1+inf,yr);
+    const crore=(total/10000000).toFixed(2);
+    const barWidth=Math.min(97,Math.max(3,(simulate(yr)/max30)*100));
+
+    // Find milestones at this year
+    const mMarkers=milestones.filter(m=>m.year===yr);
+    const mHtml=mMarkers.map(m=>`
+      <span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full" style="background:var(--amber-lt);color:var(--amber)">
+        🎯 ${m.label}${m.amount?` · ${fmt(m.amount)}`:''}
+      </span>`).join('');
+
+    fHtml+=`
+      <div class="forecast-row ${mMarkers.length?'':''}">
+        <span class="mono text-sm font-semibold w-14 shrink-0" style="color:var(--muted)">${yr} Yrs</span>
+        <div class="flex-1">
+          <div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:${mMarkers.length?'4px':'0'}">
+            <div style="height:100%;width:${barWidth}%;border-radius:99px;background:linear-gradient(to right,var(--teal),var(--indigo));transition:width .5s ease"></div>
+          </div>
+          ${mHtml}
+        </div>
+        <span class="mono text-base font-bold w-24 text-right shrink-0" style="color:var(--teal-dk)">₹${crore} Cr</span>
+      </div>`;
+  });
+  document.getElementById('forecastTable').innerHTML=fHtml;
+}
+
+// ── SCENARIO COMPARISON ────────────────────────────────────────────────
+function switchScenario(sc) {
+  activeScenario=sc;
+  ['A','B'].forEach(s=>document.getElementById('scTab_'+s).classList.toggle('active',s===sc));
+  const cur=scenarios[sc];
+  document.getElementById('sc_name').value=cur.name;
+  document.getElementById('sc_extraExp').value=cur.extraExp?cur.extraExp.toLocaleString('en-IN'):'0';
+  document.getElementById('sc_lumpsum').value=cur.lumpsum?cur.lumpsum.toLocaleString('en-IN'):'0';
+  document.getElementById('sc_extraInc').value=cur.extraInc?cur.extraInc.toLocaleString('en-IN'):'0';
+}
+
+function saveScenario() {
+  scenarios[activeScenario].name=document.getElementById('sc_name').value||('Scenario '+activeScenario);
+  scenarios[activeScenario].extraExp=parseFloat(document.getElementById('sc_extraExp').value.replace(/,/g,''))||0;
+  scenarios[activeScenario].lumpsum=parseFloat(document.getElementById('sc_lumpsum').value.replace(/,/g,''))||0;
+  scenarios[activeScenario].extraInc=parseFloat(document.getElementById('sc_extraInc').value.replace(/,/g,''))||0;
+  renderComparison(); saveToLocal();
+}
+
+function renderComparison() {
+  const {b1,b2,g1,g2,exp,fdSplitPct,sipSplitPct,sipR,fdR,inf}=getBaseInputs();
+  const {totP,totalYield}=getAssetTotals(b1,b2);
+
+  function simScenario(sc, years){
+    const {extraExp,lumpsum,extraInc}=scenarios[sc];
+    let cFD=totP+lumpsum, cSIP=0;
+    let s1=b1, s2=b2, annExp=exp;
+    for(let yr=1;yr<=years;yr++){
+      s1*=(1+g1); s2*=(1+g2); annExp*=(1+inf);
+      const t1=calculateTax(s1+totalYield/2,true), t2=calculateTax(s2+totalYield/2,true);
+      const surplus=(s1+s2+totalYield-t1-t2-annExp)/12+(extraInc-extraExp);
+      const mFD=Math.max(0,surplus)*fdSplitPct;
+      const mSIP=Math.max(0,surplus)*sipSplitPct;
+      cFD=(cFD+mFD*12)*(1+fdR);
+      cSIP=(cSIP+mSIP*12)*(1+sipR);
+    }
+    return cFD+cSIP;
+  }
+
+  const years=[10,20,30];
+  const rows=years.map(yr=>{
+    const a=simScenario('A',yr), b_val=simScenario('B',yr);
+    const diff=b_val-a;
+    const better=diff>0?'B':'A';
+    return `<tr style="border-bottom:1px solid var(--border)">
+      <td class="py-3 mono text-sm font-semibold" style="color:var(--muted)">${yr} Yrs</td>
+      <td class="py-3 mono text-sm font-bold" style="color:var(--indigo)">${fmt(a)}</td>
+      <td class="py-3 mono text-sm font-bold" style="color:var(--purple)">${fmt(b_val)}</td>
+      <td class="py-3 mono text-sm font-bold ${diff>=0?'':''}">
+        <span style="color:${diff>=0?'var(--green)':'var(--rose)'}">${diff>=0?'+':''}${fmt(Math.abs(diff))}</span>
+        <span class="text-xs font-normal ml-1" style="color:var(--faint)">→ ${better} wins</span>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('scenarioComparison').innerHTML=`
+    <table class="w-full text-left">
+      <thead style="border-bottom:2px solid var(--border)">
+        <tr>
+          <th class="pb-2 text-xs font-semibold uppercase tracking-wider" style="color:var(--faint)">Horizon</th>
+          <th class="pb-2 text-xs font-semibold uppercase tracking-wider" style="color:var(--indigo)">${scenarios.A.name}</th>
+          <th class="pb-2 text-xs font-semibold uppercase tracking-wider" style="color:var(--purple)">${scenarios.B.name}</th>
+          <th class="pb-2 text-xs font-semibold uppercase tracking-wider" style="color:var(--faint)">Difference</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ── INSIGHTS ───────────────────────────────────────────────────────────
+function renderInsights() {
+  const {b1,b2}=getBaseInputs();
+  const {s1G,s2G,totalYield,totP}=getAssetTotals(b1,b2);
+  const t1=calculateTax(s1G,b1>0), t2=calculateTax(s2G,b2>0);
+  const insights=[];
+
+  // 1. Tax split suggestion
+  if(s1G>1600000 && s2G<800000 && totalYield>0){
+    const saving=calculateTax(s1G,b1>0)-calculateTax(s1G-totalYield*0.5,b1>0);
+    insights.push({type:'tip',icon:'💡',title:'Tax Optimisation — Asset Ownership Split',
+      body:`Spouse 1 is in a higher tax bracket (>₹16L gross). Moving taxable investment income to Spouse 2 could save up to ${fmt(saving)} in tax annually.`});
+  }
+
+  // 2. Slab boundary warning
+  [400000,800000,1200000,1600000,2000000,2400000].forEach(boundary=>{
+    const gap1=boundary-s1G;
+    if(gap1>0&&gap1<50000)
+      insights.push({type:'warn',icon:'⚠️',title:`Spouse 1 is ₹${Math.round(gap1).toLocaleString('en-IN')} below the ₹${(boundary/100000).toFixed(0)}L tax slab`,
+        body:`Small income additions (like interest or bonus) could push into the next slab. Consider channelling extra income to Spouse 2 or tax-free instruments.`});
+    const gap2=boundary-s2G;
+    if(gap2>0&&gap2<50000)
+      insights.push({type:'warn',icon:'⚠️',title:`Spouse 2 is ₹${Math.round(gap2).toLocaleString('en-IN')} below the ₹${(boundary/100000).toFixed(0)}L tax slab`,
+        body:`Small income additions could push into the next slab. Consider parking yield in tax-free instruments.`});
+  });
+
+  // 3. Low equity warning
+  if(totP>0){
+    const rows=[...document.querySelectorAll('.asset-row')];
+    const fdP=rows.filter(r=>r.querySelector('.name_in').value.toLowerCase().includes('fd')||r.querySelector('.y_in').value<9)
+               .reduce((s,r)=>s+(parseFloat(r.querySelector('.p_in').value.replace(/,/g,''))||0),0);
+    if(fdP/totP>0.7)
+      insights.push({type:'info',icon:'📊',title:'Portfolio is heavily fixed-income (>70% FD)',
+        body:`Over long horizons, equity (SIP/MF) typically outperforms FDs significantly after inflation. Consider shifting some allocation to equity if your timeline is 10+ years.`});
+  }
+
+  // 4. No tax-free assets
+  const hasTaxFree=[...document.querySelectorAll('.tf_in')].some(el=>el.checked);
+  if(totP>0&&!hasTaxFree)
+    insights.push({type:'tip',icon:'💡',title:'No tax-free assets in your portfolio',
+      body:`PPF, ELSS (lock-in 3yr), and Sukanya Samriddhi Yojana offer tax-free returns. Adding even one can reduce your overall tax burden.`});
+
+  // 5. Good surplus
+  const surplus=(b1+b2+totalYield-t1-t2-(parseFloat(document.getElementById('expTotal').value.replace(/,/g,''))||0));
+  if(surplus>0&&surplus/(b1+b2||1)>0.3)
+    insights.push({type:'tip',icon:'🌟',title:'Strong savings rate — above 30%',
+      body:`Your household saves over 30% of income — well above the recommended 20%. Keep compounding this advantage through regular SIP increases each year.`});
+
+  if(!insights.length){
+    insights.push({type:'info',icon:'ℹ️',title:'Fill in your data to see personalised insights',
+      body:'Add income, assets, and expenses across the other tabs and come back here.'});
+  }
+
+  const typeMap={tip:'insight-tip',warn:'insight-warn',info:'insight-info'};
+  document.getElementById('insightsPanel').innerHTML=insights.map(i=>`
+    <div class="insight-card ${typeMap[i.type]}">
+      <div class="flex items-start gap-3">
+        <span style="font-size:1.3rem;flex-shrink:0">${i.icon}</span>
+        <div>
+          <p class="font-semibold text-sm mb-1">${i.title}</p>
+          <p class="text-sm opacity-80">${i.body}</p>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── PERSISTENCE ────────────────────────────────────────────────────────
+function saveToLocal() {
+  const data={
+    b1:document.getElementById('b1').value, b2:document.getElementById('b2').value,
+    g1:document.getElementById('g1').value, g2:document.getElementById('g2').value,
+    fdRange:document.getElementById('fdRangeInput').value,
+    sipRange:document.getElementById('sipRangeInput').value,
+    sipRet:document.getElementById('sipRet').value, fdRate:document.getElementById('fdRate').value,
+    infRet:document.getElementById('infRet').value, adj:isAdj,
+    goalCorpus:document.getElementById('goalCorpus').value,
+    goalYears:document.getElementById('goalYears').value,
+    ddCorpus:document.getElementById('ddCorpus').value,
+    ddWithdraw:document.getElementById('ddWithdraw').value,
+    ddReturn:document.getElementById('ddReturn').value,
+    ddInflation:document.getElementById('ddInflation').value,
+    expCategories:expCategories, milestones, scenarios,
+    assets:[]
+  };
+  document.querySelectorAll('.asset-row').forEach(row=>{
+    data.assets.push({n:row.querySelector('.name_in').value, p:row.querySelector('.p_in').value,
+      y:row.querySelector('.y_in').value, o:row.querySelector('.o_in').value, tf:row.querySelector('.tf_in').checked});
+  });
+  try{localStorage.setItem('master_plan_v3',JSON.stringify(data));}catch(e){}
+}
+
+function loadFromLocal() {
+  let saved; try{saved=localStorage.getItem('master_plan_v3');}catch(e){}
+  renderExpenses(); // always render expense grid first
+  if(!saved){validateSplit('fd');recalc();return;}
+  const d=JSON.parse(saved);
+  document.getElementById('b1').value=d.b1||'0';
+  document.getElementById('b2').value=d.b2||'0';
+  document.getElementById('g1').value=d.g1||'8';
+  document.getElementById('g2').value=d.g2||'8';
+  document.getElementById('fdRangeInput').value=d.fdRange||'50';
+  document.getElementById('sipRangeInput').value=d.sipRange||'50';
+  document.getElementById('sipRet').value=d.sipRet||'12';
+  document.getElementById('fdRate').value=d.fdRate||'7';
+  document.getElementById('infRet').value=d.infRet||'5';
+  document.getElementById('goalCorpus').value=d.goalCorpus||'0';
+  document.getElementById('goalYears').value=d.goalYears||'20';
+  document.getElementById('ddCorpus').value=d.ddCorpus||'0';
+  document.getElementById('ddWithdraw').value=d.ddWithdraw||'0';
+  document.getElementById('ddReturn').value=d.ddReturn||'8';
+  document.getElementById('ddInflation').value=d.ddInflation||'5';
+  if(d.expCategories){expCategories=d.expCategories; renderExpenses();}
+  if(d.milestones){milestones=d.milestones; renderMilestoneList();}
+  if(d.scenarios){scenarios=d.scenarios; switchScenario('A');}
+  if(d.adj){isAdj=true;document.getElementById('adjToggleBtn').classList.add('on');
+    document.getElementById('adjNote').textContent='Showing inflation-adjusted (real) values · includes salary growth';}
+  document.getElementById('assetBody').innerHTML='';
+  (d.assets||[]).forEach(a=>addRow(a.n,parseFloat((a.p||'0').replace(/,/g,'')),parseFloat(a.y),a.o,a.tf));
+  validateSplit('fd'); recalc();
+}
+
+function resetToZero() {
+  if(!confirm('Clear all data and start fresh?')) return;
+  try{localStorage.removeItem('master_plan_v3');}catch(e){}
+  location.reload();
+}
+
+window.onload=loadFromLocal;
+</script>
 </body>
 </html>
