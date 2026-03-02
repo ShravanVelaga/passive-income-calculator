@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Master Planning Dashboard</title>
+<title>Chart Your Finances</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:#F7F4EF; --surface:#FFFFFF; --border:#E8E2D9;
@@ -19,1080 +19,1736 @@
   --green:#16A34A; --green-lt:#DCFCE7;
   --purple:#7C3AED; --purple-lt:#EDE9FE;
   --orange:#EA580C; --orange-lt:#FFEDD5;
+  --blue:#2563EB; --blue-lt:#DBEAFE; --blue-dk:#1E40AF;
 }
-*{font-family:'DM Sans',sans-serif;box-sizing:border-box;margin:0;padding:0;}
-.mono{font-family:'DM Mono',monospace;}
-body{background:var(--bg);color:var(--text);min-height:100vh;}
+*, *::before, *::after { font-family:'DM Sans',sans-serif; box-sizing:border-box; margin:0; padding:0; }
+.mono { font-family:'DM Mono',monospace; }
+body { background:var(--bg); color:var(--text); min-height:100vh; }
 
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;}
-.inset{background:var(--bg);border:1px solid var(--border);border-radius:12px;}
-.section-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);}
+.card  { background:var(--surface); border:1px solid var(--border); border-radius:16px; }
+.inset { background:var(--bg); border:1px solid var(--border); border-radius:12px; }
+.sl    { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); }
 
-.field-input{width:100%;background:transparent;border:none;border-bottom:2px solid var(--border);font-family:'DM Mono',monospace;font-size:1.35rem;font-weight:500;color:var(--text);outline:none;padding-bottom:4px;transition:border-color .2s;}
-.field-input:focus{border-color:var(--teal);}
-.small-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:0.9rem;font-weight:500;color:var(--text);outline:none;padding:7px 10px;transition:border-color .2s;}
-.small-input:focus{border-color:var(--teal);}
-select.small-input{font-family:'DM Sans',sans-serif;}
+.fi { width:100%; background:transparent; border:none; border-bottom:2px solid var(--border); font-family:'DM Mono',monospace; font-size:1.3rem; font-weight:500; color:var(--text); outline:none; padding-bottom:4px; transition:border-color .2s; }
+.fi:focus { border-color:var(--teal); }
+.si { width:100%; background:var(--bg); border:1.5px solid var(--border); border-radius:8px; font-family:'DM Mono',monospace; font-size:.9rem; font-weight:500; color:var(--text); outline:none; padding:7px 10px; transition:border-color .2s; }
+.si:focus { border-color:var(--teal); }
+select.si { font-family:'DM Sans',sans-serif; }
 
-input[type=range]{-webkit-appearance:none;height:5px;border-radius:99px;outline:none;cursor:pointer;}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:99px;cursor:pointer;transition:transform .15s;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.15);}
-input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
-#fdRangeInput::-webkit-slider-thumb{background:var(--indigo);}
-#sipRangeInput::-webkit-slider-thumb{background:var(--teal);}
+input[type=range] { -webkit-appearance:none; height:5px; border-radius:99px; outline:none; cursor:pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:99px; cursor:pointer; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.15); transition:transform .15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
 
-.hero-surplus{background:linear-gradient(135deg,#0F766E 0%,#0D9488 60%,#14B8A6 100%);border-radius:16px;}
-.hero-deficit{background:linear-gradient(135deg,#9F1239 0%,#E11D48 60%,#FB7185 100%);border-radius:16px;}
+.hero-s { background:linear-gradient(135deg,#0F766E,#0D9488,#14B8A6); border-radius:16px; }
+.hero-d { background:linear-gradient(135deg,#9F1239,#E11D48,#FB7185); border-radius:16px; }
 
-/* Tabs */
-.tab-bar{display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.tab-bar::-webkit-scrollbar{display:none;}
-.tab-btn{flex-shrink:0;padding:8px 14px;border-radius:9px;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;white-space:nowrap;}
-.tab-btn.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08);}
-.tab-panel{display:none;}.tab-panel.active{display:block;}
+/* Tabs — flex:1 so they fill full width */
+.tab-bar { display:flex; gap:4px; background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:4px; }
+.tb { flex:1; padding:8px 14px; border-radius:9px; border:none; background:transparent; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; transition:all .2s; white-space:nowrap; text-align:center; }
+.tb.on { background:var(--surface); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,.08); }
+.tp { display:none; } .tp.on { display:block; }
 
-.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;}
-.stat-row+.stat-row{border-top:1px solid var(--border);}
+.sr { display:flex; justify-content:space-between; align-items:center; padding:6px 0; }
+.sr + .sr { border-top:1px solid var(--border); }
 
-.forecast-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
-.forecast-row:last-child{border-bottom:none;}
+.fr { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+.fr:last-child { border-bottom:none; }
 
-.tag{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;letter-spacing:.04em;}
-.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;}
+.tag  { display:inline-flex; align-items:center; font-size:11px; font-weight:600; padding:3px 10px; border-radius:99px; letter-spacing:.04em; }
+.pill { display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:600; padding:2px 8px; border-radius:99px; }
 
-.asset-table th{font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.07em;padding-bottom:10px;}
-.asset-table td{padding:9px 4px;vertical-align:middle;}
-.asset-table tbody tr{border-bottom:1px solid var(--border);}
-.asset-table tbody tr:last-child{border-bottom:none;}
+.at th { font-size:11px; font-weight:600; color:var(--faint); text-transform:uppercase; letter-spacing:.07em; padding-bottom:10px; }
+.at td { padding:9px 4px; vertical-align:middle; }
+.at tbody tr { border-bottom:1px solid var(--border); }
+.at tbody tr:last-child { border-bottom:none; }
 
-.adj-btn{font-size:12px;font-weight:600;padding:5px 14px;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;}
-.adj-btn.on{background:var(--indigo);color:white;border-color:var(--indigo);}
+.ab { font-size:12px; font-weight:600; padding:5px 14px; border-radius:99px; border:1.5px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; transition:all .2s; }
+.ab.on { background:var(--indigo); color:#fff; border-color:var(--indigo); }
+.ob { font-size:12px; font-weight:600; padding:5px 14px; border-radius:99px; border:1.5px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; transition:all .2s; }
+.ob.on { background:var(--orange); color:#fff; border-color:var(--orange); }
 
-/* Toggle button */
-.toggle-btn{font-size:12px;font-weight:600;padding:5px 14px;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;}
-.toggle-btn.on{background:var(--orange);color:white;border-color:var(--orange);}
+.stab { padding:6px 16px; border-radius:8px; border:1.5px solid var(--border); background:transparent; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; transition:all .2s; }
+.stab.on { background:var(--purple); color:#fff; border-color:var(--purple); }
 
-.scenario-tab{padding:6px 16px;border-radius:8px;border:1.5px solid var(--border);background:transparent;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;}
-.scenario-tab.active{background:var(--purple);color:white;border-color:var(--purple);}
+.ic { border-radius:12px; padding:14px 16px; margin-bottom:10px; border:1px solid; }
+.ic-tip  { background:#F0FDF4; border-color:#86EFAC; color:#14532D; }
+.ic-warn { background:#FFFBEB; border-color:#FCD34D; color:#78350F; }
+.ic-info { background:var(--indigo-lt); border-color:#C7D2FE; color:#312E81; }
 
-.insight-card{border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid;}
-.insight-tip{background:#F0FDF4;border-color:#86EFAC;color:#14532D;}
-.insight-warn{background:#FFFBEB;border-color:#FCD34D;color:#78350F;}
-.insight-info{background:var(--indigo-lt);border-color:#C7D2FE;color:#312E81;}
+.ec { background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:12px 14px; transition:border-color .2s; }
+.ec:focus-within { border-color:var(--teal); }
+.ec.timed { border-color:#FCD34D; background:#FFFEF0; }
 
-.milestone-dot{width:10px;height:10px;border-radius:99px;background:var(--amber);border:2px solid white;box-shadow:0 0 0 2px var(--amber);flex-shrink:0;}
-.exp-end-dot{width:10px;height:10px;border-radius:99px;background:var(--green);border:2px solid white;box-shadow:0 0 0 2px var(--green);flex-shrink:0;}
+@keyframes fu { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.anim { animation:fu .4s ease both; }
 
-/* Expense card */
-.exp-card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:14px;transition:border-color .2s;}
-.exp-card:focus-within{border-color:var(--teal);}
-.exp-card.timed{border-color:#FCD34D;background:#FFFBEB;}
+/* Landing page */
+#landing { display:flex; }
+.dashboard { display:none; }
+.dashboard.active { display:block; }
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-.anim{animation:fadeUp .4s ease both;}
-
-@media(max-width:640px){
-  .field-input{font-size:1.1rem;}
-  .hide-mobile{display:none!important;}
+.country-card {
+  background:var(--surface); border:2px solid var(--border); border-radius:24px;
+  padding:40px 48px; cursor:pointer; transition:all .25s; text-align:center;
+  flex:1; max-width:340px;
 }
-@media print{.no-print{display:none!important;}}
+.country-card:hover { transform:translateY(-4px); box-shadow:0 16px 40px rgba(0,0,0,.1); }
+.country-card.india:hover { border-color:var(--teal); }
+.country-card.usa:hover { border-color:var(--blue); }
+
+@media (max-width:640px) {
+  .fi { font-size:1.1rem; }
+  .hm { display:none !important; }
+  .country-card { padding:28px 24px; }
+}
+@media print { .np { display:none !important; } }
 </style>
 </head>
-<body class="p-4 md:p-6">
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  LANDING PAGE                                          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="landing" class="min-h-screen flex flex-col items-center justify-center p-6">
+  <div class="text-center mb-12 anim">
+    <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-3">Chart Your <span style="color:var(--teal)">Finances</span></h1>
+    <p class="text-lg" style="color:var(--muted)">Tax · Investments · Forecast · Goals · What-If Scenarios</p>
+    <p class="text-sm mt-2" style="color:var(--faint)">Choose your financial context to get started</p>
+  </div>
+  <div class="flex flex-col sm:flex-row gap-6 anim" style="animation-delay:.1s">
+    <div class="country-card india" onclick="openDashboard('india')">
+      <div style="font-size:3.5rem;margin-bottom:16px">🇮🇳</div>
+      <h2 class="text-2xl font-bold mb-2">India</h2>
+      <p class="text-sm mb-4" style="color:var(--muted)">New Tax Regime · FY 2024–25</p>
+      <div class="flex flex-wrap gap-2 justify-center">
+        <span class="tag" style="background:var(--teal-lt);color:var(--teal-dk)">₹ INR</span>
+        <span class="tag" style="background:var(--indigo-lt);color:var(--indigo)">EPF / SIP / FD</span>
+      </div>
+      <div class="mt-6 text-sm font-semibold px-6 py-2 rounded-xl text-white inline-block" style="background:var(--teal)">Open Dashboard →</div>
+    </div>
+    <div class="country-card usa" onclick="openDashboard('usa')">
+      <div style="font-size:3.5rem;margin-bottom:16px">🇺🇸</div>
+      <h2 class="text-2xl font-bold mb-2">USA</h2>
+      <p class="text-sm mb-4" style="color:var(--muted)">Federal + State Tax · 2024</p>
+      <div class="flex flex-wrap gap-2 justify-center">
+        <span class="tag" style="background:var(--blue-lt);color:var(--blue-dk)">$ USD</span>
+        <span class="tag" style="background:var(--purple-lt);color:var(--purple)">401k / Index / Brokerage</span>
+      </div>
+      <div class="mt-6 text-sm font-semibold px-6 py-2 rounded-xl text-white inline-block" style="background:var(--blue)">Open Dashboard →</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  INDIA DASHBOARD                                       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="dashboard-india" class="dashboard p-4 md:p-6">
 <div class="max-w-5xl mx-auto space-y-5 anim">
 
-<!-- HEADER -->
 <header class="card p-5 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
   <div>
     <div class="flex flex-wrap gap-2 mb-2">
-      <span class="tag" style="background:var(--teal-lt);color:var(--teal-dk)">India · New Tax Regime</span>
+      <button onclick="goHome()" class="tag np" style="background:var(--bg);color:var(--muted);border:1px solid var(--border);cursor:pointer">← Switch</button>
+      <span class="tag" style="background:var(--teal-lt);color:var(--teal-dk)">🇮🇳 India · New Tax Regime</span>
       <span class="tag" style="background:var(--indigo-lt);color:var(--indigo)">FY 2024–25</span>
     </div>
-    <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Master Planning <span style="color:var(--teal)">Dashboard</span></h1>
-    <p class="text-sm mt-1" style="color:var(--muted)">Tax · Investments · Forecast · Goal Planner · What-If Scenarios</p>
+    <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Chart Your <span style="color:var(--teal)">Finances</span></h1>
+    <p class="text-sm mt-1" style="color:var(--muted)">Tax · Investments · Forecast · Goals · What-If Scenarios</p>
   </div>
-  <div class="flex flex-wrap gap-2 no-print shrink-0">
+  <div class="flex flex-wrap gap-2 np shrink-0">
     <button onclick="window.print()" class="text-sm font-semibold px-4 py-2 rounded-xl text-white" style="background:var(--teal)">↓ PDF</button>
-    <button onclick="exportData()" class="text-sm font-semibold px-4 py-2 rounded-xl border" style="border-color:var(--border);color:var(--muted)">↓ Backup</button>
-    <button onclick="document.getElementById('importFile').click()" class="text-sm font-semibold px-4 py-2 rounded-xl border" style="border-color:var(--border);color:var(--muted)">↑ Restore</button>
-    <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
-    <button onclick="resetToZero()" class="text-sm font-semibold px-4 py-2 rounded-xl border" style="border-color:var(--rose-lt);color:var(--rose)">Clear</button>
+    <button onclick="IN_exportData()" class="text-sm font-semibold px-4 py-2 rounded-xl border" style="border-color:var(--border);color:var(--muted)">↓ Backup</button>
+    <button onclick="document.getElementById('in_impF').click()" class="text-sm font-semibold px-4 py-2 rounded-xl border" style="border-color:var(--border);color:var(--muted)">↑ Restore</button>
+    <input type="file" id="in_impF" accept=".json" class="hidden" onchange="IN_importData(event)">
+    <button onclick="IN_resetAll()" class="text-sm font-semibold px-4 py-2 rounded-xl border" style="border-color:var(--rose-lt);color:var(--rose)">Clear</button>
   </div>
 </header>
 
-<!-- INCOME + SURPLUS STRIP -->
+<!-- INCOME + SURPLUS -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
   <div class="lg:col-span-2 card p-6 space-y-5">
-    <p class="section-label">Combined Household Income</p>
+    <p class="sl">Combined Household Income</p>
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
       <div>
         <p class="text-sm font-medium mb-2" style="color:var(--indigo)">Spouse 1 · Annual ₹</p>
-        <input type="text" id="b1" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="field-input mono">
+        <input type="text" id="in_b1" value="0" oninput="IN_hi(this);IN_rc();IN_sv()" class="fi mono">
         <div class="flex gap-2 mt-2 items-center">
           <span class="text-xs" style="color:var(--faint)">Growth %/yr</span>
-          <input type="number" id="g1" value="8" min="0" max="30" oninput="recalc();saveToLocal()" class="small-input mono" style="width:60px;padding:4px 8px;font-size:.8rem">
+          <input type="number" id="in_g1" value="8" min="0" max="30" oninput="IN_rc();IN_sv()" class="si mono" style="width:60px;padding:4px 8px;font-size:.8rem">
+        </div>
+        <button id="in_dt1" onclick="IN_togDed(1)" class="mt-3 flex items-center gap-1 text-xs font-semibold" style="color:var(--indigo)">
+          <span id="in_da1" style="font-size:10px;display:inline-block;transition:transform .2s">▶</span>
+          Deductions <span id="in_db1" class="hidden mono font-normal" style="color:var(--faint)"></span>
+        </button>
+        <div id="in_dp1" class="hidden mt-2 space-y-1.5">
+          <div id="in_dl1" class="space-y-1"></div>
+          <button onclick="IN_addDed(1)" class="text-xs font-semibold" style="color:var(--indigo)">+ Add row</button>
         </div>
       </div>
       <div>
         <p class="text-sm font-medium mb-2" style="color:var(--teal)">Spouse 2 · Annual ₹</p>
-        <input type="text" id="b2" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="field-input mono">
+        <input type="text" id="in_b2" value="0" oninput="IN_hi(this);IN_rc();IN_sv()" class="fi mono">
         <div class="flex gap-2 mt-2 items-center">
           <span class="text-xs" style="color:var(--faint)">Growth %/yr</span>
-          <input type="number" id="g2" value="8" min="0" max="30" oninput="recalc();saveToLocal()" class="small-input mono" style="width:60px;padding:4px 8px;font-size:.8rem">
+          <input type="number" id="in_g2" value="8" min="0" max="30" oninput="IN_rc();IN_sv()" class="si mono" style="width:60px;padding:4px 8px;font-size:.8rem">
+        </div>
+        <button id="in_dt2" onclick="IN_togDed(2)" class="mt-3 flex items-center gap-1 text-xs font-semibold" style="color:var(--teal)">
+          <span id="in_da2" style="font-size:10px;display:inline-block;transition:transform .2s">▶</span>
+          Deductions <span id="in_db2" class="hidden mono font-normal" style="color:var(--faint)"></span>
+        </button>
+        <div id="in_dp2" class="hidden mt-2 space-y-1.5">
+          <div id="in_dl2" class="space-y-1"></div>
+          <button onclick="IN_addDed(2)" class="text-xs font-semibold" style="color:var(--teal)">+ Add row</button>
         </div>
       </div>
       <div>
         <p class="text-sm font-medium mb-2" style="color:var(--rose)">Total Expenses · Annual ₹</p>
-        <p class="mono font-bold text-xl pt-1" id="expTotalDisplay" style="color:var(--rose)">₹0</p>
-        <p class="text-xs mt-2" style="color:var(--faint)">← auto from categories</p>
+        <p class="mono text-xl font-bold pt-1" id="in_expDisp" style="color:var(--rose)">₹0</p>
+        <p class="text-xs mt-2" style="color:var(--faint)">← auto-summed from categories</p>
       </div>
     </div>
     <div class="grid grid-cols-2 gap-3 pt-1">
-      <div class="inset p-3 space-y-1">
-        <p class="text-xs font-semibold mb-1" style="color:var(--indigo)">Spouse 1 · Net In-Hand</p>
-        <div class="stat-row"><span class="text-xs" style="color:var(--muted)">Gross</span><span class="mono text-xs" id="s1_gross">₹0</span></div>
-        <div class="stat-row"><span class="text-xs" style="color:var(--faint)">Tax</span><span class="mono text-xs" style="color:var(--rose)" id="s1_tax">₹0</span></div>
-        <div class="stat-row"><span class="text-sm font-bold">Net</span><span class="mono text-sm font-bold" id="s1_net">₹0</span></div>
-        <div class="stat-row"><span class="text-xs" style="color:var(--faint)">Eff. Rate</span><span class="mono text-xs" id="s1_rate">0%</span></div>
+      <div class="inset p-3">
+        <p class="text-xs font-semibold mb-2" style="color:var(--indigo)">Spouse 1 · Net In-Hand</p>
+        <div class="sr"><span class="text-xs" style="color:var(--muted)">Gross</span><span class="mono text-xs" id="in_s1g">₹0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">Tax</span><span class="mono text-xs" style="color:var(--rose)" id="in_s1t">₹0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--amber)">Deductions</span><span class="mono text-xs" style="color:var(--amber)" id="in_s1d">₹0</span></div>
+        <div class="sr"><span class="text-sm font-bold">Net</span><span class="mono text-sm font-bold" id="in_s1n">₹0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">Eff. Rate</span><span class="mono text-xs" id="in_s1r">0%</span></div>
       </div>
-      <div class="inset p-3 space-y-1">
-        <p class="text-xs font-semibold mb-1" style="color:var(--teal)">Spouse 2 · Net In-Hand</p>
-        <div class="stat-row"><span class="text-xs" style="color:var(--muted)">Gross</span><span class="mono text-xs" id="s2_gross">₹0</span></div>
-        <div class="stat-row"><span class="text-xs" style="color:var(--faint)">Tax</span><span class="mono text-xs" style="color:var(--rose)" id="s2_tax">₹0</span></div>
-        <div class="stat-row"><span class="text-sm font-bold">Net</span><span class="mono text-sm font-bold" id="s2_net">₹0</span></div>
-        <div class="stat-row"><span class="text-xs" style="color:var(--faint)">Eff. Rate</span><span class="mono text-xs" id="s2_rate">0%</span></div>
+      <div class="inset p-3">
+        <p class="text-xs font-semibold mb-2" style="color:var(--teal)">Spouse 2 · Net In-Hand</p>
+        <div class="sr"><span class="text-xs" style="color:var(--muted)">Gross</span><span class="mono text-xs" id="in_s2g">₹0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">Tax</span><span class="mono text-xs" style="color:var(--rose)" id="in_s2t">₹0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--amber)">Deductions</span><span class="mono text-xs" style="color:var(--amber)" id="in_s2d">₹0</span></div>
+        <div class="sr"><span class="text-sm font-bold">Net</span><span class="mono text-sm font-bold" id="in_s2n">₹0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">Eff. Rate</span><span class="mono text-xs" id="in_s2r">0%</span></div>
       </div>
     </div>
   </div>
-
-  <!-- Surplus hero -->
-  <div class="hero-surplus p-6 flex flex-col justify-between text-white" id="surplusCard">
-    <p class="text-sm font-semibold opacity-80 uppercase tracking-widest" id="surplusLabel">Monthly Surplus</p>
+  <div class="hero-s p-6 flex flex-col justify-between text-white" id="in_sCard">
+    <p class="text-sm font-semibold opacity-80 uppercase tracking-widest" id="in_sLbl">Monthly Surplus</p>
     <div class="my-4">
-      <p class="mono text-4xl font-bold leading-none" id="monthlySurplusDisplay">₹0</p>
-      <p class="mono text-sm opacity-60 mt-2" id="annualSurplusDisplay">₹0 / year</p>
+      <p class="mono text-4xl font-bold leading-none" id="in_sDisp">₹0</p>
+      <p class="mono text-sm opacity-60 mt-2" id="in_saDisp">₹0 / year</p>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div class="rounded-xl p-3 text-center" style="background:rgba(255,255,255,.15)">
         <p class="text-xs font-semibold opacity-75 uppercase tracking-wider mb-1">To FD</p>
-        <p class="mono text-base font-bold" id="fdVal">₹0</p>
+        <p class="mono text-base font-bold" id="in_fdV">₹0</p>
       </div>
       <div class="rounded-xl p-3 text-center" style="background:rgba(255,255,255,.15)">
         <p class="text-xs font-semibold opacity-75 uppercase tracking-wider mb-1">To SIP</p>
-        <p class="mono text-base font-bold" id="sipVal">₹0</p>
+        <p class="mono text-base font-bold" id="in_sipV">₹0</p>
       </div>
     </div>
   </div>
 </div>
 
 <!-- TAB BAR -->
-<div class="tab-bar no-print">
-  <button class="tab-btn active" onclick="switchTab('expenses',this)">💸 Expenses</button>
-  <button class="tab-btn" onclick="switchTab('investments',this)">📈 Investments</button>
-  <button class="tab-btn" onclick="switchTab('forecast',this)">🔭 Forecast</button>
-  <button class="tab-btn" onclick="switchTab('scenarios',this)">⚖️ What-If</button>
-  <button class="tab-btn" onclick="switchTab('insights',this)">💡 Insights</button>
+<div class="tab-bar np">
+  <button class="tb on" onclick="IN_tab('expenses',this)">💸 Expenses</button>
+  <button class="tb" onclick="IN_tab('investments',this)">📈 Investments</button>
+  <button class="tb" onclick="IN_tab('forecast',this)">🔭 Forecast</button>
+  <button class="tb" onclick="IN_tab('scenarios',this)">⚖️ What-If</button>
+  <button class="tb" onclick="IN_tab('insights',this)">💡 Insights</button>
 </div>
 
-<!-- ══════════════════ TAB: EXPENSES ══════════════════ -->
-<div id="tab-expenses" class="tab-panel active space-y-4">
+<!-- TAB: EXPENSES -->
+<div id="in_tp-expenses" class="tp on space-y-4">
   <div class="card p-6">
     <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
       <div>
-        <p class="section-label">Monthly Expense Categories</p>
-        <p class="text-sm mt-1" style="color:var(--muted)">Set a start year, end year, and whether this expense grows with inflation each year.</p>
+        <p class="sl">Monthly Expense Categories</p>
+        <p class="text-sm mt-1" style="color:var(--muted)">Set start &amp; end year per category. Leave blank = permanent.</p>
       </div>
-      <div class="flex gap-2 items-center flex-wrap no-print">
-        <button id="expInflBtn" onclick="toggleExpInfl()" class="toggle-btn">📈 Inflation Off</button>
-        <button onclick="addExpenseCategory()" class="text-sm font-semibold px-4 py-2 rounded-lg border" style="border-color:var(--border);color:var(--muted)">+ Add</button>
+      <div class="flex gap-2 items-center flex-wrap np">
+        <button id="in_eiBtn" onclick="IN_togExpInfl()" class="ob">📈 Inflation Off</button>
+        <button onclick="IN_addExp()" class="text-sm font-semibold px-4 py-2 rounded-lg border" style="border-color:var(--border);color:var(--muted)">+ Add</button>
       </div>
     </div>
-
-    <!-- Column headers -->
-    <div class="grid gap-2 mb-2 hide-mobile" style="grid-template-columns:2fr 1.2fr 0.7fr 0.7fr 0.7fr 1fr 28px">
-      <p class="section-label">Category</p>
-      <p class="section-label">Monthly ₹</p>
-      <p class="section-label">Start Yr</p>
-      <p class="section-label">End Yr</p>
-      <p class="section-label">Infl?</p>
-      <p class="section-label">Status</p>
-      <p></p>
+    <div class="hm grid mb-3 items-center" style="grid-template-columns:1.8fr 1.1fr 0.55fr 0.55fr 0.4fr 0.9fr 26px; gap:8px;">
+      <p class="sl">Category</p><p class="sl">Monthly ₹</p><p class="sl">Start Yr</p><p class="sl">End Yr</p>
+      <p class="sl text-center">Infl?</p><p class="sl">Status</p><p></p>
     </div>
-
-    <div id="expenseList" class="space-y-2"></div>
-
+    <div id="in_expList" class="space-y-2"></div>
     <div class="mt-4 p-3 rounded-xl flex justify-between items-center" style="background:var(--rose-lt)">
       <span class="text-sm font-semibold" style="color:var(--rose)">Current Monthly Total</span>
-      <span class="mono text-lg font-bold" style="color:var(--rose)" id="expMonthlyTotal">₹0</span>
+      <span class="mono text-lg font-bold" style="color:var(--rose)" id="in_expMTot">₹0</span>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════ TAB: INVESTMENTS ══════════════════ -->
-<div id="tab-investments" class="tab-panel space-y-5">
-  <!-- EPF Tracker -->
+<!-- TAB: INVESTMENTS -->
+<div id="in_tp-investments" class="tp space-y-5">
+  <!-- EMI -->
   <div class="card p-6">
-    <p class="section-label mb-4">EPF / Provident Fund</p>
-    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-      <div>
-        <p class="text-sm font-medium mb-1.5" style="color:var(--indigo)">Spouse 1 Basic Salary ₹/yr</p>
-        <input type="text" id="epf1Basic" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="small-input mono">
-      </div>
-      <div>
-        <p class="text-sm font-medium mb-1.5" style="color:var(--teal)">Spouse 2 Basic Salary ₹/yr</p>
-        <input type="text" id="epf2Basic" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="small-input mono">
-      </div>
-      <div>
-        <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">EPF Interest Rate %</p>
-        <input type="number" id="epfRate" value="8.25" min="1" max="15" step="0.05" oninput="recalc();saveToLocal()" class="small-input mono">
-      </div>
-      <div>
-        <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Current EPF Balance ₹</p>
-        <input type="text" id="epfBalance" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="small-input mono">
-      </div>
+    <div class="flex justify-between items-center mb-3">
+      <p class="sl">EMI / Loan Tracker</p>
+      <button onclick="IN_addEMI()" class="text-sm font-semibold px-4 py-2 rounded-lg border np" style="border-color:var(--border);color:var(--muted)">+ Add Loan</button>
     </div>
-    <div class="grid grid-cols-3 gap-3 mt-4">
-      <div class="inset p-3 text-center">
-        <p class="text-xs" style="color:var(--faint)">Monthly EPF Contribution</p>
-        <p class="mono text-base font-bold mt-1" id="epfMonthly">₹0</p>
-      </div>
-      <div class="inset p-3 text-center">
-        <p class="text-xs" style="color:var(--faint)">EPF Corpus in 30 Yrs</p>
-        <p class="mono text-base font-bold mt-1" style="color:var(--teal)" id="epfCorpus30">₹0 Cr</p>
-      </div>
-      <div class="inset p-3 text-center">
-        <p class="text-xs" style="color:var(--faint)">Note</p>
-        <p class="text-xs mt-1" style="color:var(--muted)">12% of basic from each side. Tax-free on withdrawal.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- EMI / Loan Tracker -->
-  <div class="card p-6">
-    <div class="flex justify-between items-center mb-4">
-      <p class="section-label">EMI / Loan Tracker</p>
-      <button onclick="addEMI()" class="text-sm font-semibold px-4 py-2 rounded-lg border no-print" style="border-color:var(--border);color:var(--muted)">+ Add Loan</button>
-    </div>
-    <p class="text-sm mb-4" style="color:var(--muted)">Loans reduce your monthly surplus for their duration — they're automatically modelled in the forecast.</p>
-    <div id="emiList" class="space-y-3"></div>
-    <div id="emiNone" class="text-center py-4" style="color:var(--faint)">
-      <p class="text-sm">No loans added. Add a home loan, car loan, or personal loan.</p>
-    </div>
+    <p class="text-sm mb-4" style="color:var(--muted)">Loans reduce monthly surplus for their duration and drop off automatically in forecast.</p>
+    <div id="in_emiList" class="space-y-3"></div>
+    <div id="in_emiNone" class="text-center py-4" style="color:var(--faint)"><p class="text-sm">No loans added yet.</p></div>
     <div class="mt-4 p-3 rounded-xl flex justify-between items-center" style="background:var(--orange-lt)">
       <span class="text-sm font-semibold" style="color:var(--orange)">Total Monthly EMI</span>
-      <span class="mono text-lg font-bold" style="color:var(--orange)" id="emiMonthlyTotal">₹0</span>
+      <span class="mono text-lg font-bold" style="color:var(--orange)" id="in_emiTot">₹0</span>
     </div>
   </div>
-
   <!-- Investment Matrix -->
   <div class="card p-6">
     <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
-      <div>
-        <p class="section-label">Investment Matrix</p>
-        <p class="text-sm mt-1" style="color:var(--muted)">Yield from non-tax-free assets adds to taxable gross</p>
-      </div>
-      <div class="flex gap-2 no-print">
-        <select id="categorySelector" class="small-input" style="max-width:220px">
+      <div><p class="sl">Investment Matrix</p><p class="text-sm mt-1" style="color:var(--muted)">Yield from non-tax-free assets is added to each spouse's taxable gross</p></div>
+      <div class="flex gap-2 np">
+        <select id="in_catSel" class="si" style="max-width:220px">
           <option value="7.0">FD — Major Bank (7%)</option>
           <option value="8.5">FD — Small Finance (8.5%)</option>
           <option value="7.5">Govt Schemes (7.5%)</option>
           <option value="3.5">Rental Property (3.5%)</option>
           <option value="0.0">Custom Asset</option>
         </select>
-        <button onclick="addCategorizedRow()" class="text-sm font-semibold px-4 py-2 rounded-xl text-white shrink-0" style="background:var(--indigo)">+ Add</button>
+        <button onclick="IN_addAssetRow()" class="text-sm font-semibold px-4 py-2 rounded-xl text-white shrink-0" style="background:var(--indigo)">+ Add</button>
       </div>
     </div>
-    <div id="roiWarning" class="hidden mb-4" style="background:#FFFBEB;border:1px solid #FCD34D;color:#92400E;border-radius:8px;padding:10px 14px;font-size:13px;">⚠ One or more assets have ROI above 30%.</div>
+    <div id="in_roiW" class="hidden mb-4" style="background:#FFFBEB;border:1px solid #FCD34D;color:#92400E;border-radius:8px;padding:10px 14px;font-size:13px">⚠ ROI above 30% on one or more assets — please verify.</div>
     <div class="overflow-x-auto">
-      <table class="w-full asset-table">
+      <table class="w-full at">
         <thead><tr>
           <th class="text-left">Asset</th><th class="text-left">Principal (₹)</th>
           <th class="text-center">ROI %</th><th class="text-left">Owner</th>
-          <th class="text-center">Tax-Free</th><th class="no-print"></th>
+          <th class="text-center">Tax-Free</th><th class="np"></th>
         </tr></thead>
-        <tbody id="assetBody"></tbody>
-        <tfoot>
-          <tr style="border-top:2px solid var(--border)">
-            <td class="pt-3 text-sm font-semibold" style="color:var(--muted)">Portfolio Total</td>
-            <td class="pt-3 mono text-sm font-bold" id="totalPrincipal">₹0</td>
-            <td class="pt-3 mono text-sm font-bold text-center" style="color:var(--teal)" id="blendedROI">—</td>
-            <td colspan="3" class="pt-3 text-xs" style="color:var(--faint)">Blended yield</td>
-          </tr>
-        </tfoot>
+        <tbody id="in_aBody"></tbody>
+        <tfoot><tr style="border-top:2px solid var(--border)">
+          <td class="pt-3 text-sm font-semibold" style="color:var(--muted)">Portfolio Total</td>
+          <td class="pt-3 mono text-sm font-bold" id="in_totP">₹0</td>
+          <td class="pt-3 mono text-sm font-bold text-center" style="color:var(--teal)" id="in_bROI">—</td>
+          <td colspan="3" class="pt-3 text-xs" style="color:var(--faint)">Blended yield</td>
+        </tr></tfoot>
       </table>
     </div>
   </div>
-
   <!-- Reinvestment Strategy -->
   <div class="card p-6">
-    <p class="section-label mb-5">Reinvestment Strategy</p>
+    <p class="sl mb-5">Reinvestment Strategy</p>
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-5">
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">SIP Returns %/yr</p><input type="number" id="sipRet" value="12" min="1" max="30" oninput="recalc();saveToLocal()" class="small-input mono"></div>
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">FD Rate %/yr</p><input type="number" id="fdRate" value="7" min="1" max="15" oninput="recalc();saveToLocal()" class="small-input mono"></div>
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--rose)">Inflation %/yr</p><input type="number" id="infRet" value="5" min="1" max="15" oninput="recalc();saveToLocal()" class="small-input mono"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">SIP Returns %/yr</p><input type="number" id="in_sipRet" value="12" min="1" max="30" oninput="IN_rc();IN_sv()" class="si mono"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">FD Rate %/yr</p><input type="number" id="in_fdRt" value="7" min="1" max="15" oninput="IN_rc();IN_sv()" class="si mono"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--rose)">Inflation %/yr</p><input type="number" id="in_infR" value="5" min="1" max="15" oninput="IN_rc();IN_sv()" class="si mono"></div>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
       <div>
-        <div class="flex justify-between mb-2"><p class="text-sm font-medium" style="color:var(--indigo)">FD Split</p><p class="mono text-sm font-bold" style="color:var(--indigo)" id="fdLabel">50%</p></div>
-        <input type="range" id="fdRangeInput" min="0" max="100" value="50" oninput="validateSplit('fd');recalc();saveToLocal()" class="w-full" style="background:linear-gradient(to right,var(--indigo) 50%,var(--border) 50%)">
+        <div class="flex justify-between mb-2"><p class="text-sm font-medium" style="color:var(--indigo)">FD Split</p><p class="mono text-sm font-bold" style="color:var(--indigo)" id="in_fdLbl">50%</p></div>
+        <input type="range" id="in_fdRng" min="0" max="100" value="50" oninput="IN_vs('fd');IN_rc();IN_sv()" class="w-full" style="background:linear-gradient(to right,var(--indigo) 50%,var(--border) 50%)">
       </div>
       <div>
-        <div class="flex justify-between mb-2"><p class="text-sm font-medium" style="color:var(--teal)">SIP Split</p><p class="mono text-sm font-bold" style="color:var(--teal)" id="sipLabel">50%</p></div>
-        <input type="range" id="sipRangeInput" min="0" max="100" value="50" oninput="validateSplit('sip');recalc();saveToLocal()" class="w-full" style="background:linear-gradient(to right,var(--teal) 50%,var(--border) 50%)">
+        <div class="flex justify-between mb-2"><p class="text-sm font-medium" style="color:var(--teal)">SIP Split</p><p class="mono text-sm font-bold" style="color:var(--teal)" id="in_sipLbl">50%</p></div>
+        <input type="range" id="in_sipRng" min="0" max="100" value="50" oninput="IN_vs('sip');IN_rc();IN_sv()" class="w-full" style="background:linear-gradient(to right,var(--teal) 50%,var(--border) 50%)">
       </div>
     </div>
-    <p class="text-xs mt-3 text-center" style="color:var(--faint)">Always sums to 100%</p>
+    <p class="text-xs mt-3 text-center" style="color:var(--faint)">Sliders always sum to 100%</p>
   </div>
 </div>
 
-<!-- ══════════════════ TAB: FORECAST ══════════════════ -->
-<div id="tab-forecast" class="tab-panel space-y-5">
+<!-- TAB: FORECAST -->
+<div id="in_tp-forecast" class="tp space-y-5">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
     <div class="card p-6">
       <div class="flex justify-between items-center mb-4">
-        <p class="section-label">30-Year Wealth Path</p>
-        <button id="adjToggleBtn" onclick="toggleAdj()" class="adj-btn no-print">Inflation Adj.</button>
+        <p class="sl">30-Year Wealth Path</p>
+        <button id="in_adjBtn" onclick="IN_togAdj()" class="ab np">Inflation Adj.</button>
       </div>
-      <div id="forecastTable"></div>
-      <p class="text-xs mt-3 text-center" style="color:var(--faint)" id="adjNote">Nominal · salary growth · time-bound expenses · EMIs modelled</p>
+      <div id="in_fcTbl"></div>
+      <p class="text-xs mt-3 text-center" style="color:var(--faint)" id="in_adjNote">Nominal · includes salary growth, time-bound expenses &amp; EMIs</p>
     </div>
-
     <div class="card p-6">
       <div class="flex justify-between items-center mb-3">
-        <p class="section-label">Milestone Markers</p>
-        <button onclick="addMilestone()" class="text-xs font-semibold px-3 py-1.5 rounded-lg border no-print" style="border-color:var(--border);color:var(--muted)">+ Add</button>
+        <p class="sl">Milestone Markers</p>
+        <button onclick="IN_addMS()" class="text-xs font-semibold px-3 py-1.5 rounded-lg border np" style="border-color:var(--border);color:var(--muted)">+ Add</button>
       </div>
-      <p class="text-sm mb-4" style="color:var(--muted)">Goals appear as markers on the forecast bars.</p>
-      <div id="milestoneList" class="space-y-3"></div>
-      <div id="milestoneNone" class="text-center py-5" style="color:var(--faint)">
-        <p class="text-2xl mb-1">🎯</p>
-        <p class="text-sm">Add goals like "Child's college", "Car", "Retirement".</p>
+      <div id="in_msList" class="space-y-3"></div>
+      <div id="in_msNone" class="text-center py-5" style="color:var(--faint)">
+        <p class="text-2xl mb-1">🎯</p><p class="text-sm">Add goals like "Child's college", "Home purchase", "Retirement".</p>
       </div>
     </div>
   </div>
-
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-    <!-- Goal planner -->
     <div class="card p-6 space-y-4">
-      <div><p class="section-label">Goal Planner</p><p class="text-sm mt-1" style="color:var(--muted)">How much to invest monthly to hit a target corpus?</p></div>
+      <div><p class="sl">Goal Planner</p><p class="text-sm mt-1" style="color:var(--muted)">How much to invest monthly to hit a target corpus?</p></div>
       <div class="grid grid-cols-2 gap-3">
-        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Target Corpus (₹)</p><input type="text" id="goalCorpus" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="small-input mono"></div>
-        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">In (years)</p><input type="number" id="goalYears" value="20" min="1" max="40" oninput="recalc();saveToLocal()" class="small-input mono"></div>
+        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Target Corpus (₹)</p><input type="text" id="in_gC" value="0" oninput="IN_hi(this);IN_rc();IN_sv()" class="si mono"></div>
+        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">In (years)</p><input type="number" id="in_gY" value="20" min="1" max="40" oninput="IN_rc();IN_sv()" class="si mono"></div>
       </div>
       <div class="inset p-4 text-center">
         <p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color:var(--faint)">Required Monthly SIP</p>
-        <p class="mono text-2xl font-bold" style="color:var(--amber)" id="goalSIP">₹0</p>
-        <p class="text-sm mt-2 font-medium" id="goalFeasibility"></p>
+        <p class="mono text-2xl font-bold" style="color:var(--amber)" id="in_gSIP">₹0</p>
+        <p class="text-sm mt-2 font-medium" id="in_gFeas"></p>
       </div>
     </div>
-
-    <!-- Drawdown simulator -->
     <div class="card p-6 space-y-4">
-      <div><p class="section-label">Corpus Drawdown Simulator</p><p class="text-sm mt-1" style="color:var(--muted)">If you retire with a corpus, how long does it last?</p></div>
+      <div><p class="sl">Corpus Drawdown Simulator</p><p class="text-sm mt-1" style="color:var(--muted)">If you retire with a corpus, how long does it last?</p></div>
       <div class="grid grid-cols-2 gap-3">
-        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Retirement Corpus (₹)</p><input type="text" id="ddCorpus" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="small-input mono"></div>
-        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Annual Withdrawal (₹)</p><input type="text" id="ddWithdraw" value="0" oninput="handleInput(this);recalc();saveToLocal()" class="small-input mono"></div>
-        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Portfolio Return %</p><input type="number" id="ddReturn" value="8" min="1" max="20" oninput="recalc();saveToLocal()" class="small-input mono"></div>
-        <div><p class="text-sm font-medium mb-1.5" style="color:var(--rose)">Inflation %</p><input type="number" id="ddInflation" value="5" min="1" max="15" oninput="recalc();saveToLocal()" class="small-input mono"></div>
+        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Retirement Corpus (₹)</p><input type="text" id="in_ddC" value="0" oninput="IN_hi(this);IN_rc();IN_sv()" class="si mono"></div>
+        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Annual Withdrawal (₹)</p><input type="text" id="in_ddW" value="0" oninput="IN_hi(this);IN_rc();IN_sv()" class="si mono"></div>
+        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Portfolio Return %</p><input type="number" id="in_ddRt" value="8" min="1" max="20" oninput="IN_rc();IN_sv()" class="si mono"></div>
+        <div><p class="text-sm font-medium mb-1.5" style="color:var(--rose)">Inflation %</p><input type="number" id="in_ddI" value="5" min="1" max="15" oninput="IN_rc();IN_sv()" class="si mono"></div>
       </div>
       <div class="inset p-4 text-center">
         <p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color:var(--faint)">Corpus Lasts</p>
-        <p class="mono text-2xl font-bold" style="color:var(--purple)" id="ddResult">—</p>
-        <p class="text-sm mt-1" style="color:var(--muted)" id="ddNote"></p>
+        <p class="mono text-2xl font-bold" style="color:var(--purple)" id="in_ddRes">—</p>
+        <p class="text-sm mt-1" style="color:var(--muted)" id="in_ddNote"></p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════ TAB: WHAT-IF ══════════════════ -->
-<div id="tab-scenarios" class="tab-panel space-y-5">
+<!-- TAB: WHAT-IF -->
+<div id="in_tp-scenarios" class="tp space-y-5">
+  <div class="card p-6">
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
+      <div><p class="sl">What-If Scenario Comparison</p><p class="text-sm mt-1" style="color:var(--muted)">Compare two financial paths side-by-side over 10, 20, and 30 years.</p></div>
+      <div class="flex gap-2 np"><button class="stab on" id="in_stA" onclick="IN_swSC('A')">Scenario A</button><button class="stab" id="in_stB" onclick="IN_swSC('B')">Scenario B</button></div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Scenario Name</p><input type="text" id="in_scN" placeholder="e.g. Buy a House" class="si" oninput="IN_saveSC()"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Expense (₹)</p><input type="text" id="in_scE" value="0" oninput="IN_hi(this);IN_saveSC()" class="si mono"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">One-Time Investment (₹)</p><input type="text" id="in_scL" value="0" oninput="IN_hi(this);IN_saveSC()" class="si mono"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Income (₹)</p><input type="text" id="in_scI" value="0" oninput="IN_hi(this);IN_saveSC()" class="si mono"></div>
+    </div>
+    <div id="in_scComp"></div>
+  </div>
+</div>
+
+<!-- TAB: INSIGHTS -->
+<div id="in_tp-insights" class="tp">
+  <div class="card p-6">
+    <p class="sl mb-5">Smart Insights &amp; Tax Optimisation</p>
+    <div id="in_insP"><p class="text-sm" style="color:var(--faint)">Fill in your data to see personalised insights.</p></div>
+  </div>
+</div>
+
+<p id="in_audit" class="mono text-xs text-center pb-4" style="color:var(--faint)">Audit: Ready</p>
+</div><!-- /max-w -->
+</div><!-- /dashboard-india -->
+
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  USA DASHBOARD                                         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="dashboard-usa" class="dashboard p-4 md:p-6">
+<div class="max-w-5xl mx-auto space-y-5 anim">
+
+<header class="card p-5 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+  <div>
+    <div class="flex flex-wrap gap-2 mb-2">
+      <button onclick="goHome()" class="tag np" style="background:var(--bg);color:var(--muted);border:1px solid var(--border);cursor:pointer">← Switch</button>
+      <span class="tag" style="background:var(--blue-lt);color:var(--blue-dk)">🇺🇸 USA · Federal + State Tax</span>
+      <span class="tag" style="background:var(--purple-lt);color:var(--purple)">Tax Year 2024</span>
+    </div>
+    <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Chart Your <span style="color:var(--blue)">Finances</span></h1>
+    <p class="text-sm mt-1" style="color:var(--muted)">Tax · Investments · Forecast · Goals · What-If Scenarios</p>
+  </div>
+  <div class="flex flex-wrap gap-2 np shrink-0">
+    <button onclick="window.print()" class="text-sm font-semibold px-4 py-2 rounded-xl text-white" style="background:var(--blue)">↓ PDF</button>
+    <button onclick="US_exportData()" class="text-sm font-semibold px-4 py-2 rounded-xl border" style="border-color:var(--border);color:var(--muted)">↓ Backup</button>
+    <button onclick="document.getElementById('us_impF').click()" class="text-sm font-semibold px-4 py-2 rounded-xl border" style="border-color:var(--border);color:var(--muted)">↑ Restore</button>
+    <input type="file" id="us_impF" accept=".json" class="hidden" onchange="US_importData(event)">
+    <button onclick="US_resetAll()" class="text-sm font-semibold px-4 py-2 rounded-xl border" style="border-color:var(--rose-lt);color:var(--rose)">Clear</button>
+  </div>
+</header>
+
+<!-- US INCOME + SURPLUS -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+  <div class="lg:col-span-2 card p-6 space-y-5">
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+      <p class="sl">Combined Household Income</p>
+      <div class="flex flex-wrap gap-2 items-center">
+        <span class="text-xs font-semibold" style="color:var(--muted)">Filing:</span>
+        <select id="us_filing" onchange="US_rc();US_sv()" class="si" style="width:auto;padding:5px 10px;font-size:12px">
+          <option value="mfj">Married Filing Jointly</option>
+          <option value="single">Single</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+        <select id="us_state" onchange="US_rc();US_sv()" class="si" style="width:auto;padding:5px 10px;font-size:12px">
+          <option value="0" data-name="No State Tax (TX/FL/etc)">No State Tax (TX/FL/etc)</option>
+          <option value="4.4" data-name="Colorado">Colorado (4.4%)</option>
+          <option value="3" data-name="Indiana">Indiana (3.05%)</option>
+          <option value="5.75" data-name="Georgia">Georgia (5.75%)</option>
+          <option value="5" data-name="Virginia">Virginia (5.75%)</option>
+          <option value="5.75" data-name="North Carolina">North Carolina (4.5%)</option>
+          <option value="6.99" data-name="Connecticut">Connecticut (6.99%)</option>
+          <option value="6.85" data-name="Nevada">Nevada (0%)</option>
+          <option value="0" data-name="Nevada">Nevada (0%)</option>
+          <option value="0" data-name="Wyoming">Wyoming (0%)</option>
+          <option value="0" data-name="Washington">Washington (0%)</option>
+          <option value="0" data-name="South Dakota">South Dakota (0%)</option>
+          <option value="0" data-name="Alaska">Alaska (0%)</option>
+          <option value="0" data-name="Tennessee">Tennessee (0%)</option>
+          <option value="13.3" data-name="California">California (up to 13.3%)</option>
+          <option value="9.9" data-name="Oregon">Oregon (up to 9.9%)</option>
+          <option value="9.85" data-name="Minnesota">Minnesota (up to 9.85%)</option>
+          <option value="8.82" data-name="New Jersey">New Jersey (up to 8.82%)</option>
+          <option value="10.9" data-name="New York">New York (up to 10.9%)</option>
+          <option value="5.3" data-name="Arizona">Arizona (2.5%)</option>
+          <option value="2.5" data-name="Arizona (flat)">Arizona (flat 2.5%)</option>
+          <option value="4.4" data-name="Utah">Utah (4.65%)</option>
+          <option value="5" data-name="Michigan">Michigan (4.25%)</option>
+          <option value="4.95" data-name="Illinois">Illinois (4.95%)</option>
+          <option value="5" data-name="Massachusetts">Massachusetts (5%)</option>
+          <option value="3.07" data-name="Pennsylvania">Pennsylvania (3.07%)</option>
+          <option value="5" data-name="Wisconsin">Wisconsin (7.65%)</option>
+          <option value="5" data-name="Maryland">Maryland (5.75%)</option>
+          <option value="7" data-name="South Carolina">South Carolina (6.5%)</option>
+          <option value="5" data-name="Alabama">Alabama (5%)</option>
+          <option value="5" data-name="Mississippi">Mississippi (5%)</option>
+          <option value="5" data-name="Arkansas">Arkansas (4.7%)</option>
+          <option value="5.9" data-name="Missouri">Missouri (4.95%)</option>
+          <option value="5.7" data-name="Kansas">Kansas (5.7%)</option>
+          <option value="4.99" data-name="Idaho">Idaho (5.8%)</option>
+          <option value="5" data-name="Montana">Montana (6.75%)</option>
+          <option value="4" data-name="New Mexico">New Mexico (5.9%)</option>
+          <option value="5" data-name="Oklahoma">Oklahoma (4.75%)</option>
+          <option value="5" data-name="Kentucky">Kentucky (4.5%)</option>
+          <option value="0" data-name="Custom">Custom (enter below)</option>
+        </select>
+      </div>
+    </div>
+    <!-- Custom state rate row -->
+    <div id="us_customStateRow" class="hidden">
+      <div class="flex items-center gap-2">
+        <span class="text-xs" style="color:var(--faint)">Custom state marginal rate %</span>
+        <input type="number" id="us_customState" value="0" min="0" max="20" step="0.1" oninput="US_rc();US_sv()" class="si mono" style="width:70px;padding:4px 8px;font-size:.85rem">
+      </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <div>
+        <p class="text-sm font-medium mb-2" style="color:var(--indigo)">Spouse 1 · Annual $</p>
+        <input type="text" id="us_b1" value="0" oninput="US_hi(this);US_rc();US_sv()" class="fi mono">
+        <div class="flex gap-2 mt-2 items-center">
+          <span class="text-xs" style="color:var(--faint)">Growth %/yr</span>
+          <input type="number" id="us_g1" value="5" min="0" max="30" oninput="US_rc();US_sv()" class="si mono" style="width:60px;padding:4px 8px;font-size:.8rem">
+        </div>
+        <!-- 401k / deductions -->
+        <button id="us_dt1" onclick="US_togDed(1)" class="mt-3 flex items-center gap-1 text-xs font-semibold" style="color:var(--indigo)">
+          <span id="us_da1" style="font-size:10px;display:inline-block;transition:transform .2s">▶</span>
+          Pre-tax Deductions <span id="us_db1" class="hidden mono font-normal" style="color:var(--faint)"></span>
+        </button>
+        <div id="us_dp1" class="hidden mt-2 space-y-1.5">
+          <div id="us_dl1" class="space-y-1"></div>
+          <button onclick="US_addDed(1)" class="text-xs font-semibold" style="color:var(--indigo)">+ Add row</button>
+        </div>
+      </div>
+      <div>
+        <p class="text-sm font-medium mb-2" style="color:var(--teal)">Spouse 2 · Annual $</p>
+        <input type="text" id="us_b2" value="0" oninput="US_hi(this);US_rc();US_sv()" class="fi mono">
+        <div class="flex gap-2 mt-2 items-center">
+          <span class="text-xs" style="color:var(--faint)">Growth %/yr</span>
+          <input type="number" id="us_g2" value="5" min="0" max="30" oninput="US_rc();US_sv()" class="si mono" style="width:60px;padding:4px 8px;font-size:.8rem">
+        </div>
+        <button id="us_dt2" onclick="US_togDed(2)" class="mt-3 flex items-center gap-1 text-xs font-semibold" style="color:var(--teal)">
+          <span id="us_da2" style="font-size:10px;display:inline-block;transition:transform .2s">▶</span>
+          Pre-tax Deductions <span id="us_db2" class="hidden mono font-normal" style="color:var(--faint)"></span>
+        </button>
+        <div id="us_dp2" class="hidden mt-2 space-y-1.5">
+          <div id="us_dl2" class="space-y-1"></div>
+          <button onclick="US_addDed(2)" class="text-xs font-semibold" style="color:var(--teal)">+ Add row</button>
+        </div>
+      </div>
+      <div>
+        <p class="text-sm font-medium mb-2" style="color:var(--rose)">Total Expenses · Annual $</p>
+        <p class="mono text-xl font-bold pt-1" id="us_expDisp" style="color:var(--rose)">$0</p>
+        <p class="text-xs mt-2" style="color:var(--faint)">← auto-summed from categories</p>
+      </div>
+    </div>
+    <!-- FICA toggle -->
+    <div class="p-3 rounded-xl flex flex-wrap gap-3 items-center" style="background:var(--bg);border:1px solid var(--border)">
+      <span class="text-xs font-semibold" style="color:var(--muted)">FICA Taxes:</span>
+      <label class="flex items-center gap-1.5 cursor-pointer">
+        <input type="checkbox" id="us_ssOn" checked onchange="US_rc();US_sv()" class="w-3.5 h-3.5" style="accent-color:var(--blue)">
+        <span class="text-xs">Social Security (6.2% up to $168,600)</span>
+      </label>
+      <label class="flex items-center gap-1.5 cursor-pointer">
+        <input type="checkbox" id="us_medOn" checked onchange="US_rc();US_sv()" class="w-3.5 h-3.5" style="accent-color:var(--blue)">
+        <span class="text-xs">Medicare (1.45% + 0.9% above $200k)</span>
+      </label>
+    </div>
+    <!-- Tax audit -->
+    <div class="grid grid-cols-2 gap-3 pt-1">
+      <div class="inset p-3">
+        <p class="text-xs font-semibold mb-2" style="color:var(--indigo)">Spouse 1 · Net Take-Home</p>
+        <div class="sr"><span class="text-xs" style="color:var(--muted)">Gross</span><span class="mono text-xs" id="us_s1g">$0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">Pre-tax Ded.</span><span class="mono text-xs" style="color:var(--amber)" id="us_s1d">$0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">Federal Tax</span><span class="mono text-xs" style="color:var(--rose)" id="us_s1ft">$0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">State Tax</span><span class="mono text-xs" style="color:var(--rose)" id="us_s1st">$0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">FICA</span><span class="mono text-xs" style="color:var(--rose)" id="us_s1fi">$0</span></div>
+        <div class="sr"><span class="text-sm font-bold">Net</span><span class="mono text-sm font-bold" id="us_s1n">$0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">Eff. Rate</span><span class="mono text-xs" id="us_s1r">0%</span></div>
+      </div>
+      <div class="inset p-3">
+        <p class="text-xs font-semibold mb-2" style="color:var(--teal)">Spouse 2 · Net Take-Home</p>
+        <div class="sr"><span class="text-xs" style="color:var(--muted)">Gross</span><span class="mono text-xs" id="us_s2g">$0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">Pre-tax Ded.</span><span class="mono text-xs" style="color:var(--amber)" id="us_s2d">$0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">Federal Tax</span><span class="mono text-xs" style="color:var(--rose)" id="us_s2ft">$0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">State Tax</span><span class="mono text-xs" style="color:var(--rose)" id="us_s2st">$0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">FICA</span><span class="mono text-xs" style="color:var(--rose)" id="us_s2fi">$0</span></div>
+        <div class="sr"><span class="text-sm font-bold">Net</span><span class="mono text-sm font-bold" id="us_s2n">$0</span></div>
+        <div class="sr"><span class="text-xs" style="color:var(--faint)">Eff. Rate</span><span class="mono text-xs" id="us_s2r">0%</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-s p-6 flex flex-col justify-between text-white" id="us_sCard" style="background:linear-gradient(135deg,#1E40AF,#2563EB,#3B82F6)">
+    <p class="text-sm font-semibold opacity-80 uppercase tracking-widest" id="us_sLbl">Monthly Surplus</p>
+    <div class="my-4">
+      <p class="mono text-4xl font-bold leading-none" id="us_sDisp">$0</p>
+      <p class="mono text-sm opacity-60 mt-2" id="us_saDisp">$0 / year</p>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div class="rounded-xl p-3 text-center" style="background:rgba(255,255,255,.15)">
+        <p class="text-xs font-semibold opacity-75 uppercase tracking-wider mb-1">To Brokerage</p>
+        <p class="mono text-base font-bold" id="us_fdV">$0</p>
+      </div>
+      <div class="rounded-xl p-3 text-center" style="background:rgba(255,255,255,.15)">
+        <p class="text-xs font-semibold opacity-75 uppercase tracking-wider mb-1">To Index Fund</p>
+        <p class="mono text-base font-bold" id="us_sipV">$0</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- US TAB BAR -->
+<div class="tab-bar np">
+  <button class="tb on" onclick="US_tab('expenses',this)">💸 Expenses</button>
+  <button class="tb" onclick="US_tab('investments',this)">📈 Investments</button>
+  <button class="tb" onclick="US_tab('forecast',this)">🔭 Forecast</button>
+  <button class="tb" onclick="US_tab('scenarios',this)">⚖️ What-If</button>
+  <button class="tb" onclick="US_tab('insights',this)">💡 Insights</button>
+</div>
+
+<!-- TAB: EXPENSES -->
+<div id="us_tp-expenses" class="tp on space-y-4">
   <div class="card p-6">
     <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
       <div>
-        <p class="section-label">What-If Scenario Comparison</p>
-        <p class="text-sm mt-1" style="color:var(--muted)">Compare two different financial paths side-by-side over 30 years.</p>
+        <p class="sl">Monthly Expense Categories</p>
+        <p class="text-sm mt-1" style="color:var(--muted)">Set start &amp; end year per category. Leave blank = permanent.</p>
       </div>
-      <div class="flex gap-2 no-print">
-        <button class="scenario-tab active" id="scTab_A" onclick="switchScenario('A')">Scenario A</button>
-        <button class="scenario-tab" id="scTab_B" onclick="switchScenario('B')">Scenario B</button>
+      <div class="flex gap-2 items-center flex-wrap np">
+        <button id="us_eiBtn" onclick="US_togExpInfl()" class="ob">📈 Inflation Off</button>
+        <button onclick="US_addExp()" class="text-sm font-semibold px-4 py-2 rounded-lg border" style="border-color:var(--border);color:var(--muted)">+ Add</button>
       </div>
+    </div>
+    <div class="hm grid mb-3 items-center" style="grid-template-columns:1.8fr 1.1fr 0.55fr 0.55fr 0.4fr 0.9fr 26px; gap:8px;">
+      <p class="sl">Category</p><p class="sl">Monthly $</p><p class="sl">Start Yr</p><p class="sl">End Yr</p>
+      <p class="sl text-center">Infl?</p><p class="sl">Status</p><p></p>
+    </div>
+    <div id="us_expList" class="space-y-2"></div>
+    <div class="mt-4 p-3 rounded-xl flex justify-between items-center" style="background:var(--rose-lt)">
+      <span class="text-sm font-semibold" style="color:var(--rose)">Current Monthly Total</span>
+      <span class="mono text-lg font-bold" style="color:var(--rose)" id="us_expMTot">$0</span>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: INVESTMENTS -->
+<div id="us_tp-investments" class="tp space-y-5">
+  <div class="card p-6">
+    <div class="flex justify-between items-center mb-3">
+      <p class="sl">Loan / Mortgage Tracker</p>
+      <button onclick="US_addEMI()" class="text-sm font-semibold px-4 py-2 rounded-lg border np" style="border-color:var(--border);color:var(--muted)">+ Add Loan</button>
+    </div>
+    <p class="text-sm mb-4" style="color:var(--muted)">Loans reduce monthly surplus for their duration and drop off automatically in forecast.</p>
+    <div id="us_emiList" class="space-y-3"></div>
+    <div id="us_emiNone" class="text-center py-4" style="color:var(--faint)"><p class="text-sm">No loans added yet.</p></div>
+    <div class="mt-4 p-3 rounded-xl flex justify-between items-center" style="background:var(--orange-lt)">
+      <span class="text-sm font-semibold" style="color:var(--orange)">Total Monthly Payment</span>
+      <span class="mono text-lg font-bold" style="color:var(--orange)" id="us_emiTot">$0</span>
+    </div>
+  </div>
+  <div class="card p-6">
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
+      <div><p class="sl">Investment Matrix</p><p class="text-sm mt-1" style="color:var(--muted)">Yield from taxable assets is added to each spouse's income</p></div>
+      <div class="flex gap-2 np">
+        <select id="us_catSel" class="si" style="max-width:220px">
+          <option value="5.0">HYSA / Money Market (5%)</option>
+          <option value="7.0">Bonds / CD (4-7%)</option>
+          <option value="10.0">Index Fund S&amp;P500 (10%)</option>
+          <option value="3.0">Rental Property (3%)</option>
+          <option value="0.0">Custom Asset</option>
+        </select>
+        <button onclick="US_addAssetRow()" class="text-sm font-semibold px-4 py-2 rounded-xl text-white shrink-0" style="background:var(--blue)">+ Add</button>
+      </div>
+    </div>
+    <div id="us_roiW" class="hidden mb-4" style="background:#FFFBEB;border:1px solid #FCD34D;color:#92400E;border-radius:8px;padding:10px 14px;font-size:13px">⚠ ROI above 30% on one or more assets — please verify.</div>
+    <div class="overflow-x-auto">
+      <table class="w-full at">
+        <thead><tr>
+          <th class="text-left">Asset</th><th class="text-left">Principal ($)</th>
+          <th class="text-center">ROI %</th><th class="text-left">Owner</th>
+          <th class="text-center">Tax-Adv.</th><th class="np"></th>
+        </tr></thead>
+        <tbody id="us_aBody"></tbody>
+        <tfoot><tr style="border-top:2px solid var(--border)">
+          <td class="pt-3 text-sm font-semibold" style="color:var(--muted)">Portfolio Total</td>
+          <td class="pt-3 mono text-sm font-bold" id="us_totP">$0</td>
+          <td class="pt-3 mono text-sm font-bold text-center" style="color:var(--teal)" id="us_bROI">—</td>
+          <td colspan="3" class="pt-3 text-xs" style="color:var(--faint)">Blended yield</td>
+        </tr></tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="card p-6">
+    <p class="sl mb-5">Reinvestment Strategy</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-5">
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Index Fund Returns %/yr</p><input type="number" id="us_sipRet" value="10" min="1" max="30" oninput="US_rc();US_sv()" class="si mono"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Brokerage/HYSA Rate %/yr</p><input type="number" id="us_fdRt" value="5" min="1" max="15" oninput="US_rc();US_sv()" class="si mono"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--rose)">Inflation %/yr</p><input type="number" id="us_infR" value="3" min="1" max="15" oninput="US_rc();US_sv()" class="si mono"></div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div>
+        <div class="flex justify-between mb-2"><p class="text-sm font-medium" style="color:var(--indigo)">Brokerage Split</p><p class="mono text-sm font-bold" style="color:var(--indigo)" id="us_fdLbl">50%</p></div>
+        <input type="range" id="us_fdRng" min="0" max="100" value="50" oninput="US_vs('fd');US_rc();US_sv()" class="w-full" style="background:linear-gradient(to right,var(--indigo) 50%,var(--border) 50%)">
+      </div>
+      <div>
+        <div class="flex justify-between mb-2"><p class="text-sm font-medium" style="color:var(--teal)">Index Fund Split</p><p class="mono text-sm font-bold" style="color:var(--teal)" id="us_sipLbl">50%</p></div>
+        <input type="range" id="us_sipRng" min="0" max="100" value="50" oninput="US_vs('sip');US_rc();US_sv()" class="w-full" style="background:linear-gradient(to right,var(--teal) 50%,var(--border) 50%)">
+      </div>
+    </div>
+    <p class="text-xs mt-3 text-center" style="color:var(--faint)">Sliders always sum to 100%</p>
+  </div>
+</div>
+
+<!-- TAB: FORECAST -->
+<div id="us_tp-forecast" class="tp space-y-5">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="card p-6">
+      <div class="flex justify-between items-center mb-4">
+        <p class="sl">30-Year Wealth Path</p>
+        <button id="us_adjBtn" onclick="US_togAdj()" class="ab np">Inflation Adj.</button>
+      </div>
+      <div id="us_fcTbl"></div>
+      <p class="text-xs mt-3 text-center" style="color:var(--faint)" id="us_adjNote">Nominal · includes salary growth &amp; time-bound expenses</p>
+    </div>
+    <div class="card p-6">
+      <div class="flex justify-between items-center mb-3">
+        <p class="sl">Milestone Markers</p>
+        <button onclick="US_addMS()" class="text-xs font-semibold px-3 py-1.5 rounded-lg border np" style="border-color:var(--border);color:var(--muted)">+ Add</button>
+      </div>
+      <div id="us_msList" class="space-y-3"></div>
+      <div id="us_msNone" class="text-center py-5" style="color:var(--faint)">
+        <p class="text-2xl mb-1">🎯</p><p class="text-sm">Add goals like "Child's college", "Home purchase", "Retirement".</p>
+      </div>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="card p-6 space-y-4">
+      <div><p class="sl">Goal Planner</p><p class="text-sm mt-1" style="color:var(--muted)">How much to invest monthly to hit a target?</p></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Target Amount ($)</p><input type="text" id="us_gC" value="0" oninput="US_hi(this);US_rc();US_sv()" class="si mono"></div>
+        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">In (years)</p><input type="number" id="us_gY" value="20" min="1" max="40" oninput="US_rc();US_sv()" class="si mono"></div>
+      </div>
+      <div class="inset p-4 text-center">
+        <p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color:var(--faint)">Required Monthly Investment</p>
+        <p class="mono text-2xl font-bold" style="color:var(--amber)" id="us_gSIP">$0</p>
+        <p class="text-sm mt-2 font-medium" id="us_gFeas"></p>
+      </div>
+    </div>
+    <div class="card p-6 space-y-4">
+      <div><p class="sl">Portfolio Drawdown Simulator</p><p class="text-sm mt-1" style="color:var(--muted)">How long does your retirement portfolio last?</p></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Retirement Portfolio ($)</p><input type="text" id="us_ddC" value="0" oninput="US_hi(this);US_rc();US_sv()" class="si mono"></div>
+        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Annual Withdrawal ($)</p><input type="text" id="us_ddW" value="0" oninput="US_hi(this);US_rc();US_sv()" class="si mono"></div>
+        <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Portfolio Return %</p><input type="number" id="us_ddRt" value="7" min="1" max="20" oninput="US_rc();US_sv()" class="si mono"></div>
+        <div><p class="text-sm font-medium mb-1.5" style="color:var(--rose)">Inflation %</p><input type="number" id="us_ddI" value="3" min="1" max="15" oninput="US_rc();US_sv()" class="si mono"></div>
+      </div>
+      <div class="inset p-4 text-center">
+        <p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color:var(--faint)">Portfolio Lasts</p>
+        <p class="mono text-2xl font-bold" style="color:var(--purple)" id="us_ddRes">—</p>
+        <p class="text-sm mt-1" style="color:var(--muted)" id="us_ddNote"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: WHAT-IF -->
+<div id="us_tp-scenarios" class="tp space-y-5">
+  <div class="card p-6">
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
+      <div><p class="sl">What-If Scenario Comparison</p><p class="text-sm mt-1" style="color:var(--muted)">Compare two financial paths side-by-side over 10, 20, and 30 years.</p></div>
+      <div class="flex gap-2 np"><button class="stab on" id="us_stA" onclick="US_swSC('A')">Scenario A</button><button class="stab" id="us_stB" onclick="US_swSC('B')">Scenario B</button></div>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Scenario Name</p><input type="text" id="sc_name" placeholder="e.g. Buy a House" class="small-input" oninput="saveScenario()"></div>
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Expense (₹)</p><input type="text" id="sc_extraExp" value="0" oninput="handleInput(this);saveScenario()" class="small-input mono"></div>
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">One-Time Investment (₹)</p><input type="text" id="sc_lumpsum" value="0" oninput="handleInput(this);saveScenario()" class="small-input mono"></div>
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Income (₹)</p><input type="text" id="sc_extraInc" value="0" oninput="handleInput(this);saveScenario()" class="small-input mono"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Scenario Name</p><input type="text" id="us_scN" placeholder="e.g. Buy a House" class="si" oninput="US_saveSC()"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Expense ($)</p><input type="text" id="us_scE" value="0" oninput="US_hi(this);US_saveSC()" class="si mono"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">One-Time Investment ($)</p><input type="text" id="us_scL" value="0" oninput="US_hi(this);US_saveSC()" class="si mono"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Income ($)</p><input type="text" id="us_scI" value="0" oninput="US_hi(this);US_saveSC()" class="si mono"></div>
     </div>
-    <div id="scenarioComparison"></div>
+    <div id="us_scComp"></div>
   </div>
 </div>
 
-<!-- ══════════════════ TAB: INSIGHTS ══════════════════ -->
-<div id="tab-insights" class="tab-panel">
+<!-- TAB: INSIGHTS -->
+<div id="us_tp-insights" class="tp">
   <div class="card p-6">
-    <p class="section-label mb-5">Smart Insights & Tax Optimisation</p>
-    <div id="insightsPanel"><p class="text-sm" style="color:var(--faint)">Fill in your data to see personalised insights.</p></div>
+    <p class="sl mb-5">Smart Insights &amp; Tax Optimisation</p>
+    <div id="us_insP"><p class="text-sm" style="color:var(--faint)">Fill in your data to see personalised insights.</p></div>
   </div>
 </div>
 
-<p id="audit" class="mono text-xs text-center pb-4" style="color:var(--faint)">Audit: Ready</p>
-</div>
+<p id="us_audit" class="mono text-xs text-center pb-4" style="color:var(--faint)">Audit: Ready</p>
+</div><!-- /max-w -->
+</div><!-- /dashboard-usa -->
+
 
 <script>
-// ─── STATE ─────────────────────────────────────────────────────────────────
-let isAdj = false;
-let expInflEnabled = false;
-let activeScenario = 'A';
-let scenarios = {
-  A:{name:'Scenario A',extraExp:0,lumpsum:0,extraInc:0},
-  B:{name:'Scenario B',extraExp:0,lumpsum:0,extraInc:0}
-};
-let milestones = [];
-let emiList = [];
+// ═══════════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+function openDashboard(country) {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('dashboard-india').classList.remove('active');
+  document.getElementById('dashboard-usa').classList.remove('active');
+  document.getElementById('dashboard-' + country).classList.add('active');
+  if (country === 'india') { IN_loadData(); }
+  else                     { US_loadData(); }
+  try { localStorage.setItem('cyf_lastCountry', country); } catch(e) {}
+}
 
-// Default expense categories — each has startYr (null = now), endYr (null = forever), inflEnabled
-let expCategories = [
-  {id:'rent',   label:'Rent / EMI',     icon:'🏠', val:0, startYr:null, endYr:null, infl:true},
-  {id:'food',   label:'Food & Dining',  icon:'🍽',  val:0, startYr:null, endYr:null, infl:true},
-  {id:'travel', label:'Travel & Fuel',  icon:'🚗', val:0, startYr:null, endYr:null, infl:true},
-  {id:'health', label:'Health & Med',   icon:'💊', val:0, startYr:null, endYr:null, infl:true},
-  {id:'kids',   label:'Kids / School',  icon:'👶', val:0, startYr:null, endYr:null, infl:true},
-  {id:'leisure',label:'Leisure',        icon:'🎬', val:0, startYr:null, endYr:null, infl:true},
-  {id:'ins',    label:'LIC / Insurance',icon:'🛡',  val:0, startYr:null, endYr:null, infl:false},
-  {id:'other',  label:'Other',          icon:'📦', val:0, startYr:null, endYr:null, infl:true},
+function goHome() {
+  document.getElementById('landing').style.display = 'flex';
+  document.getElementById('dashboard-india').classList.remove('active');
+  document.getElementById('dashboard-usa').classList.remove('active');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  SHARED UTILS
+// ═══════════════════════════════════════════════════════════════════
+function gv(id)  { return parseFloat((document.getElementById(id)?.value||'0').replace(/,/g,''))||0; }
+function gn(id)  { return parseFloat(document.getElementById(id)?.value)||0; }
+function gi(id)  { return parseInt(document.getElementById(id)?.value)||0; }
+function setText(id, v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+
+// ═══════════════════════════════════════════════════════════════════
+//  INDIA STATE
+// ═══════════════════════════════════════════════════════════════════
+let IN_isAdj=false, IN_expInflOn=false, IN_activeSC='A';
+let IN_SC = { A:{name:'Scenario A',extraExp:0,lumpsum:0,extraInc:0}, B:{name:'Scenario B',extraExp:0,lumpsum:0,extraInc:0} };
+let IN_MS=[], IN_EMIS=[];
+let IN_EXPS=[
+  {id:'rent',   label:'Rent / EMI',     icon:'🏠',val:0,sYr:null,eYr:null,infl:true},
+  {id:'food',   label:'Food & Dining',  icon:'🍽', val:0,sYr:null,eYr:null,infl:true},
+  {id:'travel', label:'Travel & Fuel',  icon:'🚗',val:0,sYr:null,eYr:null,infl:true},
+  {id:'health', label:'Health & Med',   icon:'💊',val:0,sYr:null,eYr:null,infl:true},
+  {id:'kids',   label:'Kids / School',  icon:'👶',val:0,sYr:null,eYr:null,infl:true},
+  {id:'leisure',label:'Leisure',        icon:'🎬',val:0,sYr:null,eYr:null,infl:true},
+  {id:'ins',    label:'LIC / Insurance',icon:'🛡', val:0,sYr:null,eYr:null,infl:false},
+  {id:'other',  label:'Other',          icon:'📦',val:0,sYr:null,eYr:null,infl:true},
 ];
+let IN_DEDS = {1:[], 2:[]};
+let IN_dedOpen = {1:false, 2:false};
 
-// ─── TABS ───────────────────────────────────────────────────────────────────
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  if(btn) btn.classList.add('active');
-  if(name==='forecast')  { renderForecast(); renderMilestoneList(); }
-  if(name==='insights')  renderInsights();
-  if(name==='scenarios') renderComparison();
-}
+// ── India utils ──
+function IN_hi(el) { const r=el.value.replace(/,/g,''); if(!r||isNaN(r)){el.value='0';return;} el.value=parseFloat(r).toLocaleString('en-IN'); }
+function IN_fmt(n)   { return '₹'+Math.round(n).toLocaleString('en-IN'); }
+function IN_fmtCr(n) { return '₹'+(n/10000000).toFixed(2)+' Cr'; }
 
-// ─── UTILS ──────────────────────────────────────────────────────────────────
-function handleInput(el) {
-  const raw=el.value.replace(/,/g,'');
-  if(!raw||isNaN(raw)){el.value='0';return;}
-  el.value=parseFloat(raw).toLocaleString('en-IN');
-}
-function fmt(n){return '₹'+Math.round(n).toLocaleString('en-IN');}
-function fmtCr(n){return '₹'+(n/10000000).toFixed(2)+' Cr';}
-
-function updateSliderTrack(id,color,val){
-  document.getElementById(id).style.background=
-    `linear-gradient(to right,${color} ${val}%,var(--border) ${val}%)`;
-}
-function validateSplit(source){
-  let fd=parseInt(document.getElementById('fdRangeInput').value);
-  let sip=parseInt(document.getElementById('sipRangeInput').value);
-  if(source==='fd'){sip=100-fd;document.getElementById('sipRangeInput').value=sip;}
-  else{fd=100-sip;document.getElementById('fdRangeInput').value=fd;}
-  document.getElementById('fdLabel').textContent=fd+'%';
-  document.getElementById('sipLabel').textContent=sip+'%';
-  updateSliderTrack('fdRangeInput','var(--indigo)',fd);
-  updateSliderTrack('sipRangeInput','var(--teal)',sip);
-}
-function toggleAdj(){
-  isAdj=!isAdj;
-  document.getElementById('adjToggleBtn').classList.toggle('on',isAdj);
-  document.getElementById('adjNote').textContent=isAdj
-    ?'Inflation-adjusted · salary growth · time-bound expenses modelled'
-    :'Nominal · salary growth · time-bound expenses · EMIs modelled';
-  renderForecast(); saveToLocal();
-}
-function toggleExpInfl(){
-  expInflEnabled=!expInflEnabled;
-  const btn=document.getElementById('expInflBtn');
-  btn.classList.toggle('on',expInflEnabled);
-  btn.textContent=expInflEnabled?'📈 Inflation On':'📈 Inflation Off';
-  recalc(); saveToLocal();
+function IN_tab(name, btn) {
+  document.querySelectorAll('#dashboard-india .tp').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('#dashboard-india .tb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('in_tp-'+name).classList.add('on');
+  if(btn) btn.classList.add('on');
+  if(name==='forecast'){IN_rFC();IN_rMS();}
+  if(name==='insights') IN_rIns();
+  if(name==='scenarios')IN_rSC();
 }
 
-// ─── TAX ────────────────────────────────────────────────────────────────────
-function calculateTax(income,isSalaried){
+function IN_vs(src) {
+  let fd=gi('in_fdRng'), sip=gi('in_sipRng');
+  if(src==='fd'){sip=100-fd;document.getElementById('in_sipRng').value=sip;}
+  else{fd=100-sip;document.getElementById('in_fdRng').value=fd;}
+  setText('in_fdLbl',fd+'%'); setText('in_sipLbl',sip+'%');
+  const tr=(id,c,v)=>document.getElementById(id).style.background=`linear-gradient(to right,${c} ${v}%,var(--border) ${v}%)`;
+  tr('in_fdRng','var(--indigo)',fd); tr('in_sipRng','var(--teal)',sip);
+}
+
+function IN_togAdj(){
+  IN_isAdj=!IN_isAdj;
+  document.getElementById('in_adjBtn').classList.toggle('on',IN_isAdj);
+  setText('in_adjNote',IN_isAdj?'Inflation-adjusted values':'Nominal · includes salary growth & time-bound expenses');
+  IN_rFC(); IN_sv();
+}
+
+function IN_togExpInfl(){
+  IN_expInflOn=!IN_expInflOn;
+  const btn=document.getElementById('in_eiBtn');
+  btn.classList.toggle('on',IN_expInflOn); btn.textContent=IN_expInflOn?'📈 Inflation On':'📈 Inflation Off';
+  IN_rc(); IN_sv();
+}
+
+// ── India deductions ──
+function IN_togDed(sp){
+  IN_dedOpen[sp]=!IN_dedOpen[sp];
+  document.getElementById('in_dp'+sp).classList.toggle('hidden',!IN_dedOpen[sp]);
+  document.getElementById('in_da'+sp).style.transform=IN_dedOpen[sp]?'rotate(90deg)':'rotate(0deg)';
+}
+function IN_addDed(sp){
+  IN_DEDS[sp].push({id:'d'+Date.now(),label:'EPF',pct:12});
+  if(!IN_dedOpen[sp]) IN_togDed(sp);
+  IN_rDed(sp); IN_rc(); IN_sv();
+}
+function IN_remDed(sp,i){ IN_DEDS[sp].splice(i,1); IN_rDed(sp); IN_rc(); IN_sv(); }
+function IN_rDed(sp){
+  const list=document.getElementById('in_dl'+sp);
+  const col=sp===1?'var(--indigo)':'var(--teal)';
+  list.innerHTML='';
+  IN_DEDS[sp].forEach((d,i)=>{
+    const row=document.createElement('div'); row.className='flex items-center gap-1.5';
+    row.innerHTML=`<input type="text" value="${d.label}" placeholder="Label" class="bg-transparent text-xs font-medium outline-none border-b flex-1 min-w-0" style="border-color:var(--border);color:var(--muted)" oninput="IN_DEDS[${sp}][${i}].label=this.value;IN_updBadge(${sp});IN_sv()">
+    <input type="number" value="${d.pct}" min="0" max="100" step="0.5" class="si mono text-xs text-center" style="width:52px;padding:3px 6px" oninput="IN_DEDS[${sp}][${i}].pct=parseFloat(this.value)||0;IN_rc();IN_sv()">
+    <span class="text-xs font-semibold" style="color:${col}" id="in_da${sp}_${i}">−₹0</span>
+    <button onclick="IN_remDed(${sp},${i})" class="text-xs leading-none" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">×</button>`;
+    list.appendChild(row);
+  });
+  IN_updBadge(sp);
+}
+function IN_updBadge(sp){
+  const badge=document.getElementById('in_db'+sp);
+  if(!badge) return;
+  const lst=IN_DEDS[sp];
+  if(!lst.length){badge.classList.add('hidden');return;}
+  badge.classList.remove('hidden');
+  badge.textContent=`(${lst.length} · ${lst.reduce((s,d)=>s+(d.pct||0),0)}%)`;
+}
+function IN_totDed(sp,sal){ return IN_DEDS[sp].reduce((s,d)=>s+sal*(d.pct/100),0); }
+function IN_updDedAmts(){
+  const b1=gv('in_b1'),b2=gv('in_b2');
+  [1,2].forEach(sp=>{
+    const sal=sp===1?b1:b2;
+    IN_DEDS[sp].forEach((d,i)=>{ const el=document.getElementById('in_da'+sp+'_'+i); if(el) el.textContent='−'+IN_fmt(sal*(d.pct/100)); });
+    IN_updBadge(sp);
+  });
+}
+
+// ── India tax ──
+function IN_calcTax(income, isSalaried) {
   let taxable=(isSalaried&&income>0)?Math.max(0,income-75000):income;
-  if(taxable<=1200000)return 0;
+  if(taxable<=1200000) return 0;
   let tax=0;
-  [{from:0,to:400000,rate:0},{from:400000,to:800000,rate:.05},
-   {from:800000,to:1200000,rate:.10},{from:1200000,to:1600000,rate:.15},
-   {from:1600000,to:2000000,rate:.20},{from:2000000,to:2400000,rate:.25},
-   {from:2400000,to:Infinity,rate:.30}]
-  .forEach(s=>{if(taxable>s.from)tax+=(Math.min(taxable,s.to===Infinity?taxable:s.to)-s.from)*s.rate;});
+  [{f:0,t:400000,r:0},{f:400000,t:800000,r:.05},{f:800000,t:1200000,r:.10},
+   {f:1200000,t:1600000,r:.15},{f:1600000,t:2000000,r:.20},{f:2000000,t:2400000,r:.25},{f:2400000,t:Infinity,r:.30}]
+  .forEach(s=>{ if(taxable>s.f) tax+=(Math.min(taxable,s.t===Infinity?taxable:s.t)-s.f)*s.r; });
   return tax*1.04;
 }
 
-// ─── EXPENSES ───────────────────────────────────────────────────────────────
-// Get monthly expense for a given year (0=now), respecting start/end years
-function getExpForYear(cat, year){
-  const start = cat.startYr===null ? 0 : cat.startYr;
-  const end   = cat.endYr===null   ? Infinity : cat.endYr;
-  if(year < start || year > end) return 0;
-  if(!expInflEnabled || !cat.infl) return cat.val;
-  const inf=(parseFloat(document.getElementById('infRet').value)||5)/100;
-  return cat.val * Math.pow(1+inf, year);
+// ── India expense engine ──
+function IN_expForYear(cat,yr){
+  const start=cat.sYr===null?0:cat.sYr, end=cat.eYr===null?Infinity:cat.eYr;
+  if(yr<start||yr>end) return 0;
+  if(!IN_expInflOn||!cat.infl) return cat.val;
+  return cat.val*Math.pow(1+gn('in_infR')/100,yr);
 }
-
-function getTotalMonthlyExpForYear(year){
-  // Also add EMIs active in this year
-  let total = expCategories.reduce((s,c)=>s+getExpForYear(c,year),0);
-  emiList.forEach(e=>{
-    const start = e.startYr||0;
-    const end   = start + (e.years||0) - 1;
-    if(year>=start && year<=end) total += (e.emi||0);
-  });
-  return total;
+function IN_totExpMo(yr){
+  let t=IN_EXPS.reduce((s,c)=>s+IN_expForYear(c,yr),0);
+  IN_EMIS.forEach(e=>{ const es=e.sYr||0,ee=es+(e.yrs||0)-1; if(yr>=es&&yr<=ee) t+=e.emi||0; });
+  return t;
 }
-
-function sumCurrentExpenses(){
-  const monthly=expCategories.reduce((s,c)=>s+(c.val||0),0)
-    + emiList.reduce((s,e)=>s+(e.emi||0),0);
-  document.getElementById('expMonthlyTotal').textContent=fmt(monthly);
-  document.getElementById('expTotalDisplay').textContent=fmt(monthly*12);
-  return monthly*12;
+function IN_sumExp(){
+  const mo=IN_EXPS.reduce((s,c)=>s+(c.val||0),0)+IN_EMIS.reduce((s,e)=>s+(e.emi||0),0);
+  setText('in_expMTot',IN_fmt(mo));
+  setText('in_expDisp',IN_fmt(mo*12));
+  return mo*12;
 }
-
-function renderExpenses(){
-  const list=document.getElementById('expenseList');
-  // Save focused element info to restore focus after re-render
-  const focusedId=document.activeElement?.dataset?.expid;
-  const focusedField=document.activeElement?.dataset?.field;
-
-  list.innerHTML='';
-  expCategories.forEach((cat,i)=>{
-    const isTimed=cat.startYr!==null||cat.endYr!==null;
-    const div=document.createElement('div');
-    div.className='exp-card'+(isTimed?' timed':'');
-
-    const endYrActive=cat.endYr!==null;
-    // Status text
-    let statusHtml='<span class="pill" style="background:var(--green-lt);color:var(--green)">● Ongoing</span>';
-    if(cat.startYr!==null&&cat.startYr>0)
-      statusHtml=`<span class="pill" style="background:var(--indigo-lt);color:var(--indigo)">Starts yr ${cat.startYr}</span>`;
-    if(endYrActive)
-      statusHtml=`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">Ends yr ${cat.endYr}</span>`;
-    if(cat.startYr!==null&&cat.startYr>0&&endYrActive)
-      statusHtml=`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">Yr ${cat.startYr}–${cat.endYr}</span>`;
-
-    div.innerHTML=`
-      <div class="grid gap-3 items-center" style="grid-template-columns:2fr 1.2fr 0.7fr 0.7fr 0.7fr 1fr 28px">
-        <div class="flex items-center gap-2">
-          <span style="font-size:1.2rem">${cat.icon}</span>
-          <input type="text" value="${cat.label}" data-expid="${i}" data-field="label"
-            class="bg-transparent text-sm font-medium outline-none w-full border-b" style="border-color:var(--border)"
-            oninput="expCategories[${i}].label=this.value;saveToLocal()">
-        </div>
-        <div class="flex items-center gap-1">
-          <span class="text-xs" style="color:var(--faint)">₹</span>
-          <input type="text" value="${cat.val?cat.val.toLocaleString('en-IN'):''}" placeholder="0"
-            data-expid="${i}" data-field="val"
-            class="bg-transparent mono text-sm font-medium outline-none w-full border-b" style="border-color:var(--border)"
-            oninput="handleInput(this);expCategories[${i}].val=parseFloat(this.value.replace(/,/g,''))||0;sumCurrentExpenses();recalc();saveToLocal()">
-        </div>
-        <input type="number" value="${cat.startYr===null?'':cat.startYr}" placeholder="Now" min="0" max="30"
-          class="small-input mono text-xs text-center" style="padding:4px 6px"
-          oninput="expCategories[${i}].startYr=this.value===''?null:parseInt(this.value);renderExpenses();recalc();saveToLocal()">
-        <input type="number" value="${cat.endYr===null?'':cat.endYr}" placeholder="∞" min="1" max="30"
-          class="small-input mono text-xs text-center" style="padding:4px 6px"
-          oninput="expCategories[${i}].endYr=this.value===''?null:parseInt(this.value);renderExpenses();recalc();saveToLocal()">
-        <div class="flex justify-center">
-          <input type="checkbox" class="w-4 h-4 cursor-pointer" style="accent-color:var(--orange)" ${cat.infl?'checked':''}
-            onchange="expCategories[${i}].infl=this.checked;recalc();saveToLocal()" title="Apply inflation to this category">
-        </div>
-        <div>${statusHtml}</div>
-        <button onclick="expCategories.splice(${i},1);renderExpenses();sumCurrentExpenses();recalc();saveToLocal()"
-          class="text-lg" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">×</button>
-      </div>`;
+function IN_rExp(){
+  const list=document.getElementById('in_expList'); list.innerHTML='';
+  IN_EXPS.forEach((cat,i)=>{
+    const timed=cat.sYr!==null||cat.eYr!==null;
+    let sH=`<span class="pill" style="background:var(--green-lt);color:var(--green)">● Ongoing</span>`;
+    if(cat.sYr!==null&&cat.eYr!==null) sH=`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">Yr ${cat.sYr}–${cat.eYr}</span>`;
+    else if(cat.eYr!==null) sH=`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">Ends yr ${cat.eYr}</span>`;
+    else if(cat.sYr!==null&&cat.sYr>0) sH=`<span class="pill" style="background:var(--indigo-lt);color:var(--indigo)">Starts yr ${cat.sYr}</span>`;
+    const div=document.createElement('div'); div.className='ec'+(timed?' timed':'');
+    div.innerHTML=`<div class="grid items-center" style="grid-template-columns:1.8fr 1.1fr 0.55fr 0.55fr 0.4fr 0.9fr 26px;gap:8px">
+      <div class="flex items-center gap-2 min-w-0"><span style="font-size:1.1rem;flex-shrink:0">${cat.icon}</span>
+        <input type="text" value="${cat.label}" class="bg-transparent text-sm font-medium outline-none min-w-0 w-full border-b" style="border-color:var(--border)" onchange="IN_EXPS[${i}].label=this.value;IN_sv()"></div>
+      <div class="flex items-center gap-1"><span class="text-xs shrink-0" style="color:var(--faint)">₹</span>
+        <input type="text" value="${cat.val?cat.val.toLocaleString('en-IN'):''}" placeholder="0" class="bg-transparent mono text-sm font-medium outline-none w-full border-b" style="border-color:var(--border)" oninput="IN_EXPS[${i}].val=parseFloat(this.value.replace(/,/g,''))||0;IN_sumExp();IN_rc();IN_sv()"></div>
+      <input type="number" value="${cat.sYr===null?'':cat.sYr}" placeholder="Now" min="0" max="30" class="si mono text-xs text-center" style="padding:4px 5px" onchange="IN_EXPS[${i}].sYr=this.value===''?null:parseInt(this.value);IN_rExp();IN_rc();IN_sv()">
+      <input type="number" value="${cat.eYr===null?'':cat.eYr}" placeholder="∞" min="1" max="30" class="si mono text-xs text-center" style="padding:4px 5px" onchange="IN_EXPS[${i}].eYr=this.value===''?null:parseInt(this.value);IN_rExp();IN_rc();IN_sv()">
+      <div class="flex justify-center"><input type="checkbox" class="w-4 h-4 cursor-pointer" style="accent-color:var(--orange)" ${cat.infl?'checked':''} onchange="IN_EXPS[${i}].infl=this.checked;IN_rc();IN_sv()"></div>
+      <div>${sH}</div>
+      <button onclick="IN_EXPS.splice(${i},1);IN_rExp();IN_sumExp();IN_rc();IN_sv()" style="color:var(--faint);font-size:1.1rem;line-height:1" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">×</button></div>`;
     list.appendChild(div);
   });
-  sumCurrentExpenses();
+  IN_sumExp();
 }
+function IN_addExp(){ IN_EXPS.push({id:'c'+Date.now(),label:'New Category',icon:'📌',val:0,sYr:null,eYr:null,infl:true}); IN_rExp(); IN_sv(); }
 
-function addExpenseCategory(){
-  expCategories.push({id:'c'+Date.now(),label:'New Category',icon:'📌',val:0,startYr:null,endYr:null,infl:true});
-  renderExpenses(); saveToLocal();
-}
-
-// ─── EMI ────────────────────────────────────────────────────────────────────
-function addEMI(){
-  emiList.push({id:'e'+Date.now(),label:'Home Loan',emi:0,startYr:0,years:20});
-  renderEMIs(); saveToLocal();
-}
-function renderEMIs(){
-  const container=document.getElementById('emiList');
-  const none=document.getElementById('emiNone');
-  none.style.display=emiList.length?'none':'block';
-  container.innerHTML='';
-  emiList.forEach((e,i)=>{
-    const div=document.createElement('div');
-    div.className='inset p-4';
-    div.innerHTML=`
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
-        <div>
-          <p class="text-xs font-medium mb-1" style="color:var(--muted)">Loan Name</p>
-          <input type="text" value="${e.label}" class="small-input text-sm"
-            oninput="emiList[${i}].label=this.value;saveToLocal()">
-        </div>
-        <div>
-          <p class="text-xs font-medium mb-1" style="color:var(--muted)">Monthly EMI (₹)</p>
-          <input type="text" value="${e.emi?e.emi.toLocaleString('en-IN'):''}" placeholder="0" class="small-input mono text-sm"
-            oninput="handleInput(this);emiList[${i}].emi=parseFloat(this.value.replace(/,/g,''))||0;sumCurrentExpenses();recalc();saveToLocal()">
-        </div>
-        <div>
-          <p class="text-xs font-medium mb-1" style="color:var(--muted)">Starts (year from now)</p>
-          <input type="number" value="${e.startYr||0}" min="0" max="30" class="small-input mono text-sm"
-            oninput="emiList[${i}].startYr=parseInt(this.value)||0;recalc();saveToLocal()">
-        </div>
-        <div>
-          <p class="text-xs font-medium mb-1" style="color:var(--muted)">Duration (years)</p>
-          <input type="number" value="${e.years||20}" min="1" max="30" class="small-input mono text-sm"
-            oninput="emiList[${i}].years=parseInt(this.value)||1;recalc();saveToLocal()">
-        </div>
-      </div>
-      <div class="flex justify-between items-center mt-3">
-        <span class="text-xs" style="color:var(--faint)">Ends at year ${(e.startYr||0)+(e.years||20)} · Total: ${fmt((e.emi||0)*(e.years||20)*12)}</span>
-        <button onclick="emiList.splice(${i},1);renderEMIs();sumCurrentExpenses();recalc();saveToLocal()"
-          class="text-sm font-semibold" style="color:var(--rose)">Remove</button>
-      </div>`;
-    container.appendChild(div);
+// ── India EMI ──
+function IN_addEMI(){ IN_EMIS.push({id:'e'+Date.now(),label:'Home Loan',emi:0,sYr:0,yrs:20}); IN_rEMI(); IN_sv(); }
+function IN_rEMI(){
+  const c=document.getElementById('in_emiList');
+  document.getElementById('in_emiNone').style.display=IN_EMIS.length?'none':'block';
+  c.innerHTML='';
+  IN_EMIS.forEach((e,i)=>{
+    const div=document.createElement('div'); div.className='inset p-4';
+    const endYr=(e.sYr||0)+(e.yrs||0);
+    div.innerHTML=`<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
+      <div><p class="text-xs font-medium mb-1" style="color:var(--muted)">Loan Name</p><input type="text" value="${e.label}" class="si text-sm" oninput="IN_EMIS[${i}].label=this.value;IN_sv()"></div>
+      <div><p class="text-xs font-medium mb-1" style="color:var(--muted)">Monthly EMI (₹)</p><input type="text" value="${e.emi?e.emi.toLocaleString('en-IN'):''}" placeholder="0" class="si mono text-sm" oninput="IN_hi(this);IN_EMIS[${i}].emi=parseFloat(this.value.replace(/,/g,''))||0;IN_sumExp();IN_rc();IN_sv()"></div>
+      <div><p class="text-xs font-medium mb-1" style="color:var(--muted)">Starts (year)</p><input type="number" value="${e.sYr||0}" min="0" max="30" class="si mono text-sm" oninput="IN_EMIS[${i}].sYr=parseInt(this.value)||0;IN_rc();IN_sv()"></div>
+      <div><p class="text-xs font-medium mb-1" style="color:var(--muted)">Duration (yrs)</p><input type="number" value="${e.yrs||20}" min="1" max="30" class="si mono text-sm" oninput="IN_EMIS[${i}].yrs=parseInt(this.value)||1;IN_rc();IN_sv()"></div>
+    </div>
+    <div class="flex justify-between items-center mt-3">
+      <span class="text-xs" style="color:var(--faint)">Ends year ${endYr} <span class="pill ml-1" style="background:var(--green-lt);color:var(--green)">✓ Surplus ↑ after yr ${endYr}</span></span>
+      <button onclick="IN_EMIS.splice(${i},1);IN_rEMI();IN_sumExp();IN_rc();IN_sv()" class="text-sm font-semibold" style="color:var(--rose)">Remove</button>
+    </div>`;
+    c.appendChild(div);
   });
-  // update total
-  const total=emiList.reduce((s,e)=>s+(e.emi||0),0);
-  document.getElementById('emiMonthlyTotal').textContent=fmt(total);
+  setText('in_emiTot',IN_fmt(IN_EMIS.reduce((s,e)=>s+(e.emi||0),0)));
 }
 
-// ─── ASSET TABLE ─────────────────────────────────────────────────────────────
-function addCategorizedRow(){
-  const sel=document.getElementById('categorySelector');
-  addRow(sel.options[sel.selectedIndex].text.split('(')[0].replace(/—.*/,'').trim(),0,parseFloat(sel.value));
-  saveToLocal();
+// ── India investments ──
+function IN_addAssetRow(){ const sel=document.getElementById('in_catSel'); IN_addARow(sel.options[sel.selectedIndex].text.split('(')[0].replace(/—.*/,'').trim(),0,parseFloat(sel.value)); IN_sv(); }
+function IN_addARow(name='Asset',p=0,y=0,o='1',tf=false){
+  const tr=document.createElement('tr'); tr.className='in_ar';
+  tr.innerHTML=`<td><input type="text" value="${name}" class="in_nm bg-transparent text-sm outline-none w-24 italic" style="color:var(--muted)" onchange="IN_sv()"></td>
+    <td><input type="text" value="${p.toLocaleString('en-IN')}" class="in_pv bg-transparent border-b mono text-sm font-medium w-28 outline-none" style="border-color:var(--border)" oninput="IN_hi(this);IN_rc();IN_sv()"></td>
+    <td class="text-center"><input type="number" value="${y}" class="in_yv bg-transparent border-b mono text-sm font-medium w-12 outline-none text-center" style="border-color:var(--border);color:var(--teal)" oninput="IN_chkROI(this);IN_rc();IN_sv()"></td>
+    <td><select class="in_ov si text-sm" style="width:auto;padding:5px 8px" onchange="IN_rc();IN_sv()"><option value="1" ${o==='1'?'selected':''}>Spouse 1</option><option value="2" ${o==='2'?'selected':''}>Spouse 2</option></select></td>
+    <td class="text-center"><input type="checkbox" class="in_tv w-4 h-4 cursor-pointer" style="accent-color:var(--teal)" ${tf?'checked':''} onchange="IN_rc();IN_sv()"></td>
+    <td class="text-right np"><button onclick="this.closest('tr').remove();IN_rc();IN_sv()" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕</button></td>`;
+  document.getElementById('in_aBody').appendChild(tr); IN_rc();
 }
-function addRow(name='Asset',p=0,y=0,o='1',isTaxFree=false){
-  const tr=document.createElement('tr');
-  tr.className='asset-row';
-  tr.innerHTML=`
-    <td><input type="text" value="${name}" class="name_in bg-transparent text-sm outline-none w-24 italic" style="color:var(--muted)" onchange="saveToLocal()"></td>
-    <td><input type="text" value="${p.toLocaleString('en-IN')}" class="p_in bg-transparent border-b mono text-sm font-medium w-28 outline-none" style="border-color:var(--border)" oninput="handleInput(this);recalc();saveToLocal()"></td>
-    <td class="text-center"><input type="number" value="${y}" class="y_in bg-transparent border-b mono text-sm font-medium w-12 outline-none text-center" style="border-color:var(--border);color:var(--teal)" oninput="validateROI(this);recalc();saveToLocal()"></td>
-    <td><select class="o_in text-sm rounded-lg px-2 py-1 border outline-none" style="background:var(--bg);border-color:var(--border)" onchange="recalc();saveToLocal()">
-      <option value="1" ${o==='1'?'selected':''}>Spouse 1</option>
-      <option value="2" ${o==='2'?'selected':''}>Spouse 2</option>
-    </select></td>
-    <td class="text-center"><input type="checkbox" class="tf_in w-4 h-4 cursor-pointer" style="accent-color:var(--teal)" ${isTaxFree?'checked':''} onchange="recalc();saveToLocal()"></td>
-    <td class="text-right no-print"><button onclick="this.closest('tr').remove();recalc();saveToLocal()" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕</button></td>`;
-  document.getElementById('assetBody').appendChild(tr);
-  recalc();
-}
-function validateROI(el){
-  const v=parseFloat(el.value)||0;
-  el.style.color=v>30?'var(--amber)':'var(--teal)';
-  document.getElementById('roiWarning').classList.toggle('hidden',
-    !Array.from(document.querySelectorAll('.y_in')).some(i=>(parseFloat(i.value)||0)>30));
+function IN_chkROI(el){ el.style.color=(parseFloat(el.value)||0)>30?'var(--amber)':'var(--teal)'; document.getElementById('in_roiW').classList.toggle('hidden',[...document.querySelectorAll('.in_yv')].every(i=>(parseFloat(i.value)||0)<=30)); }
+function IN_getAssets(s1b,s2b){
+  let totP=0,s1G=s1b,s2G=s2b,ty=0;
+  document.querySelectorAll('.in_ar').forEach(r=>{
+    const p=parseFloat(r.querySelector('.in_pv').value.replace(/,/g,''))||0;
+    const y=parseFloat(r.querySelector('.in_yv').value)||0;
+    const o=r.querySelector('.in_ov').value, tf=r.querySelector('.in_tv').checked;
+    const ya=(p*y)/100; totP+=p; ty+=ya;
+    if(!tf){if(o==='1')s1G+=ya;else s2G+=ya;}
+  });
+  return{totP,s1G,s2G,ty};
 }
 
-// ─── EPF ─────────────────────────────────────────────────────────────────────
-function calcEPF(){
-  const basic1=parseFloat(document.getElementById('epf1Basic').value.replace(/,/g,''))||0;
-  const basic2=parseFloat(document.getElementById('epf2Basic').value.replace(/,/g,''))||0;
-  const rate=(parseFloat(document.getElementById('epfRate').value)||8.25)/100;
-  const balance=parseFloat(document.getElementById('epfBalance').value.replace(/,/g,''))||0;
-  const monthlyContrib=((basic1+basic2)*0.24)/12; // 12% each side
-  document.getElementById('epfMonthly').textContent=fmt(monthlyContrib);
-  // 30yr corpus
-  let corpus=balance;
-  for(let i=0;i<30;i++) corpus=(corpus+monthlyContrib*12)*(1+rate);
-  document.getElementById('epfCorpus30').textContent=fmtCr(corpus);
-  return {monthlyContrib, corpus30:corpus};
-}
-
-// ─── MILESTONES ───────────────────────────────────────────────────────────────
-function addMilestone(){
-  milestones.push({label:'Goal',year:10,amount:0});
-  renderMilestoneList(); renderForecast(); saveToLocal();
-}
-function renderMilestoneList(){
-  const list=document.getElementById('milestoneList');
-  document.getElementById('milestoneNone').style.display=milestones.length?'none':'block';
+// ── India milestones ──
+function IN_addMS(){ IN_MS.push({label:'Goal',year:10,amount:0}); IN_rMS(); IN_rFC(); IN_sv(); }
+function IN_rMS(){
+  const list=document.getElementById('in_msList');
+  document.getElementById('in_msNone').style.display=IN_MS.length?'none':'block';
   list.innerHTML='';
-  milestones.forEach((m,i)=>{
-    const div=document.createElement('div');
-    div.className='inset p-3 flex items-center gap-3';
-    div.innerHTML=`
-      <div class="milestone-dot"></div>
+  IN_MS.forEach((m,i)=>{
+    const div=document.createElement('div'); div.className='inset p-3 flex items-center gap-3';
+    div.innerHTML=`<div style="width:10px;height:10px;border-radius:99px;background:var(--amber);border:2px solid #fff;box-shadow:0 0 0 2px var(--amber);flex-shrink:0"></div>
       <div class="flex-1 grid grid-cols-3 gap-2">
-        <input type="text" value="${m.label}" class="small-input text-sm" style="padding:5px 8px" oninput="milestones[${i}].label=this.value;renderForecast();saveToLocal()">
-        <input type="number" value="${m.year}" min="1" max="30" class="small-input mono text-sm" style="padding:5px 8px" placeholder="Year" oninput="milestones[${i}].year=parseInt(this.value)||1;renderForecast();saveToLocal()">
-        <input type="text" value="${m.amount?m.amount.toLocaleString('en-IN'):''}" placeholder="₹ Target" class="small-input mono text-sm" style="padding:5px 8px" oninput="handleInput(this);milestones[${i}].amount=parseFloat(this.value.replace(/,/g,''))||0;renderForecast();saveToLocal()">
+        <input type="text" value="${m.label}" class="si text-sm" style="padding:5px 8px" oninput="IN_MS[${i}].label=this.value;IN_rFC();IN_sv()">
+        <input type="number" value="${m.year}" min="1" max="30" class="si mono text-sm" style="padding:5px 8px" oninput="IN_MS[${i}].year=parseInt(this.value)||1;IN_rFC();IN_sv()">
+        <input type="text" value="${m.amount?m.amount.toLocaleString('en-IN'):''}" placeholder="₹ Target" class="si mono text-sm" style="padding:5px 8px" oninput="IN_hi(this);IN_MS[${i}].amount=parseFloat(this.value.replace(/,/g,''))||0;IN_rFC();IN_sv()">
       </div>
-      <button onclick="milestones.splice(${i},1);renderMilestoneList();renderForecast();saveToLocal()" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕</button>`;
+      <button onclick="IN_MS.splice(${i},1);IN_rMS();IN_rFC();IN_sv()" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕</button>`;
     list.appendChild(div);
   });
 }
 
-// ─── ASSET TOTALS ─────────────────────────────────────────────────────────────
-function getAssetTotals(s1Base,s2Base){
-  let totP=0,s1G=s1Base,s2G=s2Base,totalYield=0;
-  document.querySelectorAll('.asset-row').forEach(row=>{
-    const p=parseFloat(row.querySelector('.p_in').value.replace(/,/g,''))||0;
-    const y=parseFloat(row.querySelector('.y_in').value)||0;
-    const o=row.querySelector('.o_in').value;
-    const isTF=row.querySelector('.tf_in').checked;
-    const yAmt=(p*y)/100;
-    totP+=p; totalYield+=yAmt;
-    if(!isTF){if(o==='1')s1G+=yAmt;else s2G+=yAmt;}
-  });
-  return{totP,s1G,s2G,totalYield};
+// ── India core recalc ──
+function IN_rc(){
+  const b1=gv('in_b1'),b2=gv('in_b2');
+  const fdP=gi('in_fdRng')/100, sipP=gi('in_sipRng')/100, sipRt=gn('in_sipRet')/100;
+  const {totP,s1G,s2G,ty}=IN_getAssets(b1,b2);
+  const t1=IN_calcTax(s1G,b1>0), t2=IN_calcTax(s2G,b2>0);
+  const d1=IN_totDed(1,b1), d2=IN_totDed(2,b2);
+  IN_updDedAmts();
+
+  setText('in_s1g',IN_fmt(s1G)); setText('in_s1t',IN_fmt(t1));
+  setText('in_s1d',d1>0?'−'+IN_fmt(d1):'₹0'); setText('in_s1n',IN_fmt(s1G-t1-d1));
+  setText('in_s1r',s1G>0?((t1/s1G)*100).toFixed(1)+'%':'0%');
+  setText('in_s2g',IN_fmt(s2G)); setText('in_s2t',IN_fmt(t2));
+  setText('in_s2d',d2>0?'−'+IN_fmt(d2):'₹0'); setText('in_s2n',IN_fmt(s2G-t2-d2));
+  setText('in_s2r',s2G>0?((t2/s2G)*100).toFixed(1)+'%':'0%');
+
+  const expMo=IN_totExpMo(0);
+  const annSurplus=b1+b2+ty-t1-t2-d1-d2-(expMo*12);
+  const mo=annSurplus/12, deficit=mo<0, absVal=Math.abs(Math.round(mo));
+
+  const card=document.getElementById('in_sCard');
+  card.className=(deficit?'hero-d':'hero-s')+' p-6 flex flex-col justify-between text-white';
+  setText('in_sLbl',deficit?'Monthly Deficit ⚠':'Monthly Surplus');
+  setText('in_sDisp',(deficit?'−₹':'₹')+absVal.toLocaleString('en-IN'));
+  setText('in_saDisp',(deficit?'−₹':'₹')+Math.abs(Math.round(annSurplus)).toLocaleString('en-IN')+' / year');
+
+  const mFD=deficit?0:mo*fdP, mSIP=deficit?0:mo*sipP;
+  setText('in_fdV',IN_fmt(mFD)); setText('in_sipV',IN_fmt(mSIP));
+  setText('in_totP',IN_fmt(totP)); setText('in_bROI',totP>0?((ty/totP)*100).toFixed(2)+'%':'—');
+
+  const gc=gv('in_gC'),gy=gi('in_gY');
+  if(gc>0){const r=sipRt/12,n=gy*12; const req=r===0?gc/n:gc*r/(Math.pow(1+r,n)-1); setText('in_gSIP',IN_fmt(req));
+    const ok=!deficit&&req<=mSIP; document.getElementById('in_gFeas').textContent=ok?'✓ Achievable with current surplus':'⚠ Needs '+IN_fmt(Math.max(0,req-mSIP))+' more/month';
+    document.getElementById('in_gFeas').style.color=ok?'var(--green)':'var(--rose)';
+  } else {setText('in_gSIP','₹0'); document.getElementById('in_gFeas').textContent='';}
+
+  const dc=gv('in_ddC'),dw=gv('in_ddW'),dr=gn('in_ddRt')/100,di=gn('in_ddI')/100;
+  if(dc>0&&dw>0){let corpus=dc,yr=0; while(corpus>0&&yr<100){corpus=(corpus-dw*Math.pow(1+di,yr))*(1+dr);yr++;} setText('in_ddRes',yr>=100?'100+ years':yr+' years'); setText('in_ddNote',yr>=100?'Corpus outlasts a 100-year horizon 🎉':'Depleted ~'+yr+' years after retirement');}
+  else{setText('in_ddRes','—'); setText('in_ddNote','');}
+
+  if(document.getElementById('in_tp-forecast').classList.contains('on')){IN_rFC();IN_rMS();}
+  if(document.getElementById('in_tp-insights').classList.contains('on')) IN_rIns();
+  if(document.getElementById('in_tp-scenarios').classList.contains('on')) IN_rSC();
+
+  setText('in_audit',`b1=${b1.toLocaleString()}·b2=${b2.toLocaleString()}·t1=${Math.round(t1).toLocaleString()}·t2=${Math.round(t2).toLocaleString()}·yield=${Math.round(ty).toLocaleString()}·${deficit?'deficit':'surplus'}/mo=${absVal.toLocaleString()}`);
 }
 
-// ─── CORE RECALC ──────────────────────────────────────────────────────────────
-function recalc(){
-  const b1=parseFloat(document.getElementById('b1').value.replace(/,/g,''))||0;
-  const b2=parseFloat(document.getElementById('b2').value.replace(/,/g,''))||0;
-  const fdSplitPct=parseInt(document.getElementById('fdRangeInput').value)/100;
-  const sipSplitPct=parseInt(document.getElementById('sipRangeInput').value)/100;
-  const sipR=(parseFloat(document.getElementById('sipRet').value)||12)/100;
-  const fdR=(parseFloat(document.getElementById('fdRate').value)||7)/100;
-
-  const {totP,s1G,s2G,totalYield}=getAssetTotals(b1,b2);
-  const t1=calculateTax(s1G,b1>0), t2=calculateTax(s2G,b2>0);
-
-  document.getElementById('s1_gross').textContent=fmt(s1G);
-  document.getElementById('s1_tax').textContent=fmt(t1);
-  document.getElementById('s1_net').textContent=fmt(s1G-t1);
-  document.getElementById('s1_rate').textContent=s1G>0?((t1/s1G)*100).toFixed(1)+'%':'0%';
-  document.getElementById('s2_gross').textContent=fmt(s2G);
-  document.getElementById('s2_tax').textContent=fmt(t2);
-  document.getElementById('s2_net').textContent=fmt(s2G-t2);
-  document.getElementById('s2_rate').textContent=s2G>0?((t2/s2G)*100).toFixed(1)+'%':'0%';
-
-  // Current year expenses (year=0)
-  const expMonthly=getTotalMonthlyExpForYear(0);
-  const annualSurplus=b1+b2+totalYield-t1-t2-(expMonthly*12);
-  const netMonthly=annualSurplus/12;
-  const isDeficit=netMonthly<0;
-  const displayAbs=Math.abs(Math.round(netMonthly));
-
-  const card=document.getElementById('surplusCard');
-  card.className=(isDeficit?'hero-deficit':'hero-surplus')+' p-6 flex flex-col justify-between text-white';
-  document.getElementById('surplusLabel').textContent=isDeficit?'Monthly Deficit ⚠':'Monthly Surplus';
-  document.getElementById('monthlySurplusDisplay').textContent=(isDeficit?'−₹':'₹')+displayAbs.toLocaleString('en-IN');
-  document.getElementById('annualSurplusDisplay').textContent=(isDeficit?'−₹':'₹')+Math.abs(Math.round(annualSurplus)).toLocaleString('en-IN')+' / year';
-
-  const mFD=isDeficit?0:netMonthly*fdSplitPct;
-  const mSIP=isDeficit?0:netMonthly*sipSplitPct;
-  document.getElementById('fdVal').textContent=fmt(mFD);
-  document.getElementById('sipVal').textContent=fmt(mSIP);
-  document.getElementById('totalPrincipal').textContent=fmt(totP);
-  document.getElementById('blendedROI').textContent=totP>0?((totalYield/totP)*100).toFixed(2)+'%':'—';
-
-  // EPF
-  calcEPF();
-
-  // Goal planner
-  const goalCorpus=parseFloat(document.getElementById('goalCorpus').value.replace(/,/g,''))||0;
-  const goalYears=parseInt(document.getElementById('goalYears').value)||20;
-  const feasEl=document.getElementById('goalFeasibility');
-  if(goalCorpus>0){
-    const r=sipR/12,n=goalYears*12;
-    const reqSIP=r===0?goalCorpus/n:goalCorpus*r/(Math.pow(1+r,n)-1);
-    const feasible=!isDeficit&&reqSIP<=mSIP;
-    document.getElementById('goalSIP').textContent=fmt(reqSIP);
-    feasEl.textContent=feasible?'✓ Achievable with current surplus':`⚠ Needs ${fmt(Math.max(0,reqSIP-mSIP))} more/month`;
-    feasEl.style.color=feasible?'var(--green)':'var(--rose)';
-  } else{document.getElementById('goalSIP').textContent='₹0';feasEl.textContent='';}
-
-  // Drawdown
-  const ddC=parseFloat(document.getElementById('ddCorpus').value.replace(/,/g,''))||0;
-  const ddW=parseFloat(document.getElementById('ddWithdraw').value.replace(/,/g,''))||0;
-  const ddR=(parseFloat(document.getElementById('ddReturn').value)||8)/100;
-  const ddI=(parseFloat(document.getElementById('ddInflation').value)||5)/100;
-  if(ddC>0&&ddW>0){
-    let corpus=ddC,yr=0;
-    while(corpus>0&&yr<100){corpus=(corpus-ddW*Math.pow(1+ddI,yr))*(1+ddR);yr++;}
-    document.getElementById('ddResult').textContent=yr>=100?'100+ years':yr+' years';
-    document.getElementById('ddNote').textContent=yr>=100?'Corpus outlasts 100-year horizon 🎉':`Depleted ~${yr} years after retirement`;
-  }else{document.getElementById('ddResult').textContent='—';document.getElementById('ddNote').textContent='';}
-
-  // Only re-render active tabs
-  if(document.getElementById('tab-forecast').classList.contains('active')) renderForecast();
-  if(document.getElementById('tab-insights').classList.contains('active')) renderInsights();
-  if(document.getElementById('tab-scenarios').classList.contains('active')) renderComparison();
-
-  document.getElementById('audit').textContent=
-    `b1=${b1.toLocaleString()}·b2=${b2.toLocaleString()}·t1=${Math.round(t1).toLocaleString()}·t2=${Math.round(t2).toLocaleString()}·yield=${Math.round(totalYield).toLocaleString()}·${isDeficit?'deficit':'surplus'}/mo=${displayAbs.toLocaleString()}`;
-}
-
-// ─── FORECAST (salary growth + time-bound expenses + EMIs + milestones) ───────
-function simulate(years, extraExpMo=0, lumpsumAdd=0, extraIncMo=0){
-  const b1=parseFloat(document.getElementById('b1').value.replace(/,/g,''))||0;
-  const b2=parseFloat(document.getElementById('b2').value.replace(/,/g,''))||0;
-  const g1=(parseFloat(document.getElementById('g1').value)||0)/100;
-  const g2=(parseFloat(document.getElementById('g2').value)||0)/100;
-  const fdSplitPct=parseInt(document.getElementById('fdRangeInput').value)/100;
-  const sipSplitPct=parseInt(document.getElementById('sipRangeInput').value)/100;
-  const sipR=(parseFloat(document.getElementById('sipRet').value)||12)/100;
-  const fdR=(parseFloat(document.getElementById('fdRate').value)||7)/100;
-  const inf=(parseFloat(document.getElementById('infRet').value)||5)/100;
-  const {totP,totalYield}=getAssetTotals(b1,b2);
-  const epfRate=(parseFloat(document.getElementById('epfRate').value)||8.25)/100;
-  const epfMonthly=((parseFloat(document.getElementById('epf1Basic').value.replace(/,/g,''))||0)+
-                    (parseFloat(document.getElementById('epf2Basic').value.replace(/,/g,''))||0))*0.24/12;
-
-  let cFD=totP+lumpsumAdd, cSIP=0;
-  let epfCorpus=parseFloat(document.getElementById('epfBalance').value.replace(/,/g,''))||0;
-  let s1=b1, s2=b2;
-
+// ── India simulation engine ──
+function IN_sim(years,xE=0,lump=0,xI=0){
+  const b1=gv('in_b1'),b2=gv('in_b2'),g1=gn('in_g1')/100,g2=gn('in_g2')/100;
+  const fdP=gi('in_fdRng')/100,sipP=gi('in_sipRng')/100;
+  const sipRt=gn('in_sipRet')/100,fdRt=gn('in_fdRt')/100;
+  const {totP,ty}=IN_getAssets(b1,b2);
+  let cFD=totP+lump,cSIP=0,s1=b1,s2=b2;
   for(let yr=1;yr<=years;yr++){
     s1*=(1+g1); s2*=(1+g2);
-    const {s1G,s2G}=getAssetTotals(s1,s2);
-    const t1=calculateTax(s1G,true), t2=calculateTax(s2G,true);
-    const expMo=getTotalMonthlyExpForYear(yr);
-    const surplus=(s1+s2+totalYield-t1-t2-(expMo*12))/12+(extraIncMo-extraExpMo);
-    const mFD=Math.max(0,surplus)*fdSplitPct;
-    const mSIP=Math.max(0,surplus)*sipSplitPct;
-    cFD=(cFD+mFD*12)*(1+fdR);
-    cSIP=(cSIP+mSIP*12)*(1+sipR);
-    epfCorpus=(epfCorpus+epfMonthly*12)*(1+epfRate);
+    const {s1G,s2G}=IN_getAssets(s1,s2);
+    const t1=IN_calcTax(s1G,true),t2=IN_calcTax(s2G,true);
+    const d1=IN_DEDS[1].reduce((s,d)=>s+s1*(d.pct/100),0);
+    const d2=IN_DEDS[2].reduce((s,d)=>s+s2*(d.pct/100),0);
+    const expMo=IN_totExpMo(yr);
+    const surplus=(s1+s2+ty-t1-t2-d1-d2-(expMo*12))/12+(xI-xE);
+    const mFD=Math.max(0,surplus)*fdP, mSIP=Math.max(0,surplus)*sipP;
+    cFD=(cFD+mFD*12)*(1+fdRt); cSIP=(cSIP+mSIP*12)*(1+sipRt);
   }
-  return{total:cFD+cSIP+epfCorpus, noEpf:cFD+cSIP};
+  return{total:cFD+cSIP};
 }
 
-function renderForecast(){
-  const inf=(parseFloat(document.getElementById('infRet').value)||5)/100;
-  const max30=simulate(30).total||1;
-
-  // Find years where expenses end
+function IN_rFC(){
+  const infRate=gn('in_infR')/100, max30=IN_sim(30).total||1;
   const expEnds=new Set();
-  expCategories.forEach(c=>{if(c.endYr!==null)expEnds.add(c.endYr);});
-  emiList.forEach(e=>{const end=(e.startYr||0)+(e.years||20);expEnds.add(end);});
-
-  let fHtml='';
+  IN_EXPS.forEach(c=>{if(c.eYr!==null) expEnds.add(c.eYr);});
+  IN_EMIS.forEach(e=>expEnds.add((e.sYr||0)+(e.yrs||0)));
+  let html='';
   [5,10,15,20,25,30].forEach(yr=>{
-    const {total}=simulate(yr);
-    let display=total;
-    if(isAdj) display=display/Math.pow(1+inf,yr);
-    const crore=(display/10000000).toFixed(2);
-    const barWidth=Math.min(97,Math.max(3,(total/max30)*100));
-
-    // Milestone markers at this year
-    const mMarkers=milestones.filter(m=>m.year===yr);
-    // Expense-end markers at this year
-    const eEnds=[...expEnds].filter(y=>y===yr);
-
-    const markerHtml=[
-      ...mMarkers.map(m=>`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">🎯 ${m.label}${m.amount?' · '+fmt(m.amount):''}</span>`),
-      ...eEnds.map(()=>`<span class="pill" style="background:var(--green-lt);color:var(--green)">✓ Expense ends · surplus ↑</span>`)
-    ].join(' ');
-
-    fHtml+=`
-      <div class="forecast-row">
-        <span class="mono text-sm font-semibold w-14 shrink-0" style="color:var(--muted)">${yr} Yrs</span>
-        <div class="flex-1 min-w-0">
-          <div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:${markerHtml?'5px':'0'}">
-            <div style="height:100%;width:${barWidth}%;border-radius:99px;background:linear-gradient(to right,var(--teal),var(--indigo));transition:width .5s ease"></div>
-          </div>
-          ${markerHtml?`<div class="flex flex-wrap gap-1">${markerHtml}</div>`:''}
-        </div>
-        <span class="mono text-base font-bold w-24 text-right shrink-0" style="color:var(--teal-dk)">₹${crore} Cr</span>
-      </div>`;
+    let{total}=IN_sim(yr);
+    let disp=IN_isAdj?total/Math.pow(1+infRate,yr):total;
+    const cr=(disp/10000000).toFixed(2), bw=Math.min(97,Math.max(3,(total/max30)*100));
+    const mPills=IN_MS.filter(m=>m.year===yr).map(m=>`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">🎯 ${m.label}${m.amount?' · '+IN_fmt(m.amount):''}</span>`);
+    const ePills=[...expEnds].filter(y=>y===yr).map(()=>`<span class="pill" style="background:var(--green-lt);color:var(--green)">✓ Expense ends · surplus ↑</span>`);
+    const pills=[...mPills,...ePills].join(' ');
+    html+=`<div class="fr"><span class="mono text-sm font-semibold w-14 shrink-0" style="color:var(--muted)">${yr} Yrs</span>
+      <div class="flex-1 min-w-0"><div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden${pills?';margin-bottom:5px':''}"><div style="height:100%;width:${bw}%;border-radius:99px;background:linear-gradient(to right,var(--teal),var(--indigo));transition:width .5s ease"></div></div>${pills?`<div class="flex flex-wrap gap-1">${pills}</div>`:''}</div>
+      <span class="mono text-base font-bold w-24 text-right shrink-0" style="color:var(--teal-dk)">₹${cr} Cr</span></div>`;
   });
-  document.getElementById('forecastTable').innerHTML=fHtml;
+  document.getElementById('in_fcTbl').innerHTML=html;
 }
 
-// ─── SCENARIOS ────────────────────────────────────────────────────────────────
-function switchScenario(sc){
-  activeScenario=sc;
-  ['A','B'].forEach(s=>document.getElementById('scTab_'+s).classList.toggle('active',s===sc));
-  const cur=scenarios[sc];
-  document.getElementById('sc_name').value=cur.name;
-  document.getElementById('sc_extraExp').value=cur.extraExp?cur.extraExp.toLocaleString('en-IN'):'0';
-  document.getElementById('sc_lumpsum').value=cur.lumpsum?cur.lumpsum.toLocaleString('en-IN'):'0';
-  document.getElementById('sc_extraInc').value=cur.extraInc?cur.extraInc.toLocaleString('en-IN'):'0';
-  renderComparison();
+function IN_swSC(s){
+  IN_activeSC=s; ['A','B'].forEach(x=>document.getElementById('in_st'+x).classList.toggle('on',x===s));
+  const c=IN_SC[s];
+  document.getElementById('in_scN').value=c.name;
+  document.getElementById('in_scE').value=c.extraExp?c.extraExp.toLocaleString('en-IN'):'0';
+  document.getElementById('in_scL').value=c.lumpsum?c.lumpsum.toLocaleString('en-IN'):'0';
+  document.getElementById('in_scI').value=c.extraInc?c.extraInc.toLocaleString('en-IN'):'0';
+  IN_rSC();
 }
-function saveScenario(){
-  const sc=activeScenario;
-  scenarios[sc].name=document.getElementById('sc_name').value||('Scenario '+sc);
-  scenarios[sc].extraExp=parseFloat(document.getElementById('sc_extraExp').value.replace(/,/g,''))||0;
-  scenarios[sc].lumpsum=parseFloat(document.getElementById('sc_lumpsum').value.replace(/,/g,''))||0;
-  scenarios[sc].extraInc=parseFloat(document.getElementById('sc_extraInc').value.replace(/,/g,''))||0;
-  renderComparison(); saveToLocal();
+function IN_saveSC(){
+  const s=IN_activeSC;
+  IN_SC[s].name=document.getElementById('in_scN').value||('Scenario '+s);
+  IN_SC[s].extraExp=parseFloat(document.getElementById('in_scE').value.replace(/,/g,''))||0;
+  IN_SC[s].lumpsum=parseFloat(document.getElementById('in_scL').value.replace(/,/g,''))||0;
+  IN_SC[s].extraInc=parseFloat(document.getElementById('in_scI').value.replace(/,/g,''))||0;
+  IN_rSC(); IN_sv();
 }
-function renderComparison(){
+function IN_rSC(){
   const rows=[10,20,30].map(yr=>{
-    const a=simulate(yr,scenarios.A.extraExp,scenarios.A.lumpsum,scenarios.A.extraInc).total;
-    const b=simulate(yr,scenarios.B.extraExp,scenarios.B.lumpsum,scenarios.B.extraInc).total;
-    const diff=b-a;
-    return `<tr style="border-bottom:1px solid var(--border)">
-      <td class="py-3 mono text-sm font-semibold" style="color:var(--muted)">${yr} Yrs</td>
-      <td class="py-3 mono text-sm font-bold" style="color:var(--indigo)">${fmtCr(a)}</td>
-      <td class="py-3 mono text-sm font-bold" style="color:var(--purple)">${fmtCr(b)}</td>
-      <td class="py-3 mono text-sm font-bold"><span style="color:${diff>=0?'var(--green)':'var(--rose)'}">${diff>=0?'+':'−'}${fmtCr(Math.abs(diff))}</span>
-        <span class="text-xs font-normal ml-1" style="color:var(--faint)">→ ${diff>=0?scenarios.B.name:scenarios.A.name} wins</span></td>
-    </tr>`;
+    const a=IN_sim(yr,IN_SC.A.extraExp,IN_SC.A.lumpsum,IN_SC.A.extraInc).total;
+    const b=IN_sim(yr,IN_SC.B.extraExp,IN_SC.B.lumpsum,IN_SC.B.extraInc).total;
+    const d=b-a;
+    return`<tr style="border-bottom:1px solid var(--border)"><td class="py-3 mono text-sm font-semibold" style="color:var(--muted)">${yr} Yrs</td>
+      <td class="py-3 mono text-sm font-bold" style="color:var(--indigo)">${IN_fmtCr(a)}</td>
+      <td class="py-3 mono text-sm font-bold" style="color:var(--purple)">${IN_fmtCr(b)}</td>
+      <td class="py-3"><span class="mono text-sm font-bold" style="color:${d>=0?'var(--green)':'var(--rose)'}">${d>=0?'+':'−'}${IN_fmtCr(Math.abs(d))}</span>
+      <span class="text-xs ml-1" style="color:var(--faint)">→ ${d>=0?IN_SC.B.name:IN_SC.A.name} wins</span></td></tr>`;
   }).join('');
-  document.getElementById('scenarioComparison').innerHTML=`
-    <table class="w-full text-left">
-      <thead style="border-bottom:2px solid var(--border)">
-        <tr>
-          <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Horizon</th>
-          <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--indigo)">${scenarios.A.name}</th>
-          <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--purple)">${scenarios.B.name}</th>
-          <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Difference</th>
-        </tr>
-      </thead><tbody>${rows}</tbody>
-    </table>`;
+  document.getElementById('in_scComp').innerHTML=`<table class="w-full text-left"><thead style="border-bottom:2px solid var(--border)"><tr>
+    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Horizon</th>
+    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--indigo)">${IN_SC.A.name}</th>
+    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--purple)">${IN_SC.B.name}</th>
+    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Difference</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-// ─── INSIGHTS ─────────────────────────────────────────────────────────────────
-function renderInsights(){
-  const b1=parseFloat(document.getElementById('b1').value.replace(/,/g,''))||0;
-  const b2=parseFloat(document.getElementById('b2').value.replace(/,/g,''))||0;
-  const {s1G,s2G,totalYield,totP}=getAssetTotals(b1,b2);
-  const t1=calculateTax(s1G,b1>0), t2=calculateTax(s2G,b2>0);
-  const expMonthly=getTotalMonthlyExpForYear(0);
-  const surplus=b1+b2+totalYield-t1-t2-(expMonthly*12);
-  const insights=[];
-
-  if(s1G>1600000&&s2G<800000&&totalYield>0){
-    const saving=calculateTax(s1G,b1>0)-calculateTax(s1G-totalYield*0.5,b1>0);
-    insights.push({type:'tip',icon:'💡',title:'Move investment income to Spouse 2 to save tax',
-      body:`Spouse 1 is in a higher bracket. Shifting yield-bearing assets to Spouse 2 could save up to ${fmt(saving)}/year in tax.`});
+function IN_rIns(){
+  const b1=gv('in_b1'),b2=gv('in_b2');
+  const{s1G,s2G,ty,totP}=IN_getAssets(b1,b2);
+  const t1=IN_calcTax(s1G,b1>0),t2=IN_calcTax(s2G,b2>0);
+  const expMo=IN_totExpMo(0);
+  const surplus=b1+b2+ty-t1-t2-(expMo*12);
+  const ins=[];
+  if(s1G>1600000&&s2G<800000&&ty>0){
+    const saving=IN_calcTax(s1G,b1>0)-IN_calcTax(s1G-ty*0.5,b1>0);
+    ins.push({t:'tip',i:'💡',h:'Move investment income to Spouse 2',b:`Shifting yield-bearing assets could save up to ${IN_fmt(saving)}/year in tax.`});
   }
-  [400000,800000,1200000,1600000,2000000,2400000].forEach(b=>{
-    const g1=b-s1G; if(g1>0&&g1<50000)
-      insights.push({type:'warn',icon:'⚠️',title:`Spouse 1 is ${fmt(g1)} below ₹${(b/100000).toFixed(0)}L slab`,
-        body:'Small income additions could push into the next tax bracket. Consider routing new income to Spouse 2 or tax-free instruments.'});
-    const g2=b-s2G; if(g2>0&&g2<50000)
-      insights.push({type:'warn',icon:'⚠️',title:`Spouse 2 is ${fmt(g2)} below ₹${(b/100000).toFixed(0)}L slab`,
-        body:'Small income additions could push into the next tax bracket.'});
+  [400000,800000,1200000,1600000,2000000,2400000].forEach(bnd=>{
+    const lbl='₹'+(bnd/100000).toFixed(0)+'L';
+    const g1=bnd-s1G; if(g1>0&&g1<50000) ins.push({t:'warn',i:'⚠️',h:`Spouse 1 is ${IN_fmt(g1)} below ${lbl} slab`,b:'Consider routing extra income to tax-free instruments.'});
+    const g2=bnd-s2G; if(g2>0&&g2<50000) ins.push({t:'warn',i:'⚠️',h:`Spouse 2 is ${IN_fmt(g2)} below ${lbl} slab`,b:'Park additional income in tax-free instruments to stay in current bracket.'});
   });
   if(totP>0){
-    const fdP=[...document.querySelectorAll('.asset-row')]
-      .filter(r=>(parseFloat(r.querySelector('.y_in').value)||0)<9)
-      .reduce((s,r)=>s+(parseFloat(r.querySelector('.p_in').value.replace(/,/g,''))||0),0);
-    if(fdP/totP>0.7) insights.push({type:'info',icon:'📊',title:'Portfolio is >70% fixed-income',
-      body:'Over long horizons equity (SIP/MF) outperforms FDs after inflation. Consider shifting some allocation if your timeline is 10+ years.'});
+    const fdP=[...document.querySelectorAll('.in_yv')].filter(r=>(parseFloat(r.value)||0)<9).reduce((s,r)=>{const tr=r.closest('tr');return s+(parseFloat(tr.querySelector('.in_pv').value.replace(/,/g,''))||0);},0);
+    if(fdP/totP>0.7) ins.push({t:'info',i:'📊',h:'Portfolio is >70% fixed-income',b:'Equity outperforms FDs after inflation over 10+ years. Consider rebalancing.'});
   }
-  if(totP>0&&![...document.querySelectorAll('.tf_in')].some(el=>el.checked))
-    insights.push({type:'tip',icon:'💡',title:'No tax-free assets in portfolio',
-      body:'PPF, ELSS, and Sukanya Samriddhi offer tax-free returns. Even one addition reduces your overall tax burden.'});
+  if(totP>0&&![...document.querySelectorAll('.in_tv')].some(el=>el.checked))
+    ins.push({t:'tip',i:'💡',h:'No tax-free assets',b:'PPF, ELSS, Sukanya Samriddhi offer tax-free returns.'});
   if(surplus>0&&surplus/(b1+b2||1)>0.3)
-    insights.push({type:'tip',icon:'🌟',title:'Excellent savings rate — above 30%',
-      body:'You save over 30% of household income. Incremental SIP increases each year will compound this advantage significantly.'});
+    ins.push({t:'tip',i:'🌟',h:'Excellent savings rate — above 30%',b:'You save over 30% of household income. Even a 5% SIP increase annually compounds massively.'});
+  const timed=IN_EXPS.filter(c=>c.eYr!==null);
+  if(timed.length){const freed=timed.reduce((s,c)=>s+(c.val||0),0); ins.push({t:'info',i:'⏳',h:`${timed.length} time-bound expense(s) will free up ${IN_fmt(freed)}/month`,b:timed.map(c=>`${c.icon} ${c.label} ends year ${c.eYr}`).join(' · ')});}
+  if(IN_EMIS.length){const emiTotal=IN_EMIS.reduce((s,e)=>s+(e.emi||0),0); ins.push({t:'info',i:'🏦',h:`${IN_EMIS.length} loan(s) totalling ${IN_fmt(emiTotal)}/month`,b:IN_EMIS.map(e=>`${e.label} — ends year ${(e.sYr||0)+(e.yrs||0)}`).join(' · ')});}
+  if(!ins.length) ins.push({t:'info',i:'ℹ️',h:'Add your data to see insights',b:'Fill income, assets, and expenses on the other tabs.'});
+  const cm={tip:'ic-tip',warn:'ic-warn',info:'ic-info'};
+  document.getElementById('in_insP').innerHTML=ins.map(x=>`<div class="ic ${cm[x.t]}"><div class="flex items-start gap-3"><span style="font-size:1.3rem;flex-shrink:0">${x.i}</span><div><p class="font-semibold text-sm mb-1">${x.h}</p><p class="text-sm opacity-80">${x.b}</p></div></div></div>`).join('');
+}
 
-  // Time-bound expense summary
-  const timedCats=expCategories.filter(c=>c.endYr!==null);
-  if(timedCats.length){
-    const freed=timedCats.reduce((s,c)=>s+(c.val||0),0);
-    insights.push({type:'info',icon:'⏳',title:`${timedCats.length} time-bound expense(s) will free up ${fmt(freed)}/month`,
-      body:timedCats.map(c=>`${c.icon} ${c.label} ends at year ${c.endYr}`).join(' · ')});
+// ── India persistence ──
+function IN_sv(){
+  const g=id=>document.getElementById(id)?.value||'';
+  const data={b1:g('in_b1'),b2:g('in_b2'),g1:g('in_g1'),g2:g('in_g2'),fdRng:g('in_fdRng'),sipRng:g('in_sipRng'),sipRet:g('in_sipRet'),fdRt:g('in_fdRt'),infR:g('in_infR'),isAdj:IN_isAdj,expInflOn:IN_expInflOn,gC:g('in_gC'),gY:g('in_gY'),ddC:g('in_ddC'),ddW:g('in_ddW'),ddRt:g('in_ddRt'),ddI:g('in_ddI'),EXPS:IN_EXPS,EMIS:IN_EMIS,MS:IN_MS,SC:IN_SC,DEDS:IN_DEDS,assets:[]};
+  document.querySelectorAll('.in_ar').forEach(r=>data.assets.push({n:r.querySelector('.in_nm').value,p:r.querySelector('.in_pv').value,y:r.querySelector('.in_yv').value,o:r.querySelector('.in_ov').value,tf:r.querySelector('.in_tv').checked}));
+  try{localStorage.setItem('cyf_india',JSON.stringify(data));}catch(e){}
+}
+function IN_exportData(){const s=localStorage.getItem('cyf_india');if(!s){alert('No data yet.');return;} const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([s],{type:'application/json'})); a.download='cyf-india-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();}
+function IN_importData(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{localStorage.setItem('cyf_india',ev.target.result);IN_loadData();alert('Restored!');}catch{alert('Invalid file.');}};reader.readAsText(file);e.target.value='';}
+function IN_loadData(){
+  let saved; try{saved=localStorage.getItem('cyf_india');}catch(e){}
+  IN_rExp(); IN_rEMI(); IN_rMS();
+  if(!saved){IN_vs('fd');IN_rc();return;}
+  const d=JSON.parse(saved);
+  const setV=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v;};
+  setV('in_b1',d.b1);setV('in_b2',d.b2);setV('in_g1',d.g1||'8');setV('in_g2',d.g2||'8');
+  setV('in_fdRng',d.fdRng||'50');setV('in_sipRng',d.sipRng||'50');
+  setV('in_sipRet',d.sipRet||'12');setV('in_fdRt',d.fdRt||'7');setV('in_infR',d.infR||'5');
+  setV('in_gC',d.gC||'0');setV('in_gY',d.gY||'20');
+  setV('in_ddC',d.ddC||'0');setV('in_ddW',d.ddW||'0');setV('in_ddRt',d.ddRt||'8');setV('in_ddI',d.ddI||'5');
+  if(d.isAdj){IN_isAdj=true;document.getElementById('in_adjBtn').classList.add('on');}
+  if(d.expInflOn){IN_expInflOn=true;const btn=document.getElementById('in_eiBtn');btn.classList.add('on');btn.textContent='📈 Inflation On';}
+  if(d.EXPS){IN_EXPS=d.EXPS;IN_rExp();}
+  if(d.EMIS){IN_EMIS=d.EMIS;IN_rEMI();}
+  if(d.MS){IN_MS=d.MS;IN_rMS();}
+  if(d.SC){IN_SC=d.SC;IN_swSC('A');}
+  if(d.DEDS){IN_DEDS=d.DEDS;IN_rDed(1);IN_rDed(2);}
+  document.getElementById('in_aBody').innerHTML='';
+  (d.assets||[]).forEach(a=>IN_addARow(a.n,parseFloat((a.p||'0').replace(/,/g,'')),parseFloat(a.y),a.o,a.tf));
+  IN_vs('fd'); IN_rc();
+}
+function IN_resetAll(){if(!confirm('Clear all India data?'))return;try{localStorage.removeItem('cyf_india');}catch(e){} location.reload();}
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  USA STATE
+// ═══════════════════════════════════════════════════════════════════
+let US_isAdj=false, US_expInflOn=false, US_activeSC='A';
+let US_SC={A:{name:'Scenario A',extraExp:0,lumpsum:0,extraInc:0},B:{name:'Scenario B',extraExp:0,lumpsum:0,extraInc:0}};
+let US_MS=[], US_EMIS=[];
+let US_EXPS=[
+  {id:'hous', label:'Housing / Rent',   icon:'🏠',val:0,sYr:null,eYr:null,infl:true},
+  {id:'food', label:'Food & Dining',    icon:'🍽', val:0,sYr:null,eYr:null,infl:true},
+  {id:'trans',label:'Transportation',   icon:'🚗',val:0,sYr:null,eYr:null,infl:true},
+  {id:'hlth', label:'Health / Insurance',icon:'💊',val:0,sYr:null,eYr:null,infl:true},
+  {id:'kids', label:'Kids / School',    icon:'👶',val:0,sYr:null,eYr:null,infl:true},
+  {id:'leis', label:'Leisure',          icon:'🎬',val:0,sYr:null,eYr:null,infl:true},
+  {id:'subs', label:'Subscriptions',    icon:'📱',val:0,sYr:null,eYr:null,infl:false},
+  {id:'othr', label:'Other',            icon:'📦',val:0,sYr:null,eYr:null,infl:true},
+];
+let US_DEDS={1:[],2:[]};
+let US_dedOpen={1:false,2:false};
+
+// ── US utils ──
+function US_hi(el){const r=el.value.replace(/,/g,'');if(!r||isNaN(r)){el.value='0';return;}el.value=parseFloat(r).toLocaleString('en-US');}
+function US_fmt(n){return '$'+Math.round(n).toLocaleString('en-US');}
+function US_fmtM(n){return '$'+(n/1000000).toFixed(2)+'M';}
+
+function US_tab(name,btn){
+  document.querySelectorAll('#dashboard-usa .tp').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('#dashboard-usa .tb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('us_tp-'+name).classList.add('on');
+  if(btn) btn.classList.add('on');
+  if(name==='forecast'){US_rFC();US_rMS();}
+  if(name==='insights') US_rIns();
+  if(name==='scenarios')US_rSC();
+}
+
+function US_vs(src){
+  let fd=gi('us_fdRng'),sip=gi('us_sipRng');
+  if(src==='fd'){sip=100-fd;document.getElementById('us_sipRng').value=sip;}
+  else{fd=100-sip;document.getElementById('us_fdRng').value=fd;}
+  setText('us_fdLbl',fd+'%'); setText('us_sipLbl',sip+'%');
+  const tr=(id,c,v)=>document.getElementById(id).style.background=`linear-gradient(to right,${c} ${v}%,var(--border) ${v}%)`;
+  tr('us_fdRng','var(--indigo)',fd); tr('us_sipRng','var(--teal)',sip);
+}
+
+function US_togAdj(){
+  US_isAdj=!US_isAdj;
+  document.getElementById('us_adjBtn').classList.toggle('on',US_isAdj);
+  setText('us_adjNote',US_isAdj?'Inflation-adjusted values':'Nominal · includes salary growth & time-bound expenses');
+  US_rFC(); US_sv();
+}
+function US_togExpInfl(){
+  US_expInflOn=!US_expInflOn;
+  const btn=document.getElementById('us_eiBtn');
+  btn.classList.toggle('on',US_expInflOn); btn.textContent=US_expInflOn?'📈 Inflation On':'📈 Inflation Off';
+  US_rc(); US_sv();
+}
+
+// ── US deductions ──
+function US_togDed(sp){
+  US_dedOpen[sp]=!US_dedOpen[sp];
+  document.getElementById('us_dp'+sp).classList.toggle('hidden',!US_dedOpen[sp]);
+  document.getElementById('us_da'+sp).style.transform=US_dedOpen[sp]?'rotate(90deg)':'rotate(0deg)';
+}
+function US_addDed(sp){
+  US_DEDS[sp].push({id:'d'+Date.now(),label:'401k',amt:23000});
+  if(!US_dedOpen[sp]) US_togDed(sp);
+  US_rDed(sp); US_rc(); US_sv();
+}
+function US_remDed(sp,i){US_DEDS[sp].splice(i,1);US_rDed(sp);US_rc();US_sv();}
+function US_rDed(sp){
+  const list=document.getElementById('us_dl'+sp);
+  const col=sp===1?'var(--indigo)':'var(--teal)';
+  list.innerHTML='';
+  US_DEDS[sp].forEach((d,i)=>{
+    const row=document.createElement('div'); row.className='flex items-center gap-1.5';
+    row.innerHTML=`<input type="text" value="${d.label}" placeholder="Label" class="bg-transparent text-xs font-medium outline-none border-b flex-1 min-w-0" style="border-color:var(--border);color:var(--muted)" oninput="US_DEDS[${sp}][${i}].label=this.value;US_updBadge(${sp});US_sv()">
+    <span class="text-xs shrink-0" style="color:var(--faint)">$/yr</span>
+    <input type="text" value="${d.amt?d.amt.toLocaleString('en-US'):''}" placeholder="0" class="si mono text-xs text-right" style="width:90px;padding:3px 6px" oninput="US_hi(this);US_DEDS[${sp}][${i}].amt=parseFloat(this.value.replace(/,/g,''))||0;US_rc();US_sv()">
+    <span class="text-xs font-semibold" style="color:${col}" id="us_da${sp}_${i}">−$0</span>
+    <button onclick="US_remDed(${sp},${i})" class="text-xs leading-none" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">×</button>`;
+    list.appendChild(row);
+  });
+  US_updBadge(sp);
+}
+function US_updBadge(sp){
+  const badge=document.getElementById('us_db'+sp);if(!badge)return;
+  const lst=US_DEDS[sp];
+  if(!lst.length){badge.classList.add('hidden');return;}
+  badge.classList.remove('hidden');
+  const total=lst.reduce((s,d)=>s+(d.amt||0),0);
+  badge.textContent=`(${lst.length} · ${US_fmt(total)})`;
+}
+function US_totDed(sp){return US_DEDS[sp].reduce((s,d)=>s+(d.amt||0),0);}
+function US_updDedAmts(){
+  [1,2].forEach(sp=>{
+    US_DEDS[sp].forEach((d,i)=>{const el=document.getElementById('us_da'+sp+'_'+i);if(el)el.textContent='−'+US_fmt(d.amt||0);});
+    US_updBadge(sp);
+  });
+}
+
+// ── US Federal Tax 2024 ──
+function US_calcFedTax(taxableIncome, filing){
+  if(taxableIncome<=0) return 0;
+  const brackets = {
+    mfj: [{t:23200,r:.10},{t:94300,r:.12},{t:201050,r:.22},{t:383900,r:.24},{t:487450,r:.32},{t:731200,r:.35},{t:Infinity,r:.37}],
+    single:[{t:11600,r:.10},{t:47150,r:.12},{t:100525,r:.22},{t:191950,r:.24},{t:243725,r:.32},{t:609350,r:.35},{t:Infinity,r:.37}],
+    hoh:   [{t:16550,r:.10},{t:63100,r:.12},{t:100500,r:.22},{t:191950,r:.24},{t:243700,r:.32},{t:609350,r:.35},{t:Infinity,r:.37}]
+  };
+  const bkts=brackets[filing]||brackets.mfj;
+  let tax=0, prev=0;
+  for(const b of bkts){
+    const top=b.t===Infinity?taxableIncome:b.t;
+    if(taxableIncome>prev) tax+=(Math.min(taxableIncome,top)-prev)*b.r;
+    prev=top; if(taxableIncome<=top) break;
+  }
+  return tax;
+}
+function US_calcStateTax(income, filing){
+  const stateEl=document.getElementById('us_state');
+  const selectedOpt=stateEl.options[stateEl.selectedIndex];
+  const stateName=selectedOpt.getAttribute('data-name')||'';
+  if(stateName==='Custom') return income*(gn('us_customState')/100);
+  let rate=parseFloat(stateEl.value)||0;
+  // Progressive state logic for big-rate states
+  if(stateName.includes('California')){
+    // CA progressive simplified
+    const ca=[[10412,.01],[24684,.02],[38959,.04],[54081,.06],[68350,.08],[349137,.093],[418961,.103],[698274,.113],[1000000,.123],[Infinity,.133]];
+    let t=0,prev=0; for(const[top,r]of ca){if(income>prev)t+=(Math.min(income,top)-prev)*r;prev=top;if(income<=top)break;} return t;
+  }
+  if(stateName.includes('New York')){
+    const ny=[[17150,.04],[23600,.045],[27900,.0525],[161550,.0585],[323200,.0625],[2155350,.0685],[5000000,.0965],[25000000,.103],[Infinity,.109]];
+    let t=0,prev=0; for(const[top,r]of ny){if(income>prev)t+=(Math.min(income,top)-prev)*r;prev=top;if(income<=top)break;} return t;
+  }
+  // All others: flat marginal rate approximation
+  return income*rate/100;
+}
+function US_calcFICA(grossIncome){
+  const ssOn=document.getElementById('us_ssOn').checked;
+  const medOn=document.getElementById('us_medOn').checked;
+  let fica=0;
+  if(ssOn) fica+=Math.min(grossIncome,168600)*0.062;
+  if(medOn){
+    fica+=grossIncome*0.0145;
+    if(grossIncome>200000) fica+=(grossIncome-200000)*0.009;
+  }
+  return fica;
+}
+function US_getStdDeduction(filing){
+  return{mfj:29200,single:14600,hoh:21900}[filing]||29200;
+}
+
+// ── US expense engine ──
+function US_expForYear(cat,yr){
+  const start=cat.sYr===null?0:cat.sYr,end=cat.eYr===null?Infinity:cat.eYr;
+  if(yr<start||yr>end) return 0;
+  if(!US_expInflOn||!cat.infl) return cat.val;
+  return cat.val*Math.pow(1+gn('us_infR')/100,yr);
+}
+function US_totExpMo(yr){
+  let t=US_EXPS.reduce((s,c)=>s+US_expForYear(c,yr),0);
+  US_EMIS.forEach(e=>{const es=e.sYr||0,ee=es+(e.yrs||0)-1;if(yr>=es&&yr<=ee)t+=e.emi||0;});
+  return t;
+}
+function US_sumExp(){
+  const mo=US_EXPS.reduce((s,c)=>s+(c.val||0),0)+US_EMIS.reduce((s,e)=>s+(e.emi||0),0);
+  setText('us_expMTot',US_fmt(mo));
+  setText('us_expDisp',US_fmt(mo*12));
+  return mo*12;
+}
+function US_rExp(){
+  const list=document.getElementById('us_expList'); list.innerHTML='';
+  US_EXPS.forEach((cat,i)=>{
+    const timed=cat.sYr!==null||cat.eYr!==null;
+    let sH=`<span class="pill" style="background:var(--green-lt);color:var(--green)">● Ongoing</span>`;
+    if(cat.sYr!==null&&cat.eYr!==null) sH=`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">Yr ${cat.sYr}–${cat.eYr}</span>`;
+    else if(cat.eYr!==null) sH=`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">Ends yr ${cat.eYr}</span>`;
+    else if(cat.sYr!==null&&cat.sYr>0) sH=`<span class="pill" style="background:var(--indigo-lt);color:var(--indigo)">Starts yr ${cat.sYr}</span>`;
+    const div=document.createElement('div'); div.className='ec'+(timed?' timed':'');
+    div.innerHTML=`<div class="grid items-center" style="grid-template-columns:1.8fr 1.1fr 0.55fr 0.55fr 0.4fr 0.9fr 26px;gap:8px">
+      <div class="flex items-center gap-2 min-w-0"><span style="font-size:1.1rem;flex-shrink:0">${cat.icon}</span>
+        <input type="text" value="${cat.label}" class="bg-transparent text-sm font-medium outline-none min-w-0 w-full border-b" style="border-color:var(--border)" onchange="US_EXPS[${i}].label=this.value;US_sv()"></div>
+      <div class="flex items-center gap-1"><span class="text-xs shrink-0" style="color:var(--faint)">$</span>
+        <input type="text" value="${cat.val?cat.val.toLocaleString('en-US'):''}" placeholder="0" class="bg-transparent mono text-sm font-medium outline-none w-full border-b" style="border-color:var(--border)" oninput="US_EXPS[${i}].val=parseFloat(this.value.replace(/,/g,''))||0;US_sumExp();US_rc();US_sv()"></div>
+      <input type="number" value="${cat.sYr===null?'':cat.sYr}" placeholder="Now" min="0" max="30" class="si mono text-xs text-center" style="padding:4px 5px" onchange="US_EXPS[${i}].sYr=this.value===''?null:parseInt(this.value);US_rExp();US_rc();US_sv()">
+      <input type="number" value="${cat.eYr===null?'':cat.eYr}" placeholder="∞" min="1" max="30" class="si mono text-xs text-center" style="padding:4px 5px" onchange="US_EXPS[${i}].eYr=this.value===''?null:parseInt(this.value);US_rExp();US_rc();US_sv()">
+      <div class="flex justify-center"><input type="checkbox" class="w-4 h-4 cursor-pointer" style="accent-color:var(--orange)" ${cat.infl?'checked':''} onchange="US_EXPS[${i}].infl=this.checked;US_rc();US_sv()"></div>
+      <div>${sH}</div>
+      <button onclick="US_EXPS.splice(${i},1);US_rExp();US_sumExp();US_rc();US_sv()" style="color:var(--faint);font-size:1.1rem;line-height:1" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">×</button></div>`;
+    list.appendChild(div);
+  });
+  US_sumExp();
+}
+function US_addExp(){US_EXPS.push({id:'c'+Date.now(),label:'New Category',icon:'📌',val:0,sYr:null,eYr:null,infl:true});US_rExp();US_sv();}
+
+// ── US loans ──
+function US_addEMI(){US_EMIS.push({id:'e'+Date.now(),label:'Mortgage',emi:0,sYr:0,yrs:30});US_rEMI();US_sv();}
+function US_rEMI(){
+  const c=document.getElementById('us_emiList');
+  document.getElementById('us_emiNone').style.display=US_EMIS.length?'none':'block';
+  c.innerHTML='';
+  US_EMIS.forEach((e,i)=>{
+    const div=document.createElement('div'); div.className='inset p-4';
+    const endYr=(e.sYr||0)+(e.yrs||0);
+    div.innerHTML=`<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
+      <div><p class="text-xs font-medium mb-1" style="color:var(--muted)">Loan Name</p><input type="text" value="${e.label}" class="si text-sm" oninput="US_EMIS[${i}].label=this.value;US_sv()"></div>
+      <div><p class="text-xs font-medium mb-1" style="color:var(--muted)">Monthly Payment ($)</p><input type="text" value="${e.emi?e.emi.toLocaleString('en-US'):''}" placeholder="0" class="si mono text-sm" oninput="US_hi(this);US_EMIS[${i}].emi=parseFloat(this.value.replace(/,/g,''))||0;US_sumExp();US_rc();US_sv()"></div>
+      <div><p class="text-xs font-medium mb-1" style="color:var(--muted)">Starts (year)</p><input type="number" value="${e.sYr||0}" min="0" max="30" class="si mono text-sm" oninput="US_EMIS[${i}].sYr=parseInt(this.value)||0;US_rc();US_sv()"></div>
+      <div><p class="text-xs font-medium mb-1" style="color:var(--muted)">Duration (yrs)</p><input type="number" value="${e.yrs||30}" min="1" max="30" class="si mono text-sm" oninput="US_EMIS[${i}].yrs=parseInt(this.value)||1;US_rc();US_sv()"></div>
+    </div>
+    <div class="flex justify-between items-center mt-3">
+      <span class="text-xs" style="color:var(--faint)">Ends year ${endYr} <span class="pill ml-1" style="background:var(--green-lt);color:var(--green)">✓ Surplus ↑ after yr ${endYr}</span></span>
+      <button onclick="US_EMIS.splice(${i},1);US_rEMI();US_sumExp();US_rc();US_sv()" class="text-sm font-semibold" style="color:var(--rose)">Remove</button>
+    </div>`;
+    c.appendChild(div);
+  });
+  setText('us_emiTot',US_fmt(US_EMIS.reduce((s,e)=>s+(e.emi||0),0)));
+}
+
+// ── US investments ──
+function US_addAssetRow(){const sel=document.getElementById('us_catSel');US_addARow(sel.options[sel.selectedIndex].text.split('(')[0].replace(/—.*/,'').trim(),0,parseFloat(sel.value));US_sv();}
+function US_addARow(name='Asset',p=0,y=0,o='1',tf=false){
+  const tr=document.createElement('tr'); tr.className='us_ar';
+  tr.innerHTML=`<td><input type="text" value="${name}" class="us_nm bg-transparent text-sm outline-none w-24 italic" style="color:var(--muted)" onchange="US_sv()"></td>
+    <td><input type="text" value="${p.toLocaleString('en-US')}" class="us_pv bg-transparent border-b mono text-sm font-medium w-28 outline-none" style="border-color:var(--border)" oninput="US_hi(this);US_rc();US_sv()"></td>
+    <td class="text-center"><input type="number" value="${y}" class="us_yv bg-transparent border-b mono text-sm font-medium w-12 outline-none text-center" style="border-color:var(--border);color:var(--teal)" oninput="US_chkROI(this);US_rc();US_sv()"></td>
+    <td><select class="us_ov si text-sm" style="width:auto;padding:5px 8px" onchange="US_rc();US_sv()"><option value="1" ${o==='1'?'selected':''}>Spouse 1</option><option value="2" ${o==='2'?'selected':''}>Spouse 2</option></select></td>
+    <td class="text-center"><input type="checkbox" class="us_tv w-4 h-4 cursor-pointer" style="accent-color:var(--blue)" ${tf?'checked':''} onchange="US_rc();US_sv()"></td>
+    <td class="text-right np"><button onclick="this.closest('tr').remove();US_rc();US_sv()" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕</button></td>`;
+  document.getElementById('us_aBody').appendChild(tr); US_rc();
+}
+function US_chkROI(el){el.style.color=(parseFloat(el.value)||0)>30?'var(--amber)':'var(--teal)';document.getElementById('us_roiW').classList.toggle('hidden',[...document.querySelectorAll('.us_yv')].every(i=>(parseFloat(i.value)||0)<=30));}
+function US_getAssets(s1b,s2b){
+  let totP=0,s1G=s1b,s2G=s2b,ty=0;
+  document.querySelectorAll('.us_ar').forEach(r=>{
+    const p=parseFloat(r.querySelector('.us_pv').value.replace(/,/g,''))||0;
+    const y=parseFloat(r.querySelector('.us_yv').value)||0;
+    const o=r.querySelector('.us_ov').value,tf=r.querySelector('.us_tv').checked;
+    const ya=(p*y)/100; totP+=p; ty+=ya;
+    if(!tf){if(o==='1')s1G+=ya;else s2G+=ya;}
+  });
+  return{totP,s1G,s2G,ty};
+}
+
+// ── US milestones ──
+function US_addMS(){US_MS.push({label:'Goal',year:10,amount:0});US_rMS();US_rFC();US_sv();}
+function US_rMS(){
+  const list=document.getElementById('us_msList');
+  document.getElementById('us_msNone').style.display=US_MS.length?'none':'block';
+  list.innerHTML='';
+  US_MS.forEach((m,i)=>{
+    const div=document.createElement('div'); div.className='inset p-3 flex items-center gap-3';
+    div.innerHTML=`<div style="width:10px;height:10px;border-radius:99px;background:var(--amber);border:2px solid #fff;box-shadow:0 0 0 2px var(--amber);flex-shrink:0"></div>
+      <div class="flex-1 grid grid-cols-3 gap-2">
+        <input type="text" value="${m.label}" class="si text-sm" style="padding:5px 8px" oninput="US_MS[${i}].label=this.value;US_rFC();US_sv()">
+        <input type="number" value="${m.year}" min="1" max="30" class="si mono text-sm" style="padding:5px 8px" oninput="US_MS[${i}].year=parseInt(this.value)||1;US_rFC();US_sv()">
+        <input type="text" value="${m.amount?m.amount.toLocaleString('en-US'):''}" placeholder="$ Target" class="si mono text-sm" style="padding:5px 8px" oninput="US_hi(this);US_MS[${i}].amount=parseFloat(this.value.replace(/,/g,''))||0;US_rFC();US_sv()">
+      </div>
+      <button onclick="US_MS.splice(${i},1);US_rMS();US_rFC();US_sv()" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕</button>`;
+    list.appendChild(div);
+  });
+}
+
+// ── US core recalc ──
+function US_rc(){
+  const b1=gv('us_b1'),b2=gv('us_b2');
+  const filing=document.getElementById('us_filing').value;
+  const fdP=gi('us_fdRng')/100, sipP=gi('us_sipRng')/100, sipRt=gn('us_sipRet')/100;
+  const d1=US_totDed(1), d2=US_totDed(2);
+  const {totP,s1G,s2G,ty}=US_getAssets(b1,b2);
+
+  // Show/hide custom state field
+  const stateEl=document.getElementById('us_state');
+  const isCustom=stateEl.options[stateEl.selectedIndex].getAttribute('data-name')==='Custom';
+  document.getElementById('us_customStateRow').classList.toggle('hidden',!isCustom);
+
+  // Federal taxable = gross + investment income - std deduction - pretax deductions
+  const stdDed=US_getStdDeduction(filing);
+  // For MFJ, combined filing; for single, per-person
+  let ft1,ft2,st1,st2,fi1,fi2;
+  if(filing==='mfj'){
+    const combinedGross=s1G+s2G;
+    const combinedDed=d1+d2+stdDed;
+    const combinedTaxable=Math.max(0,combinedGross-combinedDed);
+    const combinedFed=US_calcFedTax(combinedTaxable,filing);
+    const combinedState=US_calcStateTax(Math.max(0,combinedGross-combinedDed),filing);
+    // Allocate proportionally
+    const r1=s1G/(combinedGross||1), r2=s2G/(combinedGross||1);
+    ft1=combinedFed*r1; ft2=combinedFed*r2;
+    st1=combinedState*r1; st2=combinedState*r2;
+    fi1=US_calcFICA(b1); fi2=US_calcFICA(b2);
+  } else {
+    ft1=US_calcFedTax(Math.max(0,s1G-d1-stdDed),filing);
+    ft2=US_calcFedTax(Math.max(0,s2G-d2-stdDed),filing);
+    st1=US_calcStateTax(Math.max(0,s1G-d1-stdDed),filing);
+    st2=US_calcStateTax(Math.max(0,s2G-d2-stdDed),filing);
+    fi1=US_calcFICA(b1); fi2=US_calcFICA(b2);
   }
 
-  if(!insights.length) insights.push({type:'info',icon:'ℹ️',title:'Add your data to see insights',body:'Fill income, assets, and expenses on the other tabs.'});
+  US_updDedAmts();
+  setText('us_s1g',US_fmt(s1G)); setText('us_s1d',d1>0?'−'+US_fmt(d1):'$0');
+  setText('us_s1ft',US_fmt(ft1)); setText('us_s1st',US_fmt(st1)); setText('us_s1fi',US_fmt(fi1));
+  setText('us_s1n',US_fmt(s1G-d1-ft1-st1-fi1));
+  const tot1=ft1+st1+fi1; setText('us_s1r',s1G>0?((tot1/s1G)*100).toFixed(1)+'%':'0%');
+  setText('us_s2g',US_fmt(s2G)); setText('us_s2d',d2>0?'−'+US_fmt(d2):'$0');
+  setText('us_s2ft',US_fmt(ft2)); setText('us_s2st',US_fmt(st2)); setText('us_s2fi',US_fmt(fi2));
+  setText('us_s2n',US_fmt(s2G-d2-ft2-st2-fi2));
+  const tot2=ft2+st2+fi2; setText('us_s2r',s2G>0?((tot2/s2G)*100).toFixed(1)+'%':'0%');
 
-  const typeMap={tip:'insight-tip',warn:'insight-warn',info:'insight-info'};
-  document.getElementById('insightsPanel').innerHTML=insights.map(i=>`
-    <div class="insight-card ${typeMap[i.type]}">
-      <div class="flex items-start gap-3">
-        <span style="font-size:1.3rem;flex-shrink:0">${i.icon}</span>
-        <div><p class="font-semibold text-sm mb-1">${i.title}</p><p class="text-sm opacity-80">${i.body}</p></div>
-      </div>
-    </div>`).join('');
+  const expMo=US_totExpMo(0);
+  const annSurplus=b1+b2+ty-d1-d2-ft1-ft2-st1-st2-fi1-fi2-(expMo*12);
+  const mo=annSurplus/12, deficit=mo<0, absVal=Math.abs(Math.round(mo));
+
+  const card=document.getElementById('us_sCard');
+  card.style.background=deficit?'linear-gradient(135deg,#9F1239,#E11D48,#FB7185)':'linear-gradient(135deg,#1E40AF,#2563EB,#3B82F6)';
+  setText('us_sLbl',deficit?'Monthly Deficit ⚠':'Monthly Surplus');
+  setText('us_sDisp',(deficit?'−$':'$')+absVal.toLocaleString('en-US'));
+  setText('us_saDisp',(deficit?'−$':'$')+Math.abs(Math.round(annSurplus)).toLocaleString('en-US')+' / year');
+
+  const mFD=deficit?0:mo*fdP, mSIP=deficit?0:mo*sipP;
+  setText('us_fdV',US_fmt(mFD)); setText('us_sipV',US_fmt(mSIP));
+  setText('us_totP',US_fmt(totP)); setText('us_bROI',totP>0?((ty/totP)*100).toFixed(2)+'%':'—');
+
+  const gc=gv('us_gC'),gy=gi('us_gY');
+  if(gc>0){const r=sipRt/12,n=gy*12; const req=r===0?gc/n:gc*r/(Math.pow(1+r,n)-1); setText('us_gSIP',US_fmt(req));
+    const ok=!deficit&&req<=mSIP; document.getElementById('us_gFeas').textContent=ok?'✓ Achievable with current surplus':'⚠ Needs '+US_fmt(Math.max(0,req-mSIP))+' more/month';
+    document.getElementById('us_gFeas').style.color=ok?'var(--green)':'var(--rose)';
+  } else{setText('us_gSIP','$0');document.getElementById('us_gFeas').textContent='';}
+
+  const dc=gv('us_ddC'),dw=gv('us_ddW'),dr=gn('us_ddRt')/100,di=gn('us_ddI')/100;
+  if(dc>0&&dw>0){let corpus=dc,yr=0;while(corpus>0&&yr<100){corpus=(corpus-dw*Math.pow(1+di,yr))*(1+dr);yr++;} setText('us_ddRes',yr>=100?'100+ years':yr+' years'); setText('us_ddNote',yr>=100?'Portfolio outlasts a 100-year horizon 🎉':'Depleted ~'+yr+' years after retirement');}
+  else{setText('us_ddRes','—');setText('us_ddNote','');}
+
+  if(document.getElementById('us_tp-forecast').classList.contains('on')){US_rFC();US_rMS();}
+  if(document.getElementById('us_tp-insights').classList.contains('on')) US_rIns();
+  if(document.getElementById('us_tp-scenarios').classList.contains('on')) US_rSC();
+
+  setText('us_audit',`b1=${b1.toLocaleString()}·b2=${b2.toLocaleString()}·fed=${Math.round(ft1+ft2).toLocaleString()}·state=${Math.round(st1+st2).toLocaleString()}·fica=${Math.round(fi1+fi2).toLocaleString()}·${deficit?'deficit':'surplus'}/mo=${absVal.toLocaleString()}`);
 }
 
-// ─── PERSISTENCE ──────────────────────────────────────────────────────────────
-function saveToLocal(){
-  const data={
-    b1:document.getElementById('b1').value, b2:document.getElementById('b2').value,
-    g1:document.getElementById('g1').value, g2:document.getElementById('g2').value,
-    fdRange:document.getElementById('fdRangeInput').value,
-    sipRange:document.getElementById('sipRangeInput').value,
-    sipRet:document.getElementById('sipRet').value, fdRate:document.getElementById('fdRate').value,
-    infRet:document.getElementById('infRet').value, adj:isAdj, expInflEnabled,
-    goalCorpus:document.getElementById('goalCorpus').value,
-    goalYears:document.getElementById('goalYears').value,
-    ddCorpus:document.getElementById('ddCorpus').value,
-    ddWithdraw:document.getElementById('ddWithdraw').value,
-    ddReturn:document.getElementById('ddReturn').value,
-    ddInflation:document.getElementById('ddInflation').value,
-    epf1Basic:document.getElementById('epf1Basic').value,
-    epf2Basic:document.getElementById('epf2Basic').value,
-    epfRate:document.getElementById('epfRate').value,
-    epfBalance:document.getElementById('epfBalance').value,
-    expCategories, emiList, milestones, scenarios, assets:[]
-  };
-  document.querySelectorAll('.asset-row').forEach(row=>{
-    data.assets.push({n:row.querySelector('.name_in').value,p:row.querySelector('.p_in').value,
-      y:row.querySelector('.y_in').value,o:row.querySelector('.o_in').value,tf:row.querySelector('.tf_in').checked});
+// ── US simulation engine ──
+function US_sim(years,xE=0,lump=0,xI=0){
+  const b1=gv('us_b1'),b2=gv('us_b2'),g1=gn('us_g1')/100,g2=gn('us_g2')/100;
+  const fdP=gi('us_fdRng')/100,sipP=gi('us_sipRng')/100;
+  const sipRt=gn('us_sipRet')/100,fdRt=gn('us_fdRt')/100;
+  const filing=document.getElementById('us_filing').value;
+  const stdDed=US_getStdDeduction(filing);
+  const {totP,ty}=US_getAssets(b1,b2);
+  let cFD=totP+lump,cSIP=0,s1=b1,s2=b2;
+  for(let yr=1;yr<=years;yr++){
+    s1*=(1+g1); s2*=(1+g2);
+    const {s1G,s2G}=US_getAssets(s1,s2);
+    const d1=US_totDed(1),d2=US_totDed(2);
+    let ft,st;
+    if(filing==='mfj'){
+      const cg=s1G+s2G, cd=d1+d2+stdDed, ct=Math.max(0,cg-cd);
+      ft=US_calcFedTax(ct,filing); st=US_calcStateTax(ct,filing);
+    } else {
+      ft=US_calcFedTax(Math.max(0,s1G-d1-stdDed),filing)+US_calcFedTax(Math.max(0,s2G-d2-stdDed),filing);
+      st=US_calcStateTax(Math.max(0,s1G-d1-stdDed),filing)+US_calcStateTax(Math.max(0,s2G-d2-stdDed),filing);
+    }
+    const fi1=US_calcFICA(s1),fi2=US_calcFICA(s2);
+    const expMo=US_totExpMo(yr);
+    const surplus=(s1+s2+ty-d1-d2-ft-st-fi1-fi2-(expMo*12))/12+(xI-xE);
+    const mFD=Math.max(0,surplus)*fdP, mSIP=Math.max(0,surplus)*sipP;
+    cFD=(cFD+mFD*12)*(1+fdRt); cSIP=(cSIP+mSIP*12)*(1+sipRt);
+  }
+  return{total:cFD+cSIP};
+}
+
+function US_rFC(){
+  const infRate=gn('us_infR')/100, max30=US_sim(30).total||1;
+  const expEnds=new Set();
+  US_EXPS.forEach(c=>{if(c.eYr!==null)expEnds.add(c.eYr);});
+  US_EMIS.forEach(e=>expEnds.add((e.sYr||0)+(e.yrs||0)));
+  let html='';
+  [5,10,15,20,25,30].forEach(yr=>{
+    let{total}=US_sim(yr);
+    let disp=US_isAdj?total/Math.pow(1+infRate,yr):total;
+    const m=(disp/1000000).toFixed(2), bw=Math.min(97,Math.max(3,(total/max30)*100));
+    const mPills=US_MS.filter(m=>m.year===yr).map(m=>`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">🎯 ${m.label}${m.amount?' · '+US_fmt(m.amount):''}</span>`);
+    const ePills=[...expEnds].filter(y=>y===yr).map(()=>`<span class="pill" style="background:var(--green-lt);color:var(--green)">✓ Expense ends · surplus ↑</span>`);
+    const pills=[...mPills,...ePills].join(' ');
+    html+=`<div class="fr"><span class="mono text-sm font-semibold w-14 shrink-0" style="color:var(--muted)">${yr} Yrs</span>
+      <div class="flex-1 min-w-0"><div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden${pills?';margin-bottom:5px':''}"><div style="height:100%;width:${bw}%;border-radius:99px;background:linear-gradient(to right,var(--blue),var(--purple));transition:width .5s ease"></div></div>${pills?`<div class="flex flex-wrap gap-1">${pills}</div>`:''}</div>
+      <span class="mono text-base font-bold w-24 text-right shrink-0" style="color:var(--blue-dk)">$${m}M</span></div>`;
   });
-  try{localStorage.setItem('master_plan_v4',JSON.stringify(data));}catch(e){}
+  document.getElementById('us_fcTbl').innerHTML=html;
 }
 
-function exportData(){
-  const saved=localStorage.getItem('master_plan_v4');
-  if(!saved){alert('No data to export yet.');return;}
-  const blob=new Blob([saved],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='master-plan-backup-'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
+function US_swSC(s){
+  US_activeSC=s; ['A','B'].forEach(x=>document.getElementById('us_st'+x).classList.toggle('on',x===s));
+  const c=US_SC[s];
+  document.getElementById('us_scN').value=c.name;
+  document.getElementById('us_scE').value=c.extraExp?c.extraExp.toLocaleString('en-US'):'0';
+  document.getElementById('us_scL').value=c.lumpsum?c.lumpsum.toLocaleString('en-US'):'0';
+  document.getElementById('us_scI').value=c.extraInc?c.extraInc.toLocaleString('en-US'):'0';
+  US_rSC();
+}
+function US_saveSC(){
+  const s=US_activeSC;
+  US_SC[s].name=document.getElementById('us_scN').value||('Scenario '+s);
+  US_SC[s].extraExp=parseFloat(document.getElementById('us_scE').value.replace(/,/g,''))||0;
+  US_SC[s].lumpsum=parseFloat(document.getElementById('us_scL').value.replace(/,/g,''))||0;
+  US_SC[s].extraInc=parseFloat(document.getElementById('us_scI').value.replace(/,/g,''))||0;
+  US_rSC(); US_sv();
+}
+function US_rSC(){
+  const rows=[10,20,30].map(yr=>{
+    const a=US_sim(yr,US_SC.A.extraExp,US_SC.A.lumpsum,US_SC.A.extraInc).total;
+    const b=US_sim(yr,US_SC.B.extraExp,US_SC.B.lumpsum,US_SC.B.extraInc).total;
+    const d=b-a;
+    return`<tr style="border-bottom:1px solid var(--border)"><td class="py-3 mono text-sm font-semibold" style="color:var(--muted)">${yr} Yrs</td>
+      <td class="py-3 mono text-sm font-bold" style="color:var(--indigo)">${US_fmtM(a)}</td>
+      <td class="py-3 mono text-sm font-bold" style="color:var(--purple)">${US_fmtM(b)}</td>
+      <td class="py-3"><span class="mono text-sm font-bold" style="color:${d>=0?'var(--green)':'var(--rose)'}">${d>=0?'+':'−'}${US_fmtM(Math.abs(d))}</span>
+      <span class="text-xs ml-1" style="color:var(--faint)">→ ${d>=0?US_SC.B.name:US_SC.A.name} wins</span></td></tr>`;
+  }).join('');
+  document.getElementById('us_scComp').innerHTML=`<table class="w-full text-left"><thead style="border-bottom:2px solid var(--border)"><tr>
+    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Horizon</th>
+    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--indigo)">${US_SC.A.name}</th>
+    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--purple)">${US_SC.B.name}</th>
+    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Difference</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-function importData(e){
-  const file=e.target.files[0]; if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    try{
-      const d=JSON.parse(ev.target.result);
-      localStorage.setItem('master_plan_v4',JSON.stringify(d));
-      loadFromLocal();
-      alert('Data restored successfully!');
-    }catch{alert('Invalid backup file.');}
-  };
-  reader.readAsText(file);
-  e.target.value='';
+function US_rIns(){
+  const b1=gv('us_b1'),b2=gv('us_b2');
+  const {s1G,s2G,ty,totP}=US_getAssets(b1,b2);
+  const d1=US_totDed(1),d2=US_totDed(2);
+  const filing=document.getElementById('us_filing').value;
+  const stdDed=US_getStdDeduction(filing);
+  const ft1=US_calcFedTax(Math.max(0,s1G-d1-stdDed),filing==='mfj'?'single':filing);
+  const expMo=US_totExpMo(0);
+  const surplus=b1+b2+ty-(expMo*12);
+  const ins=[];
+
+  // 401k maxout check
+  const total401k=US_DEDS[1].concat(US_DEDS[2]).filter(d=>d.label.includes('401')).reduce((s,d)=>s+(d.amt||0),0);
+  if(total401k<23000&&(b1+b2)>50000)
+    ins.push({t:'tip',i:'💰',h:'Consider maxing out 401k contributions',b:`You can contribute up to $23,000/person in 2024. Current total: ${US_fmt(total401k)}. Pre-tax contributions lower your taxable income significantly.`});
+
+  // FICA savings on 401k
+  if(d1+d2>0)
+    ins.push({t:'tip',i:'📉',h:'Pre-tax deductions reducing your tax burden',b:`${US_fmt(d1+d2)} in pre-tax deductions saved you approximately ${US_fmt((d1+d2)*0.22)} in federal tax (at 22% bracket).`});
+
+  // High state tax
+  const stEl=document.getElementById('us_state');
+  const stRate=parseFloat(stEl.value)||0;
+  if(stRate>8) ins.push({t:'warn',i:'⚠️',h:'High state income tax',b:`Your state has a top marginal rate of ${stRate}%. Tax-advantaged accounts (401k, HSA, Roth IRA) become even more valuable.`});
+
+  // No FICA
+  if(!document.getElementById('us_ssOn').checked&&!document.getElementById('us_medOn').checked)
+    ins.push({t:'info',i:'ℹ️',h:'FICA excluded from calculations',b:'If self-employed, note that you may owe both employer and employee portions (15.3% self-employment tax).'});
+
+  // Savings rate
+  if(surplus>0&&surplus/(b1+b2||1)>0.25)
+    ins.push({t:'tip',i:'🌟',h:'Strong savings rate — above 25%',b:'You are well above the average US savings rate. Consider whether your emergency fund is fully funded (3-6 months) before increasing investments.'});
+
+  // Time-bound expenses
+  const timed=US_EXPS.filter(c=>c.eYr!==null);
+  if(timed.length){const freed=timed.reduce((s,c)=>s+(c.val||0),0); ins.push({t:'info',i:'⏳',h:`${timed.length} time-bound expense(s) will free up ${US_fmt(freed)}/month`,b:timed.map(c=>`${c.icon} ${c.label} ends year ${c.eYr}`).join(' · ')});}
+
+  if(!ins.length) ins.push({t:'info',i:'ℹ️',h:'Add your data to see insights',b:'Fill income, assets, and expenses on the other tabs.'});
+  const cm={tip:'ic-tip',warn:'ic-warn',info:'ic-info'};
+  document.getElementById('us_insP').innerHTML=ins.map(x=>`<div class="ic ${cm[x.t]}"><div class="flex items-start gap-3"><span style="font-size:1.3rem;flex-shrink:0">${x.i}</span><div><p class="font-semibold text-sm mb-1">${x.h}</p><p class="text-sm opacity-80">${x.b}</p></div></div></div>`).join('');
 }
 
-function loadFromLocal(){
-  let saved; try{saved=localStorage.getItem('master_plan_v4');}catch(e){}
-  renderExpenses(); renderEMIs(); renderMilestoneList();
-  if(!saved){validateSplit('fd');recalc();return;}
+// ── US persistence ──
+function US_sv(){
+  const g=id=>document.getElementById(id)?.value||'';
+  const data={b1:g('us_b1'),b2:g('us_b2'),g1:g('us_g1'),g2:g('us_g2'),fdRng:g('us_fdRng'),sipRng:g('us_sipRng'),sipRet:g('us_sipRet'),fdRt:g('us_fdRt'),infR:g('us_infR'),filing:g('us_filing'),state:g('us_state'),customState:g('us_customState'),ssOn:document.getElementById('us_ssOn').checked,medOn:document.getElementById('us_medOn').checked,isAdj:US_isAdj,expInflOn:US_expInflOn,gC:g('us_gC'),gY:g('us_gY'),ddC:g('us_ddC'),ddW:g('us_ddW'),ddRt:g('us_ddRt'),ddI:g('us_ddI'),EXPS:US_EXPS,EMIS:US_EMIS,MS:US_MS,SC:US_SC,DEDS:US_DEDS,assets:[]};
+  document.querySelectorAll('.us_ar').forEach(r=>data.assets.push({n:r.querySelector('.us_nm').value,p:r.querySelector('.us_pv').value,y:r.querySelector('.us_yv').value,o:r.querySelector('.us_ov').value,tf:r.querySelector('.us_tv').checked}));
+  try{localStorage.setItem('cyf_usa',JSON.stringify(data));}catch(e){}
+}
+function US_exportData(){const s=localStorage.getItem('cyf_usa');if(!s){alert('No data yet.');return;}const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'application/json'}));a.download='cyf-usa-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();}
+function US_importData(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{localStorage.setItem('cyf_usa',ev.target.result);US_loadData();alert('Restored!');}catch{alert('Invalid file.');}};reader.readAsText(file);e.target.value='';}
+function US_loadData(){
+  let saved;try{saved=localStorage.getItem('cyf_usa');}catch(e){}
+  US_rExp();US_rEMI();US_rMS();
+  if(!saved){US_vs('fd');US_rc();return;}
   const d=JSON.parse(saved);
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||el.value;};
-  set('b1',d.b1);set('b2',d.b2);set('g1',d.g1||'8');set('g2',d.g2||'8');
-  set('fdRangeInput',d.fdRange||'50');set('sipRangeInput',d.sipRange||'50');
-  set('sipRet',d.sipRet||'12');set('fdRate',d.fdRate||'7');set('infRet',d.infRet||'5');
-  set('goalCorpus',d.goalCorpus||'0');set('goalYears',d.goalYears||'20');
-  set('ddCorpus',d.ddCorpus||'0');set('ddWithdraw',d.ddWithdraw||'0');
-  set('ddReturn',d.ddReturn||'8');set('ddInflation',d.ddInflation||'5');
-  set('epf1Basic',d.epf1Basic||'0');set('epf2Basic',d.epf2Basic||'0');
-  set('epfRate',d.epfRate||'8.25');set('epfBalance',d.epfBalance||'0');
-
-  if(d.adj){isAdj=true;document.getElementById('adjToggleBtn').classList.add('on');
-    document.getElementById('adjNote').textContent='Inflation-adjusted · salary growth · time-bound expenses modelled';}
-  if(d.expInflEnabled){expInflEnabled=true;
-    document.getElementById('expInflBtn').classList.add('on');
-    document.getElementById('expInflBtn').textContent='📈 Inflation On';}
-  if(d.expCategories){expCategories=d.expCategories;renderExpenses();}
-  if(d.emiList){emiList=d.emiList;renderEMIs();}
-  if(d.milestones){milestones=d.milestones;renderMilestoneList();}
-  if(d.scenarios){scenarios=d.scenarios;switchScenario('A');}
-  document.getElementById('assetBody').innerHTML='';
-  (d.assets||[]).forEach(a=>addRow(a.n,parseFloat((a.p||'0').replace(/,/g,'')),parseFloat(a.y),a.o,a.tf));
-  validateSplit('fd');
-  recalc();
+  const setV=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v;};
+  setV('us_b1',d.b1);setV('us_b2',d.b2);setV('us_g1',d.g1||'5');setV('us_g2',d.g2||'5');
+  setV('us_fdRng',d.fdRng||'50');setV('us_sipRng',d.sipRng||'50');
+  setV('us_sipRet',d.sipRet||'10');setV('us_fdRt',d.fdRt||'5');setV('us_infR',d.infR||'3');
+  setV('us_filing',d.filing||'mfj');setV('us_state',d.state||'0');setV('us_customState',d.customState||'0');
+  setV('us_gC',d.gC||'0');setV('us_gY',d.gY||'20');
+  setV('us_ddC',d.ddC||'0');setV('us_ddW',d.ddW||'0');setV('us_ddRt',d.ddRt||'7');setV('us_ddI',d.ddI||'3');
+  if(d.ssOn!==undefined) document.getElementById('us_ssOn').checked=d.ssOn;
+  if(d.medOn!==undefined) document.getElementById('us_medOn').checked=d.medOn;
+  if(d.isAdj){US_isAdj=true;document.getElementById('us_adjBtn').classList.add('on');}
+  if(d.expInflOn){US_expInflOn=true;const btn=document.getElementById('us_eiBtn');btn.classList.add('on');btn.textContent='📈 Inflation On';}
+  if(d.EXPS){US_EXPS=d.EXPS;US_rExp();}
+  if(d.EMIS){US_EMIS=d.EMIS;US_rEMI();}
+  if(d.MS){US_MS=d.MS;US_rMS();}
+  if(d.SC){US_SC=d.SC;US_swSC('A');}
+  if(d.DEDS){US_DEDS=d.DEDS;US_rDed(1);US_rDed(2);}
+  document.getElementById('us_aBody').innerHTML='';
+  (d.assets||[]).forEach(a=>US_addARow(a.n,parseFloat((a.p||'0').replace(/,/g,'')),parseFloat(a.y),a.o,a.tf));
+  US_vs('fd');US_rc();
 }
+function US_resetAll(){if(!confirm('Clear all USA data?'))return;try{localStorage.removeItem('cyf_usa');}catch(e){}location.reload();}
 
-function resetToZero(){
-  if(!confirm('Clear all data and start fresh?'))return;
-  try{localStorage.removeItem('master_plan_v4');}catch(e){}
-  location.reload();
-}
-
-window.onload=loadFromLocal;
+// ═══════════════════════════════════════════════════════════════════
+//  INIT — return to last used country
+// ═══════════════════════════════════════════════════════════════════
+window.onload = function(){
+  try{
+    const last=localStorage.getItem('cyf_lastCountry');
+    if(last==='india'||last==='usa') openDashboard(last);
+  } catch(e){}
+};
 </script>
 </body>
 </html>
