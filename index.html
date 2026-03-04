@@ -392,7 +392,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
     <button class="tb on" onclick="IN_tab('expenses',this)"><span class="tab-step">1</span> 💸 Expenses</button>
     <button class="tb" onclick="IN_tab('investments',this)"><span class="tab-step">2</span> 📈 Investments</button>
     <button class="tb" onclick="IN_tab('forecast',this)"><span class="tab-step">3</span> 🔭 Forecast</button>
-    <button class="tb" onclick="IN_tab('scenarios',this)">⚖️ What-If</button>
+    <button class="tb" onclick="IN_tab('scenarios',this)">🗓 Life Events</button>
     <button class="tb" onclick="IN_tab('insights',this)">💡 Insights</button>
   </div>
   <p class="text-xs text-center" style="color:var(--faint);margin-top:5px">Follow steps <strong style="color:var(--muted)">1 → 2 → 3</strong> to get started · hover <span style="background:var(--border);padding:1px 6px;border-radius:4px;font-size:10px">ⓘ</span> on any section for guidance</p>
@@ -537,15 +537,15 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
   <div class="card p-6">
     <div class="flex justify-between items-center mb-4">
       <div>
-        <p class="sl">🎯 Milestone Markers</p>
-        <p class="text-sm mt-0.5" style="color:var(--muted)">Mark meaningful moments on your wealth timeline — they appear as flags on your forecast.</p>
+        <p class="sl">🗓 Life Events</p>
+        <p class="text-sm mt-0.5" style="color:var(--muted)">Add one-time events — they appear on your forecast and optionally reduce your wealth.</p>
       </div>
-      <button onclick="IN_addMS()" class="text-xs font-semibold px-4 py-2 rounded-lg border np" style="border-color:var(--amber);color:var(--amber)">+ Add Milestone</button>
+      <button onclick="IN_addLE()" class="text-xs font-semibold px-4 py-2 rounded-lg border np" style="border-color:var(--teal);color:var(--teal)">+ Add Event</button>
     </div>
-    <div id="in_msList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-    <div id="in_msNone" class="text-center py-6" style="color:var(--faint)">
-      <p class="text-3xl mb-2">🎯</p><p class="text-sm font-medium">No milestones yet</p>
-      <p class="text-xs mt-1" style="color:var(--faint)">e.g. "Child's college" · "Home purchase" · "Retirement"</p>
+    <div id="in_leList" class="space-y-3"></div>
+    <div id="in_leNone" class="text-center py-6" style="color:var(--faint)">
+      <p class="text-3xl mb-2">🗓</p><p class="text-sm font-medium">No life events yet</p>
+      <p class="text-xs mt-1">e.g. "Child's college" · "Home purchase" · "Medical expense"</p>
     </div>
   </div>
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -578,39 +578,43 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
   </div>
 </div>
 
-<!-- TAB: WHAT-IF -->
+<!-- TAB: LIFE EVENTS -->
 <div id="in_tp-scenarios" class="tp space-y-5">
   <div class="card p-6">
-    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
-      <div><p class="sl tip-wrap">What-If Scenario Comparison<span class="tip-icon">ⓘ</span><span class="tip-box">Model two different financial decisions (e.g. "Buy a house" vs "Keep renting") and compare how they affect your total wealth at 10, 20, and 30 years. Add extra expense, one-time investment, or extra income per scenario. You can also model job loss — temporary gap or permanent stop.</span></p><p class="text-sm mt-1" style="color:var(--muted)">Compare two financial paths side-by-side over 10, 20, and 30 years.</p></div>
-      <div class="flex gap-2 np"><button class="stab on" id="in_stA" onclick="IN_swSC('A')">Scenario A</button><button class="stab" id="in_stB" onclick="IN_swSC('B')">Scenario B</button></div>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Scenario Name</p><input type="text" id="in_scN" placeholder="e.g. Buy a House" class="si" oninput="IN_saveSC()"></div>
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Expense (₹)</p><input type="text" id="in_scE" value="0" oninput="IN_hi(this);IN_saveSC()" class="si mono"></div>
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">One-Time Investment (₹)</p><input type="text" id="in_scL" value="0" oninput="IN_hi(this);IN_saveSC()" class="si mono"></div>
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Income (₹)</p><input type="text" id="in_scI" value="0" oninput="IN_hi(this);IN_saveSC()" class="si mono"></div>
-    </div>
-    <div class="inset p-4 mb-5 space-y-3">
-      <p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color:var(--rose)">💼 Job Loss Scenario</p>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div><p class="text-xs font-medium mb-1" style="color:var(--muted)">Who loses job?</p>
-          <select id="in_scJL" class="si text-sm" onchange="IN_saveSC()">
-            <option value="none">None</option>
-            <option value="s1">Spouse 1 — temporary gap</option>
-            <option value="s2">Spouse 2 — temporary gap</option>
-            <option value="both">Both — temporary gap</option>
-            <option value="s1p">Spouse 1 — stops permanently</option>
-            <option value="s2p">Spouse 2 — stops permanently</option>
-            <option value="bothp">Both — stops permanently</option>
-          </select></div>
-        <div id="in_scJLYrow"><p class="text-xs font-medium mb-1" style="color:var(--muted)">Duration out (years)</p>
-          <input type="number" id="in_scJLY" value="1" min="0.5" max="10" step="0.5" class="si mono text-sm" oninput="IN_saveSC()"></div>
-        <div id="in_scJLRrow"><p class="text-xs font-medium mb-1" style="color:var(--muted)">Re-entry salary (% of original)</p>
-          <input type="number" id="in_scJLR" value="100" min="0" max="200" class="si mono text-sm" oninput="IN_saveSC()"></div>
+    <div class="flex justify-between items-center mb-5">
+      <div>
+        <p class="sl tip-wrap">Life Events<span class="tip-icon">ⓘ</span><span class="tip-box">Model real financial events — home purchase, education, medical expenses, windfalls. Toggle "Deduct from wealth" to have the amount removed from your forecast corpus at that year. Events also appear as markers on your forecast chart.</span></p>
+        <p class="text-sm mt-1" style="color:var(--muted)">One-time events that affect your wealth trajectory.</p>
       </div>
+      <button onclick="IN_addLE()" class="text-xs font-semibold px-4 py-2 rounded-lg border np" style="border-color:var(--teal);color:var(--teal)">+ Add Event</button>
     </div>
-    <div id="in_scComp"></div>
+    <div id="in_leList2" class="space-y-3"></div>
+    <div id="in_leNone2" class="text-center py-8" style="color:var(--faint)">
+      <p class="text-3xl mb-2">🗓</p>
+      <p class="text-sm font-medium">No life events yet</p>
+      <p class="text-xs mt-1">e.g. "Home purchase · Yr 3 · ₹80L" · "Child college · Yr 12 · ₹20L"</p>
+    </div>
+  </div>
+  <div class="card p-6">
+    <p class="sl mb-1 tip-wrap">💼 Job Loss Scenario<span class="tip-icon">ⓘ</span><span class="tip-box">Model the impact of one spouse losing their job — temporarily or permanently. The forecast adjusts income, surplus, and wealth from that year forward.</span></p>
+    <p class="text-sm mb-5" style="color:var(--muted)">Model a temporary gap or permanent stop for either spouse.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Who loses job?</p>
+        <select id="in_scJL" class="si text-sm" onchange="IN_saveSC();IN_rSCJobLossUI()">
+          <option value="none">None</option>
+          <option value="s1">Spouse 1 — temporary gap</option>
+          <option value="s2">Spouse 2 — temporary gap</option>
+          <option value="both">Both — temporary gap</option>
+          <option value="s1p">Spouse 1 — stops permanently</option>
+          <option value="s2p">Spouse 2 — stops permanently</option>
+          <option value="bothp">Both — stops permanently</option>
+        </select></div>
+      <div id="in_scJLYrow"><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Duration out (years)</p>
+        <input type="number" id="in_scJLY" value="1" min="0.5" max="10" step="0.5" class="si mono" oninput="IN_saveSC()"></div>
+      <div id="in_scJLRrow"><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Re-entry salary (%)</p>
+        <input type="number" id="in_scJLR" value="100" min="0" max="200" class="si mono" oninput="IN_saveSC()"></div>
+    </div>
+    <div id="in_scComp" class="mt-5"></div>
   </div>
 </div>
 
@@ -852,7 +856,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
     <button class="tb on" onclick="US_tab('expenses',this)"><span class="tab-step">1</span> 💸 Expenses</button>
     <button class="tb" onclick="US_tab('investments',this)"><span class="tab-step">2</span> 📈 Investments</button>
     <button class="tb" onclick="US_tab('forecast',this)"><span class="tab-step">3</span> 🔭 Forecast</button>
-    <button class="tb" onclick="US_tab('scenarios',this)">⚖️ What-If</button>
+    <button class="tb" onclick="US_tab('scenarios',this)">🗓 Life Events</button>
     <button class="tb" onclick="US_tab('insights',this)">💡 Insights</button>
   </div>
   <p class="text-xs text-center" style="color:var(--faint);margin-top:5px">Follow steps <strong style="color:var(--muted)">1 → 2 → 3</strong> to get started · hover <span style="background:var(--border);padding:1px 6px;border-radius:4px;font-size:10px">ⓘ</span> on any section for guidance</p>
@@ -1008,15 +1012,15 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
   <div class="card p-6">
     <div class="flex justify-between items-center mb-4">
       <div>
-        <p class="sl">🎯 Milestone Markers</p>
-        <p class="text-sm mt-0.5" style="color:var(--muted)">Mark meaningful moments on your wealth timeline — they appear as flags on your forecast.</p>
+        <p class="sl">🗓 Life Events</p>
+        <p class="text-sm mt-0.5" style="color:var(--muted)">Add one-time events — they appear on your forecast and optionally reduce your wealth.</p>
       </div>
-      <button onclick="US_addMS()" class="text-xs font-semibold px-4 py-2 rounded-lg border np" style="border-color:var(--amber);color:var(--amber)">+ Add Milestone</button>
+      <button onclick="US_addLE()" class="text-xs font-semibold px-4 py-2 rounded-lg border np" style="border-color:var(--blue);color:var(--blue)">+ Add Event</button>
     </div>
-    <div id="us_msList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-    <div id="us_msNone" class="text-center py-6" style="color:var(--faint)">
-      <p class="text-3xl mb-2">🎯</p><p class="text-sm font-medium">No milestones yet</p>
-      <p class="text-xs mt-1" style="color:var(--faint)">e.g. "Child's college" · "Home purchase" · "Retirement"</p>
+    <div id="us_leList" class="space-y-3"></div>
+    <div id="us_leNone" class="text-center py-6" style="color:var(--faint)">
+      <p class="text-3xl mb-2">🗓</p><p class="text-sm font-medium">No life events yet</p>
+      <p class="text-xs mt-1">e.g. "Child's college" · "Home purchase" · "Medical expense"</p>
     </div>
   </div>
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -1049,47 +1053,44 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
   </div>
 </div>
 
-<!-- TAB: WHAT-IF -->
+<!-- TAB: LIFE EVENTS -->
 <div id="us_tp-scenarios" class="tp space-y-5">
   <div class="card p-6">
-    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
-      <div><p class="sl tip-wrap">What-If Scenario Comparison<span class="tip-icon">ⓘ</span><span class="tip-box">Compare two financial decisions side by side — e.g. "Pay off mortgage early" vs "Invest the extra". Add an extra monthly expense, a one-time lump sum investment, or extra income to each scenario. Wealth difference is shown at 10, 20, and 30 years.</span></p><p class="text-sm mt-1" style="color:var(--muted)">Compare two financial paths side-by-side over 10, 20, and 30 years.</p></div>
-      <div class="flex gap-2 np"><button class="stab on" id="us_stA" onclick="US_swSC('A')">Scenario A</button><button class="stab" id="us_stB" onclick="US_swSC('B')">Scenario B</button></div>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Scenario Name</p><input type="text" id="us_scN" placeholder="e.g. Buy a House" class="si" oninput="US_saveSC()"></div>
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Expense ($)</p><input type="text" id="us_scE" value="0" oninput="US_hi(this);US_saveSC()" class="si mono"></div>
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">One-Time Investment ($)</p><input type="text" id="us_scL" value="0" oninput="US_hi(this);US_saveSC()" class="si mono"></div>
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Income ($)</p><input type="text" id="us_scI" value="0" oninput="US_hi(this);US_saveSC()" class="si mono"></div>
-    </div>
-    <div class="inset p-4 mb-5">
-      <p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color:var(--rose)">💼 Job Loss Scenario</p>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div>
-          <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Who loses job?</p>
-          <select id="us_scJL" class="si text-sm" onchange="US_saveSC()">
-            <option value="none">— None (no job loss)</option>
-            <option value="s1">Spouse 1 — temporary gap</option>
-            <option value="s2">Spouse 2 — temporary gap</option>
-            <option value="both">Both — temporary gap</option>
-            <option value="s1p">Spouse 1 — stops working permanently</option>
-            <option value="s2p">Spouse 2 — stops working permanently</option>
-            <option value="bothp">Both — stop working permanently</option>
-          </select>
-        </div>
-        <div>
-          <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Duration (years out)</p>
-          <input type="number" id="us_scJLY" value="1" min="0.5" max="10" step="0.5" class="si mono text-sm" oninput="US_saveSC()">
-        </div>
-        <div>
-          <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Re-entry salary (% of original)</p>
-          <input type="number" id="us_scJLR" value="100" min="0" max="200" step="5" class="si mono text-sm" oninput="US_saveSC()">
-          <p class="text-xs mt-1" style="color:var(--faint)">e.g. 80% = took a 20% pay cut returning</p>
-        </div>
+    <div class="flex justify-between items-center mb-5">
+      <div>
+        <p class="sl tip-wrap">Life Events<span class="tip-icon">ⓘ</span><span class="tip-box">Model real financial events — home purchase, education, medical expenses, windfalls. Toggle "Deduct from wealth" to have the amount removed from your forecast corpus at that year. Events also appear as markers on your forecast chart.</span></p>
+        <p class="text-sm mt-1" style="color:var(--muted)">One-time events that affect your wealth trajectory.</p>
       </div>
-      <div id="us_scJLNote" class="mt-3 text-xs" style="color:var(--rose)"></div>
+      <button onclick="US_addLE()" class="text-xs font-semibold px-4 py-2 rounded-lg border np" style="border-color:var(--blue);color:var(--blue)">+ Add Event</button>
     </div>
-    <div id="us_scComp"></div>
+    <div id="us_leList2" class="space-y-3"></div>
+    <div id="us_leNone2" class="text-center py-8" style="color:var(--faint)">
+      <p class="text-3xl mb-2">🗓</p>
+      <p class="text-sm font-medium">No life events yet</p>
+      <p class="text-xs mt-1">e.g. "Home purchase · Yr 3 · $400k" · "Child college · Yr 12 · $80k"</p>
+    </div>
+  </div>
+  <div class="card p-6">
+    <p class="sl mb-1 tip-wrap">💼 Job Loss Scenario<span class="tip-icon">ⓘ</span><span class="tip-box">Model the impact of one spouse losing their job — temporarily or permanently. The forecast adjusts income, surplus, and wealth from that year forward.</span></p>
+    <p class="text-sm mb-5" style="color:var(--muted)">Model a temporary gap or permanent stop for either spouse.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Who loses job?</p>
+        <select id="us_scJL" class="si text-sm" onchange="US_saveSC();US_rSCJobLossUI()">
+          <option value="none">— None</option>
+          <option value="s1">Spouse 1 — temporary gap</option>
+          <option value="s2">Spouse 2 — temporary gap</option>
+          <option value="both">Both — temporary gap</option>
+          <option value="s1p">Spouse 1 — stops permanently</option>
+          <option value="s2p">Spouse 2 — stops permanently</option>
+          <option value="bothp">Both — stop permanently</option>
+        </select></div>
+      <div id="us_scJLYrow"><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Duration out (years)</p>
+        <input type="number" id="us_scJLY" value="1" min="0.5" max="10" step="0.5" class="si mono" oninput="US_saveSC()"></div>
+      <div id="us_scJLRrow"><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Re-entry salary (%)</p>
+        <input type="number" id="us_scJLR" value="100" min="0" max="200" step="5" class="si mono" oninput="US_saveSC()">
+        <p class="text-xs mt-1" style="color:var(--faint)">e.g. 80% = 20% pay cut on return</p></div>
+    </div>
+    <div id="us_scComp" class="mt-5"></div>
   </div>
 </div>
 
@@ -1176,7 +1177,7 @@ function setText(id, v) { const el=document.getElementById(id); if(el) el.textCo
 // ═══════════════════════════════════════════════════════════════════
 let IN_isAdj=false, IN_expInflOn=false, IN_activeSC='A';
 let IN_SC = { A:{name:'Scenario A',extraExp:0,lumpsum:0,extraInc:0,jobLoss:'none',jobLossYrs:1,jobLossReentry:100}, B:{name:'Scenario B',extraExp:0,lumpsum:0,extraInc:0,jobLoss:'none',jobLossYrs:1,jobLossReentry:100} };
-let IN_MS=[], IN_EMIS=[];
+let IN_LE_PLACEHOLDER=null; // replaced by IN_LE above
 let IN_EXPS=[
   {id:'rent',   label:'Housing / Rent',  icon:'🏠',val:0,sYr:null,eYr:null,infl:true},
   {id:'food',   label:'Food & Dining',  icon:'🍽', val:0,sYr:null,eYr:null,infl:true},
@@ -1191,7 +1192,14 @@ let IN_DEDS = {1:[], 2:[]};
 let IN_dedOpen = {1:false, 2:false};
 
 // ── India utils ──
-function IN_hi(el) { const r=el.value.replace(/,/g,''); if(!r||isNaN(r)){el.value='0';return;} el.value=parseFloat(r).toLocaleString('en-IN'); }
+function IN_hi(el) {
+  const pos=el.selectionStart, oldLen=el.value.length;
+  const r=el.value.replace(/,/g,'');
+  if(!r||isNaN(r)){el.value='0';return;}
+  el.value=parseFloat(r).toLocaleString('en-IN');
+  const diff=el.value.length-oldLen;
+  el.setSelectionRange(pos+diff,pos+diff);
+}
 function IN_fmt(n)   { return '₹'+Math.round(n).toLocaleString('en-IN'); }
 function IN_fmtCr(n){
   const abs=Math.abs(n);
@@ -1215,7 +1223,7 @@ function IN_tab(name, btn) {
   document.querySelectorAll('#dashboard-india .tb').forEach(b=>b.classList.remove('on'));
   document.getElementById('in_tp-'+name).classList.add('on');
   if(btn) btn.classList.add('on');
-  if(name==='forecast'){IN_rFC();IN_rMS();}
+  if(name==='forecast'){IN_rFC();IN_rLE();}
   if(name==='insights') IN_rIns();
   if(name==='scenarios')IN_rSC();
 }
@@ -1495,31 +1503,69 @@ function IN_getAssets(s1b,s2b){
   return{totP,s1G,s2G,ty};
 }
 
-// ── India milestones ──
-function IN_addMS(){ IN_MS.push({label:'Goal',year:10,amount:0}); IN_rMS(); IN_rFC(); IN_sv(); }
-function IN_rMS(){
-  const list=document.getElementById('in_msList');
-  document.getElementById('in_msNone').style.display=IN_MS.length?'none':'block';
+let IN_LE=[], IN_EMIS=[];
+const IN_LE_TYPES=[
+  {val:'education', label:'Education',    icon:'🎓'},
+  {val:'home',      label:'Home Purchase',icon:'🏠'},
+  {val:'medical',   label:'Medical',      icon:'🏥'},
+  {val:'car',       label:'Car Purchase', icon:'🚗'},
+  {val:'windfall',  label:'Windfall',     icon:'💰'},
+  {val:'custom',    label:'Custom',       icon:'📌'},
+];
+function IN_leAmt(el,i){
+  const pos=el.selectionStart, oldLen=el.value.length;
+  const r=el.value.replace(/,/g,'');
+  if(r&&!isNaN(r)){el.value=parseFloat(r).toLocaleString('en-IN');const diff=el.value.length-oldLen;el.setSelectionRange(pos+diff,pos+diff);}
+  IN_LE[i].amount=parseFloat(el.value.replace(/,/g,''))||0; IN_sv(); IN_rFC();
+}
+function US_leAmt(el,i){
+  const pos=el.selectionStart, oldLen=el.value.length;
+  const r=el.value.replace(/,/g,'');
+  if(r&&!isNaN(r)){el.value=parseFloat(r).toLocaleString('en-US');const diff=el.value.length-oldLen;el.setSelectionRange(pos+diff,pos+diff);}
+  US_LE[i].amount=parseFloat(el.value.replace(/,/g,''))||0; US_sv(); US_rFC();
+}
+function IN_addLE(){
+  IN_LE.push({type:'education',label:'Child Education',year:10,amount:0,deduct:true});
+  IN_rLE(); IN_rFC(); IN_sv();
+}
+function IN_rLE(){
+  const syncBoth=()=>{IN_rLE_render('in_leList','in_leNone');IN_rLE_render('in_leList2','in_leNone2');};
+  syncBoth();
+}
+function IN_rLE_render(listId,noneId){
+  const list=document.getElementById(listId); if(!list)return;
+  const none=document.getElementById(noneId); if(none)none.style.display=IN_LE.length?'none':'block';
   list.innerHTML='';
-  IN_MS.forEach((m,i)=>{
-    const div=document.createElement('div'); div.className='inset p-3 flex items-center gap-3';
-    div.className='inset p-4 space-y-2 relative';
+  IN_LE.forEach((e,i)=>{
+    const typeOpts=IN_LE_TYPES.map(t=>`<option value="${t.val}"${e.type===t.val?' selected':''}>${t.icon} ${t.label}</option>`).join('');
+    const div=document.createElement('div');
+    div.className='inset p-4 space-y-3';
     div.innerHTML=`
-      <div class="flex items-center gap-2 mb-2">
-        <div style="width:10px;height:10px;border-radius:99px;background:var(--amber);border:2px solid #fff;box-shadow:0 0 0 2px var(--amber);flex-shrink:0"></div>
-        <p class="text-xs font-semibold uppercase tracking-widest" style="color:var(--amber)">Milestone ${i+1}</p>
-        <button onclick="IN_MS.splice(${i},1);IN_rMS();IN_rFC();IN_sv()" class="ml-auto text-xs font-semibold" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕ Remove</button>
+      <div class="flex items-center gap-2">
+        <select class="si text-sm" style="width:auto;flex:0 0 auto" onchange="IN_LE[${i}].type=this.value;IN_rLE();IN_rFC();IN_sv()">${typeOpts}</select>
+        <div class="flex items-center gap-2 ml-auto">
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <span class="text-xs font-semibold" style="color:${e.deduct?'var(--rose)':'var(--faint)'}">Deduct from wealth</span>
+            <div class="relative" style="width:36px;height:20px;flex-shrink:0">
+              <input type="checkbox" ${e.deduct?'checked':''} onchange="IN_LE[${i}].deduct=this.checked;IN_rLE();IN_rFC();IN_sv()" style="opacity:0;position:absolute;width:100%;height:100%;cursor:pointer;z-index:1;margin:0">
+              <div style="width:36px;height:20px;border-radius:99px;background:${e.deduct?'var(--rose)':'var(--border-strong)'};transition:background .2s;position:relative">
+                <div style="position:absolute;top:2px;left:${e.deduct?'18px':'2px'};width:16px;height:16px;border-radius:99px;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+              </div>
+            </div>
+          </label>
+          <button onclick="IN_LE.splice(${i},1);IN_rLE();IN_rFC();IN_sv()" class="text-xs font-semibold" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕ Remove</button>
+        </div>
       </div>
-      <div><p class="text-xs mb-1" style="color:var(--faint)">Label</p>
-        <input type="text" value="${m.label}" class="si text-sm w-full"
-          oninput="IN_MS[${i}].label=this.value;IN_sv();IN_rFC()"></div>
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-3 gap-3">
+        <div><p class="text-xs mb-1" style="color:var(--faint)">Label</p>
+          <input type="text" value="${e.label}" class="si text-sm w-full"
+            oninput="IN_LE[${i}].label=this.value;IN_sv();IN_rFC()"></div>
         <div><p class="text-xs mb-1" style="color:var(--faint)">Year (1–30)</p>
-          <input type="number" value="${m.year}" min="1" max="30" class="si mono text-sm w-full"
-            oninput="IN_MS[${i}].year=parseInt(this.value)||1;IN_sv();IN_rFC()"></div>
-        <div><p class="text-xs mb-1" style="color:var(--faint)">₹ Target (optional)</p>
-          <input type="text" value="${m.amount?m.amount.toLocaleString('en-IN'):''}" placeholder="—" class="si mono text-sm w-full"
-            oninput="IN_hi(this);IN_MS[${i}].amount=parseFloat(this.value.replace(/,/g,''))||0;IN_sv();IN_rFC()"></div>
+          <input type="number" value="${e.year}" min="1" max="30" class="si mono text-sm w-full"
+            oninput="IN_LE[${i}].year=parseInt(this.value)||1;IN_sv();IN_rFC()"></div>
+        <div><p class="text-xs mb-1" style="color:var(--faint)">Amount (₹)</p>
+          <input type="text" value="${e.amount?e.amount.toLocaleString('en-IN'):''}" placeholder="0" class="si mono text-sm w-full"
+            oninput="IN_leAmt(this,${i})"></div>
       </div>`;
     list.appendChild(div);
   });
@@ -1579,7 +1625,7 @@ function IN_rc(){
   if(dc>0&&dw>0){let corpus=dc,yr=0; while(corpus>0&&yr<100){corpus=(corpus-dw*Math.pow(1+di,yr))*(1+dr);yr++;} setText('in_ddRes',yr>=100?'100+ years':yr+' years'); setText('in_ddNote',yr>=100?'Corpus outlasts a 100-year horizon 🎉':'Depleted ~'+yr+' years after retirement');}
   else{setText('in_ddRes','—'); setText('in_ddNote','');}
 
-  if(document.getElementById('in_tp-forecast').classList.contains('on')){IN_rFC();IN_rMS();}
+  if(document.getElementById('in_tp-forecast').classList.contains('on')){IN_rFC();IN_rLE();}
   if(document.getElementById('in_tp-insights').classList.contains('on')) IN_rIns();
   if(document.getElementById('in_tp-scenarios').classList.contains('on')) IN_rSC();
 
@@ -1626,6 +1672,9 @@ function IN_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=1,jobLossReentr
     totalFDContrib+=mFD*12; totalSIPContrib+=mSIP*12;
     cFD=cFD+fdNetInterest+mFD*12;
     cSIP=(cSIP+mSIP*12)*(1+sipRt);
+    // Apply life event deductions at this year (deduct proportionally from FD+SIP)
+    const leDed=IN_LE.filter(e=>e.deduct&&e.year===yr).reduce((s,e)=>s+(e.amount||0),0);
+    if(leDed>0){const tot=cFD+cSIP;if(tot>0){const r=Math.min(1,leDed/tot);cFD=Math.max(0,cFD-cFD*r);cSIP=Math.max(0,cSIP-cSIP*r);}}
     // EPF/NPS: total deduction % on each salary, compounded monthly at retRt
     const retContrib1=(aff1&&inLoss)?0:d1;
     const retContrib2=(aff2&&inLoss)?0:d2;
@@ -1660,7 +1709,7 @@ function IN_rFC(){
     const crFmt=IN_fmtCr(disp);
     const bw=Math.min(97,Math.max(3,(sim.total/max30)*100));
     const prevYr=({5:0,10:5,15:10,20:15,25:20,30:25})[yr]||0;
-    const mPills=IN_MS.filter(m=>m.year>prevYr&&m.year<=yr).map(m=>`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">🎯 ${m.label}${m.year!==yr?` · Yr ${m.year}`:''}${m.amount?' · '+IN_fmt(m.amount):''}</span>`);
+    const mPills=IN_LE.filter(e=>e.year>prevYr&&e.year<=yr).map(e=>{const t=IN_LE_TYPES.find(x=>x.val===e.type)||{icon:'📌'};const yrSuffix=e.year!==yr?' · Yr '+e.year:'';const amtSuffix=e.amount?' · '+IN_fmtCr(e.amount):'';const dedSuffix=e.deduct?' ↓':'';const bg=e.deduct?'var(--rose-lt)':'var(--amber-lt)';const col=e.deduct?'var(--rose)':'var(--amber)';return'<span class="pill" style="background:'+bg+';color:'+col+';">'+t.icon+' '+e.label+yrSuffix+amtSuffix+dedSuffix+'</span>';}).join(' ');
     const ePills=[...expEnds].filter(y=>y===yr).map(()=>`<span class="pill" style="background:var(--green-lt);color:var(--green)">✓ Expense ends · surplus ↑</span>`);
     const pills=[...mPills,...ePills].join(' ');
     const uid='infc'+yr;
@@ -1804,7 +1853,7 @@ function IN_rFC_short(){
     const growth=yrTotal-prevTotal;
     // bar always uses nominal total for consistent scaling
     const bw=Math.min(97,Math.max(2,(simCurr.total/max10)*100));
-    const msPills=IN_MS.filter(m=>m.year===yr).map(m=>`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">🎯 ${m.label}</span>`).join(' ');
+    const msPills=IN_LE.filter(e=>e.year===yr).map(e=>{const t=IN_LE_TYPES.find(x=>x.val===e.type)||{icon:'📌'};const amtSuffix=e.amount?' · '+IN_fmtCr(e.amount):'';const dedSuffix=e.deduct?' ↓':'';const bg=e.deduct?'var(--rose-lt)':'var(--amber-lt)';const col=e.deduct?'var(--rose)':'var(--amber)';return'<span class="pill" style="background:'+bg+';color:'+col+';">'+t.icon+' '+e.label+amtSuffix+dedSuffix+'</span>';}).join(' ');
     html+=`<div style="border-bottom:1px solid var(--border)">
       <div class="flex items-center gap-3 py-2 px-1" style="cursor:pointer" onclick="const el=document.getElementById('insh${yr}');const open=!el.classList.contains('hidden');el.classList.toggle('hidden');this.querySelector('.sh-hint').textContent=open?'▸ expand':'▾ collapse'">
         <div class="mono text-xl font-black shrink-0 text-center" style="width:32px;color:var(--text)">${yr}</div>
@@ -1841,27 +1890,24 @@ function IN_rFC_short(){
 }
 
 function IN_swSC(s){
-  IN_activeSC=s; ['A','B'].forEach(x=>document.getElementById('in_st'+x).classList.toggle('on',x===s));
+  IN_activeSC=s;
   const c=IN_SC[s];
-  document.getElementById('in_scN').value=c.name;
-  document.getElementById('in_scE').value=c.extraExp?c.extraExp.toLocaleString('en-IN'):'0';
-  document.getElementById('in_scL').value=c.lumpsum?c.lumpsum.toLocaleString('en-IN'):'0';
-  document.getElementById('in_scI').value=c.extraInc?c.extraInc.toLocaleString('en-IN'):'0';
-  document.getElementById('in_scJL').value=c.jobLoss||'none';
-  document.getElementById('in_scJLY').value=c.jobLossYrs||1;
-  document.getElementById('in_scJLR').value=c.jobLossReentry||100;
-  IN_rSCJobLossUI();
-  IN_rSC();
+  const jlEl=document.getElementById('in_scJL');
+  const jlyEl=document.getElementById('in_scJLY');
+  const jlrEl=document.getElementById('in_scJLR');
+  if(jlEl) jlEl.value=c.jobLoss||'none';
+  if(jlyEl) jlyEl.value=c.jobLossYrs||1;
+  if(jlrEl) jlrEl.value=c.jobLossReentry||100;
+  IN_rSCJobLossUI(); IN_rSC();
 }
 function IN_saveSC(){
   const s=IN_activeSC;
-  IN_SC[s].name=document.getElementById('in_scN').value||('Scenario '+s);
-  IN_SC[s].extraExp=parseFloat(document.getElementById('in_scE').value.replace(/,/g,''))||0;
-  IN_SC[s].lumpsum=parseFloat(document.getElementById('in_scL').value.replace(/,/g,''))||0;
-  IN_SC[s].extraInc=parseFloat(document.getElementById('in_scI').value.replace(/,/g,''))||0;
-  IN_SC[s].jobLoss=document.getElementById('in_scJL').value;
-  IN_SC[s].jobLossYrs=parseFloat(document.getElementById('in_scJLY').value)||1;
-  IN_SC[s].jobLossReentry=parseFloat(document.getElementById('in_scJLR').value)||100;
+  const jlEl=document.getElementById('in_scJL');
+  const jlyEl=document.getElementById('in_scJLY');
+  const jlrEl=document.getElementById('in_scJLR');
+  if(jlEl) IN_SC[s].jobLoss=jlEl.value;
+  if(jlyEl) IN_SC[s].jobLossYrs=parseFloat(jlyEl.value)||1;
+  if(jlrEl) IN_SC[s].jobLossReentry=parseFloat(jlrEl.value)||100;
   IN_rSCJobLossUI(); IN_rSC(); IN_sv();
 }
 function IN_rSCJobLossUI(){
@@ -1873,21 +1919,35 @@ function IN_rSCJobLossUI(){
   if(reEl) reEl.style.opacity=isPerm?'0.3':'1';
 }
 function IN_rSC(){
+  const sc=IN_SC.A;
+  const jl=sc.jobLoss||'none';
+  if(jl==='none'){
+    document.getElementById('in_scComp').innerHTML=`<div class="inset p-4 text-center" style="color:var(--faint)"><p class="text-sm">Select a job loss scenario above to see the wealth impact.</p></div>`;
+    return;
+  }
   const rows=[10,20,30].map(yr=>{
-    const sc=c=>IN_sim(yr,c.extraExp,c.lumpsum,c.extraInc,c.jobLoss||'none',c.jobLossYrs||1,c.jobLossReentry||100).total;
-    const a=sc(IN_SC.A), b=sc(IN_SC.B), d=b-a;
-    return`<tr style="border-bottom:1px solid var(--border)"><td class="py-3 mono text-sm font-semibold" style="color:var(--muted)">${yr} Yrs</td>
-      <td class="py-3 mono text-sm font-bold" style="color:var(--indigo)">${IN_fmtCr(a)}</td>
-      <td class="py-3 mono text-sm font-bold" style="color:var(--purple)">${IN_fmtCr(b)}</td>
-      <td class="py-3"><span class="mono text-sm font-bold" style="color:${d>=0?'var(--green)':'var(--rose)'}">${d>=0?'+':'−'}${IN_fmtCr(Math.abs(d))}</span>
-      <span class="text-xs ml-1" style="color:var(--faint)">→ ${d>=0?IN_SC.B.name:IN_SC.A.name} wins</span></td></tr>`;
+    const base=IN_sim(yr).total;
+    const affected=IN_sim(yr,0,0,0,sc.jobLoss,sc.jobLossYrs||1,sc.jobLossReentry||100).total;
+    const diff=affected-base;
+    return`<tr style="border-bottom:1px solid var(--border)">
+      <td class="py-3 mono text-sm font-semibold" style="color:var(--muted)">${yr} Yrs</td>
+      <td class="py-3 mono text-sm font-bold" style="color:var(--indigo)">${IN_fmtCr(base)}</td>
+      <td class="py-3 mono text-sm font-bold" style="color:var(--purple)">${IN_fmtCr(affected)}</td>
+      <td class="py-3 mono text-sm font-bold" style="color:${diff>=0?'var(--green)':'var(--rose)'}">${diff>=0?'+':'−'}${IN_fmtCr(Math.abs(diff))}</td>
+    </tr>`;
   }).join('');
-  const jlPill=c=>{const jl=c.jobLoss||'none';if(jl==='none')return'';const isPerm=jl.endsWith('p');const who={'s1':'Spouse 1','s2':'Spouse 2','both':'Both','s1p':'Spouse 1','s2p':'Spouse 2','bothp':'Both'}[jl]||'';return`<span class="pill ml-1" style="background:var(--rose-lt);color:var(--rose)">💼 ${who} ${isPerm?'stops permanently':'out '+c.jobLossYrs+'yr · '+(c.jobLossReentry||100)+'% re-entry'}</span>`;};
-  document.getElementById('in_scComp').innerHTML=`<table class="w-full text-left"><thead style="border-bottom:2px solid var(--border)"><tr>
-    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Horizon</th>
-    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--indigo)">${IN_SC.A.name}${jlPill(IN_SC.A)}</th>
-    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--purple)">${IN_SC.B.name}${jlPill(IN_SC.B)}</th>
-    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Difference</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const who={'s1':'Spouse 1','s2':'Spouse 2','both':'Both','s1p':'Spouse 1','s2p':'Spouse 2','bothp':'Both'}[jl]||'';
+  const isPerm=jl.endsWith('p');
+  document.getElementById('in_scComp').innerHTML=`
+    <div class="inset p-3 mb-3" style="background:var(--rose-lt)">
+      <p class="text-xs font-semibold" style="color:var(--rose)">💼 ${who} ${isPerm?'stops working permanently':'out for '+(sc.jobLossYrs||1)+' yr(s), re-enters at '+(sc.jobLossReentry||100)+'%'}</p>
+    </div>
+    <table class="w-full text-left"><thead style="border-bottom:2px solid var(--border)"><tr>
+      <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Horizon</th>
+      <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--indigo)">Without Job Loss</th>
+      <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--purple)">With Job Loss</th>
+      <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Impact</th>
+    </tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function IN_rIns(){
@@ -1981,7 +2041,7 @@ function IN_rIns(){
 // ── India persistence ──
 function IN_sv(){
   const g=id=>document.getElementById(id)?.value||'';
-  const data={b1:g('in_b1'),b2:g('in_b2'),g1:g('in_g1'),g2:g('in_g2'),fdRng:g('in_fdRng'),sipRng:g('in_sipRng'),sipRet:g('in_sipRet'),fdRt:g('in_fdRt'),infR:g('in_infR'),isAdj:IN_isAdj,expInflOn:IN_expInflOn,fcMode:IN_fcMode,gC:g('in_gC'),gY:g('in_gY'),ddC:g('in_ddC'),ddW:g('in_ddW'),ddRt:g('in_ddRt'),ddI:g('in_ddI'),EXPS:IN_EXPS,EMIS:IN_EMIS,MS:IN_MS,SC:IN_SC,DEDS:IN_DEDS,assets:[]};
+  const data={b1:g('in_b1'),b2:g('in_b2'),g1:g('in_g1'),g2:g('in_g2'),fdRng:g('in_fdRng'),sipRng:g('in_sipRng'),sipRet:g('in_sipRet'),fdRt:g('in_fdRt'),infR:g('in_infR'),isAdj:IN_isAdj,expInflOn:IN_expInflOn,fcMode:IN_fcMode,gC:g('in_gC'),gY:g('in_gY'),ddC:g('in_ddC'),ddW:g('in_ddW'),ddRt:g('in_ddRt'),ddI:g('in_ddI'),EXPS:IN_EXPS,EMIS:IN_EMIS,LE:IN_LE,SC:IN_SC,DEDS:IN_DEDS,assets:[]};
   document.querySelectorAll('.in_ar').forEach(r=>data.assets.push({n:r.querySelector('.in_nm').value,p:r.querySelector('.in_pv').value,y:r.querySelector('.in_yv').value,o:r.querySelector('.in_ov').value,tf:r.querySelector('.in_tv').checked}));
   try{localStorage.setItem('cyf_india',JSON.stringify(data));}catch(e){}
 }
@@ -1989,7 +2049,7 @@ function IN_exportData(){const s=localStorage.getItem('cyf_india');if(!s){alert(
 function IN_importData(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{localStorage.setItem('cyf_india',ev.target.result);IN_loadData();alert('Restored!');}catch{alert('Invalid file.');}};reader.readAsText(file);e.target.value='';}
 function IN_loadData(){
   let saved; try{saved=localStorage.getItem('cyf_india');}catch(e){}
-  IN_rExp(); IN_rEMI(); IN_rMS();
+  IN_rExp(); IN_rEMI(); IN_rLE();
   if(!saved){IN_vs('fd');IN_rc();return;}
   const d=JSON.parse(saved);
   const setV=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v;};
@@ -2014,7 +2074,8 @@ function IN_loadData(){
     }));
     IN_rEMI();
   }
-  if(d.MS){IN_MS=d.MS;IN_rMS();}
+  if(d.MS){IN_LE=d.MS.map(m=>({type:'custom',label:m.label,year:m.year,amount:m.amount||0,deduct:false}));IN_rLE();}  // migrate old MS data
+  if(d.LE){IN_LE=d.LE;IN_rLE();}
   if(d.SC){
     ['A','B'].forEach(k=>{if(d.SC[k]){d.SC[k].jobLoss=d.SC[k].jobLoss||'none';d.SC[k].jobLossYrs=d.SC[k].jobLossYrs||1;d.SC[k].jobLossReentry=d.SC[k].jobLossReentry||100;}});
     IN_SC=d.SC;IN_swSC('A');
@@ -2032,7 +2093,8 @@ function IN_resetAll(){if(!confirm('Clear all India data?'))return;try{localStor
 // ═══════════════════════════════════════════════════════════════════
 let US_isAdj=false, US_expInflOn=false, US_activeSC='A';
 let US_SC={A:{name:'Scenario A',extraExp:0,lumpsum:0,extraInc:0,jobLoss:'none',jobLossYrs:1,jobLossReentry:100},B:{name:'Scenario B',extraExp:0,lumpsum:0,extraInc:0,jobLoss:'none',jobLossYrs:1,jobLossReentry:100}};
-let US_MS=[], US_EMIS=[];
+let US_EMIS=[];
+let US_LE_PLACEHOLDER=null; // US_LE declared above near US_addLE
 let US_EXPS=[
   {id:'hous', label:'Housing / Rent',   icon:'🏠',val:0,sYr:null,eYr:null,infl:true},
   {id:'food', label:'Food & Dining',    icon:'🍽', val:0,sYr:null,eYr:null,infl:true},
@@ -2050,7 +2112,14 @@ let US_mType='pct';     // 'pct' or 'fixed'
 let US_dedOpen={1:false,2:false};
 
 // ── US utils ──
-function US_hi(el){const r=el.value.replace(/,/g,'');if(!r||isNaN(r)){el.value='0';return;}el.value=parseFloat(r).toLocaleString('en-US');}
+function US_hi(el){
+  const pos=el.selectionStart, oldLen=el.value.length;
+  const r=el.value.replace(/,/g,'');
+  if(!r||isNaN(r)){el.value='0';return;}
+  el.value=parseFloat(r).toLocaleString('en-US');
+  const diff=el.value.length-oldLen;
+  el.setSelectionRange(pos+diff,pos+diff);
+}
 function US_fmt(n){return '$'+Math.round(n).toLocaleString('en-US');}
 function US_fmtM(n){
   const abs=Math.abs(n);
@@ -2064,7 +2133,7 @@ function US_tab(name,btn){
   document.querySelectorAll('#dashboard-usa .tb').forEach(b=>b.classList.remove('on'));
   document.getElementById('us_tp-'+name).classList.add('on');
   if(btn) btn.classList.add('on');
-  if(name==='forecast'){US_rFC();US_rMS();}
+  if(name==='forecast'){US_rFC();US_rLE();}
   if(name==='insights') US_rIns();
   if(name==='scenarios')US_rSC();
 }
@@ -2433,35 +2502,61 @@ function US_getAssets(s1b,s2b){
 }
 
 // ── US milestones ──
-function US_addMS(){US_MS.push({label:'Goal',year:10,amount:0});US_rMS();US_rFC();US_sv();}
-function US_rMS(){
-  const list=document.getElementById('us_msList');
-  document.getElementById('us_msNone').style.display=US_MS.length?'none':'block';
+let US_LE=[];
+const US_LE_TYPES=[
+  {val:'education', label:'Education',    icon:'🎓'},
+  {val:'home',      label:'Home Purchase',icon:'🏠'},
+  {val:'medical',   label:'Medical',      icon:'🏥'},
+  {val:'car',       label:'Car Purchase', icon:'🚗'},
+  {val:'windfall',  label:'Windfall',     icon:'💰'},
+  {val:'custom',    label:'Custom',       icon:'📌'},
+];
+function US_addLE(){
+  US_LE.push({type:'education',label:'Child Education',year:10,amount:0,deduct:true});
+  US_rLE(); US_rFC(); US_sv();
+}
+function US_rLE(){
+  US_rLE_render('us_leList','us_leNone');
+  US_rLE_render('us_leList2','us_leNone2');
+}
+function US_rLE_render(listId,noneId){
+  const list=document.getElementById(listId); if(!list)return;
+  const none=document.getElementById(noneId); if(none)none.style.display=US_LE.length?'none':'block';
   list.innerHTML='';
-  US_MS.forEach((m,i)=>{
-    const div=document.createElement('div'); div.className='inset p-3 flex items-center gap-3';
-    div.className='inset p-4 space-y-2 relative';
+  US_LE.forEach((e,i)=>{
+    const typeOpts=US_LE_TYPES.map(t=>`<option value="${t.val}"${e.type===t.val?' selected':''}>${t.icon} ${t.label}</option>`).join('');
+    const div=document.createElement('div');
+    div.className='inset p-4 space-y-3';
     div.innerHTML=`
-      <div class="flex items-center gap-2 mb-2">
-        <div style="width:10px;height:10px;border-radius:99px;background:var(--amber);border:2px solid #fff;box-shadow:0 0 0 2px var(--amber);flex-shrink:0"></div>
-        <p class="text-xs font-semibold uppercase tracking-widest" style="color:var(--amber)">Milestone ${i+1}</p>
-        <button onclick="US_MS.splice(${i},1);US_rMS();US_rFC();US_sv()" class="ml-auto text-xs font-semibold" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕ Remove</button>
+      <div class="flex items-center gap-2">
+        <select class="si text-sm" style="width:auto;flex:0 0 auto" onchange="US_LE[${i}].type=this.value;US_rLE();US_rFC();US_sv()">${typeOpts}</select>
+        <div class="flex items-center gap-2 ml-auto">
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <span class="text-xs font-semibold" style="color:${e.deduct?'var(--rose)':'var(--faint)'}">Deduct from wealth</span>
+            <div class="relative" style="width:36px;height:20px;flex-shrink:0">
+              <input type="checkbox" ${e.deduct?'checked':''} onchange="US_LE[${i}].deduct=this.checked;US_rLE();US_rFC();US_sv()" style="opacity:0;position:absolute;width:100%;height:100%;cursor:pointer;z-index:1;margin:0">
+              <div style="width:36px;height:20px;border-radius:99px;background:${e.deduct?'var(--rose)':'var(--border-strong)'};transition:background .2s;position:relative">
+                <div style="position:absolute;top:2px;left:${e.deduct?'18px':'2px'};width:16px;height:16px;border-radius:99px;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+              </div>
+            </div>
+          </label>
+          <button onclick="US_LE.splice(${i},1);US_rLE();US_rFC();US_sv()" class="text-xs font-semibold" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕ Remove</button>
+        </div>
       </div>
-      <div><p class="text-xs mb-1" style="color:var(--faint)">Label</p>
-        <input type="text" value="${m.label}" class="si text-sm w-full"
-          oninput="US_MS[${i}].label=this.value;US_sv();US_rFC()"></div>
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-3 gap-3">
+        <div><p class="text-xs mb-1" style="color:var(--faint)">Label</p>
+          <input type="text" value="${e.label}" class="si text-sm w-full"
+            oninput="US_LE[${i}].label=this.value;US_sv();US_rFC()"></div>
         <div><p class="text-xs mb-1" style="color:var(--faint)">Year (1–30)</p>
-          <input type="number" value="${m.year}" min="1" max="30" class="si mono text-sm w-full"
-            oninput="US_MS[${i}].year=parseInt(this.value)||1;US_sv();US_rFC()"></div>
-        <div><p class="text-xs mb-1" style="color:var(--faint)">$ Target (optional)</p>
-          <input type="text" value="${m.amount?m.amount.toLocaleString('en-US'):''}" placeholder="—" class="si mono text-sm w-full"
-            oninput="US_hi(this);US_MS[${i}].amount=parseFloat(this.value.replace(/,/g,''))||0;US_sv();US_rFC()"></div>
+          <input type="number" value="${e.year}" min="1" max="30" class="si mono text-sm w-full"
+            oninput="US_LE[${i}].year=parseInt(this.value)||1;US_sv();US_rFC()"></div>
+        <div><p class="text-xs mb-1" style="color:var(--faint)">Amount ($)</p>
+          <input type="text" value="${e.amount?e.amount.toLocaleString('en-US'):''}" placeholder="0" class="si mono text-sm w-full"
+            oninput="US_leAmt(this,${i})"></div>
       </div>`;
     list.appendChild(div);
   });
 }
-function US_msUpdField(i, field, val){ US_MS[i][field]=val; US_sv(); US_rFC(); }
 
 // ── US core recalc ──
 function US_rc(){
@@ -2559,7 +2654,7 @@ function US_rc(){
   if(dc>0&&dw>0){let corpus=dc,yr=0;while(corpus>0&&yr<100){corpus=(corpus-dw*Math.pow(1+di,yr))*(1+dr);yr++;} setText('us_ddRes',yr>=100?'100+ years':yr+' years'); setText('us_ddNote',yr>=100?'Portfolio outlasts a 100-year horizon 🎉':'Depleted ~'+yr+' years after retirement');}
   else{setText('us_ddRes','—');setText('us_ddNote','');}
 
-  if(document.getElementById('us_tp-forecast').classList.contains('on')){US_rFC();US_rMS();}
+  if(document.getElementById('us_tp-forecast').classList.contains('on')){US_rFC();US_rLE();}
   if(document.getElementById('us_tp-insights').classList.contains('on')) US_rIns();
   if(document.getElementById('us_tp-scenarios').classList.contains('on')) US_rSC();
 
@@ -2791,6 +2886,9 @@ function US_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=0,jobLossReentr
     totalFDContrib+=mFD*12; totalSIPContrib+=mSIP*12;
     cFD=cFD+fdNetInterest+mFD*12;
     cSIP=(cSIP+mSIP*12)*(1+sipRt);
+    // Apply life event deductions at this year (proportional from HYSA+index fund)
+    const leDed=US_LE.filter(e=>e.deduct&&e.year===yr).reduce((s,e)=>s+(e.amount||0),0);
+    if(leDed>0){const tot=cFD+cSIP;if(tot>0){const r=Math.min(1,leDed/tot);cFD=Math.max(0,cFD-cFD*r);cSIP=Math.max(0,cSIP-cSIP*r);}}
   }
   const retCorpus=US_retTotalAt(years);
   const assetRate=totP>0?(ty/totP):0;
@@ -2934,7 +3032,7 @@ function US_rFC_short(){
     const uid='fcs'+yr;
     const loanEndPills=US_EMIS.filter(e=>{const ey=US_emiSYr(e)+(e.yrs||30)-1;return ey===yr;})
       .map(e=>`<span class="pill" style="background:var(--green-lt);color:var(--green)">🏦 ${e.label} paid off · surplus ↑</span>`).join('');
-    const msPills=US_MS.filter(m=>m.year===yr).map(m=>`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">🎯 ${m.label}</span>`).join('');
+    const msPills=US_LE.filter(e=>e.year===yr).map(e=>{const t=US_LE_TYPES.find(x=>x.val===e.type)||{icon:'📌'};const amtSuffix=e.amount?' · '+US_fmtM(e.amount):'';const dedSuffix=e.deduct?' ↓':'';const bg=e.deduct?'var(--rose-lt)':'var(--amber-lt)';const col=e.deduct?'var(--rose)':'var(--amber)';return'<span class="pill" style="background:'+bg+';color:'+col+';">'+t.icon+' '+e.label+amtSuffix+dedSuffix+'</span>';}).join('');
     const pills=loanEndPills+msPills;
 
     const prevDispYr=yr>1?(US_isAdj?US_sim(yr-1).total/Math.pow(1+infRate,yr-1):US_sim(yr-1).total):0;
@@ -3000,7 +3098,7 @@ function US_rFC(){
     const mFmt=US_fmtM(disp);
     const bw=Math.min(97,Math.max(3,(sim.total/max30)*100));
     const prevYrUS=({5:0,10:5,15:10,20:15,25:20,30:25})[yr]||0;
-    const mPills=US_MS.filter(ms=>ms.year>prevYrUS&&ms.year<=yr).map(ms=>`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">🎯 ${ms.label}${ms.year!==yr?` · Yr ${ms.year}`:''}${ms.amount?' · '+US_fmt(ms.amount):''}</span>`);
+    const mPills=US_LE.filter(e=>e.year>prevYrUS&&e.year<=yr).map(e=>{const t=US_LE_TYPES.find(x=>x.val===e.type)||{icon:'📌'};const yrSuffix=e.year!==yr?' · Yr '+e.year:'';const amtSuffix=e.amount?' · '+US_fmtM(e.amount):'';const dedSuffix=e.deduct?' ↓':'';const bg=e.deduct?'var(--rose-lt)':'var(--amber-lt)';const col=e.deduct?'var(--rose)':'var(--amber)';return'<span class="pill" style="background:'+bg+';color:'+col+';">'+t.icon+' '+e.label+yrSuffix+amtSuffix+dedSuffix+'</span>';}).join(' ');
     const ePills=[...expEnds].filter(y=>y===yr).map(()=>`<span class="pill" style="background:var(--green-lt);color:var(--green)">✓ Expense ends · surplus ↑</span>`);
     const pills=[...mPills,...ePills].join(' ');
     const uid='fc'+yr;
@@ -3122,67 +3220,65 @@ function US_rFC(){
 }
 
 function US_swSC(s){
-  US_activeSC=s; ['A','B'].forEach(x=>document.getElementById('us_st'+x).classList.toggle('on',x===s));
+  US_activeSC=s;
   const c=US_SC[s];
-  document.getElementById('us_scN').value=c.name;
-  document.getElementById('us_scE').value=c.extraExp?c.extraExp.toLocaleString('en-US'):'0';
-  document.getElementById('us_scL').value=c.lumpsum?c.lumpsum.toLocaleString('en-US'):'0';
-  document.getElementById('us_scI').value=c.extraInc?c.extraInc.toLocaleString('en-US'):'0';
-  document.getElementById('us_scJL').value=c.jobLoss||'none';
-  document.getElementById('us_scJLY').value=c.jobLossYrs||1;
-  document.getElementById('us_scJLR').value=c.jobLossReentry||100;
-  US_rSC();
+  const jlEl=document.getElementById('us_scJL');
+  const jlyEl=document.getElementById('us_scJLY');
+  const jlrEl=document.getElementById('us_scJLR');
+  if(jlEl) jlEl.value=c.jobLoss||'none';
+  if(jlyEl) jlyEl.value=c.jobLossYrs||1;
+  if(jlrEl) jlrEl.value=c.jobLossReentry||100;
+  US_rSCJobLossUI(); US_rSC();
 }
 function US_saveSC(){
   const s=US_activeSC;
-  US_SC[s].name=document.getElementById('us_scN').value||('Scenario '+s);
-  US_SC[s].extraExp=parseFloat(document.getElementById('us_scE').value.replace(/,/g,''))||0;
-  US_SC[s].lumpsum=parseFloat(document.getElementById('us_scL').value.replace(/,/g,''))||0;
-  US_SC[s].extraInc=parseFloat(document.getElementById('us_scI').value.replace(/,/g,''))||0;
-  US_SC[s].jobLoss=document.getElementById('us_scJL').value;
-  US_SC[s].jobLossYrs=parseFloat(document.getElementById('us_scJLY').value)||1;
-  US_SC[s].jobLossReentry=parseFloat(document.getElementById('us_scJLR').value)||100;
-  // Update note
-  const jl=US_SC[s].jobLoss, jly=US_SC[s].jobLossYrs, jlr=US_SC[s].jobLossReentry;
-  const noteEl=document.getElementById('us_scJLNote');
-  const isPerm=jl.endsWith('p');
-  // Show/hide duration and re-entry fields based on permanent vs temporary
-  ['us_scJLY','us_scJLR'].forEach(id=>{
-    const el=document.getElementById(id); if(!el) return;
-    el.closest('div').style.opacity=isPerm?'0.3':'1';
-    el.closest('div').style.pointerEvents=isPerm?'none':'';
-  });
-  if(noteEl&&jl!=='none'){
-    const who=jl.startsWith('s1')?'Spouse 1':jl.startsWith('s2')?'Spouse 2':'Both spouses';
-    noteEl.textContent=isPerm
-      ? `⚠ ${who} stops working permanently from Year 1 onwards`
-      : `⚠ ${who} out of work for ${jly} yr${jly!==1?'s':''} starting Year 1, then return at ${jlr}% of original salary`;
-  } else if(noteEl) noteEl.textContent='';
-  US_rSC(); US_sv();
+  const jlEl=document.getElementById('us_scJL');
+  const jlyEl=document.getElementById('us_scJLY');
+  const jlrEl=document.getElementById('us_scJLR');
+  if(jlEl) US_SC[s].jobLoss=jlEl.value;
+  if(jlyEl) US_SC[s].jobLossYrs=parseFloat(jlyEl.value)||1;
+  if(jlrEl) US_SC[s].jobLossReentry=parseFloat(jlrEl.value)||100;
+  US_rSCJobLossUI(); US_rSC(); US_sv();
 }
 function US_rSC(){
+  const sc=US_SC.A;
+  const jl=sc.jobLoss||'none';
+  if(jl==='none'){
+    document.getElementById('us_scComp').innerHTML=`<div class="inset p-4 text-center" style="color:var(--faint)"><p class="text-sm">Select a job loss scenario above to see the wealth impact.</p></div>`;
+    return;
+  }
   const rows=[10,20,30].map(yr=>{
-    const a=US_sim(yr,US_SC.A.extraExp,US_SC.A.lumpsum,US_SC.A.extraInc,US_SC.A.jobLoss||'none',US_SC.A.jobLossYrs||0,US_SC.A.jobLossReentry||100).total;
-    const b=US_sim(yr,US_SC.B.extraExp,US_SC.B.lumpsum,US_SC.B.extraInc,US_SC.B.jobLoss||'none',US_SC.B.jobLossYrs||0,US_SC.B.jobLossReentry||100).total;
-    const d=b-a;
-    return`<tr style="border-bottom:1px solid var(--border)"><td class="py-3 mono text-sm font-semibold" style="color:var(--muted)">${yr} Yrs</td>
-      <td class="py-3 mono text-sm font-bold" style="color:var(--indigo)">${US_fmtM(a)}</td>
-      <td class="py-3 mono text-sm font-bold" style="color:var(--purple)">${US_fmtM(b)}</td>
-      <td class="py-3"><span class="mono text-sm font-bold" style="color:${d>=0?'var(--green)':'var(--rose)'}">${d>=0?'+':'−'}${US_fmtM(Math.abs(d))}</span>
-      <span class="text-xs ml-1" style="color:var(--faint)">→ ${d>=0?US_SC.B.name:US_SC.A.name} wins</span></td></tr>`;
+    const base=US_sim(yr).total;
+    const affected=US_sim(yr,0,0,0,sc.jobLoss,sc.jobLossYrs||1,sc.jobLossReentry||100).total;
+    const diff=affected-base;
+    return`<tr style="border-bottom:1px solid var(--border)">
+      <td class="py-3 mono text-sm font-semibold" style="color:var(--muted)">${yr} Yrs</td>
+      <td class="py-3 mono text-sm font-bold" style="color:var(--indigo)">${US_fmtM(base)}</td>
+      <td class="py-3 mono text-sm font-bold" style="color:var(--purple)">${US_fmtM(affected)}</td>
+      <td class="py-3 mono text-sm font-bold" style="color:${diff>=0?'var(--green)':'var(--rose)'}">${diff>=0?'+':'−'}${US_fmtM(Math.abs(diff))}</td>
+    </tr>`;
   }).join('');
-  // Build job loss impact note for each scenario
-  const jlNote=(sc)=>{
-    const jl=sc.jobLoss||'none'; if(jl==='none') return '';
-    const isPermPill=jl.endsWith('p'); const who=jl.startsWith('s1')?'Spouse 1':jl.startsWith('s2')?'Spouse 2':'Both';
-    const r=sc.jobLossReentry||100;
-    return isPermPill ? `<span class="pill ml-1" style="background:var(--rose-lt,#fee2e2);color:var(--rose)">💼 ${who} retired permanently</span>` : `<span class="pill ml-1" style="background:var(--rose-lt,#fee2e2);color:var(--rose)">💼 ${who} out ${sc.jobLossYrs}yr${sc.jobLossYrs!==1?'s':''}${r!==100?' · '+r+'% re-entry':''}</span>`;
-  };
-  document.getElementById('us_scComp').innerHTML=`<table class="w-full text-left"><thead style="border-bottom:2px solid var(--border)"><tr>
-    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Horizon</th>
-    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--indigo)">${US_SC.A.name}${jlNote(US_SC.A)}</th>
-    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--purple)">${US_SC.B.name}${jlNote(US_SC.B)}</th>
-    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Difference</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const who={'s1':'Spouse 1','s2':'Spouse 2','both':'Both','s1p':'Spouse 1','s2p':'Spouse 2','bothp':'Both'}[jl]||'';
+  const isPerm=jl.endsWith('p');
+  document.getElementById('us_scComp').innerHTML=`
+    <div class="inset p-3 mb-3" style="background:var(--rose-lt)">
+      <p class="text-xs font-semibold" style="color:var(--rose)">💼 ${who} ${isPerm?'stops working permanently':'out for '+(sc.jobLossYrs||1)+' yr(s), re-enters at '+(sc.jobLossReentry||100)+'%'}</p>
+    </div>
+    <table class="w-full text-left"><thead style="border-bottom:2px solid var(--border)"><tr>
+      <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Horizon</th>
+      <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--indigo)">Without Job Loss</th>
+      <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--purple)">With Job Loss</th>
+      <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Impact</th>
+    </tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function US_rSCJobLossUI(){
+  const jl=document.getElementById('us_scJL'); if(!jl)return;
+  const isPerm=jl.value.endsWith('p');
+  const durEl=document.getElementById('us_scJLYrow');
+  const reEl=document.getElementById('us_scJLRrow');
+  if(durEl) durEl.style.opacity=isPerm?'0.3':'1';
+  if(reEl) reEl.style.opacity=isPerm?'0.3':'1';
 }
 
 function US_rIns(){
@@ -3240,7 +3336,7 @@ function US_rIns(){
 // ── US persistence ──
 function US_sv(){
   const g=id=>document.getElementById(id)?.value||'';
-  const data={b1:g('us_b1'),b2:g('us_b2'),g1:g('us_g1'),g2:g('us_g2'),fdRng:g('us_fdRng'),sipRng:g('us_sipRng'),sipRet:g('us_sipRet'),fdRt:g('us_fdRt'),infR:g('us_infR'),filing:g('us_filing'),state:g('us_state'),customState:g('us_customState'),ssOn:document.getElementById('us_ssOn').checked,medOn:document.getElementById('us_medOn').checked,ss1Exempt:document.getElementById('us_ss1Exempt').checked,ss2Exempt:document.getElementById('us_ss2Exempt').checked,isAdj:US_isAdj,expInflOn:US_expInflOn,gC:g('us_gC'),gY:g('us_gY'),ddC:g('us_ddC'),ddW:g('us_ddW'),ddRt:g('us_ddRt'),ddI:g('us_ddI'),EXPS:US_EXPS,EMIS:US_EMIS,MS:US_MS,SC:US_SC,DEDS:US_DEDS,RET:US_RET,assets:[]};
+  const data={b1:g('us_b1'),b2:g('us_b2'),g1:g('us_g1'),g2:g('us_g2'),fdRng:g('us_fdRng'),sipRng:g('us_sipRng'),sipRet:g('us_sipRet'),fdRt:g('us_fdRt'),infR:g('us_infR'),filing:g('us_filing'),state:g('us_state'),customState:g('us_customState'),ssOn:document.getElementById('us_ssOn').checked,medOn:document.getElementById('us_medOn').checked,ss1Exempt:document.getElementById('us_ss1Exempt').checked,ss2Exempt:document.getElementById('us_ss2Exempt').checked,isAdj:US_isAdj,expInflOn:US_expInflOn,gC:g('us_gC'),gY:g('us_gY'),ddC:g('us_ddC'),ddW:g('us_ddW'),ddRt:g('us_ddRt'),ddI:g('us_ddI'),EXPS:US_EXPS,EMIS:US_EMIS,LE:US_LE,SC:US_SC,DEDS:US_DEDS,RET:US_RET,assets:[]};
   document.querySelectorAll('.us_ar').forEach(r=>data.assets.push({n:r.querySelector('.us_nm').value,p:r.querySelector('.us_pv').value,y:r.querySelector('.us_yv').value,o:r.querySelector('.us_ov').value,tf:r.querySelector('.us_tv').checked}));
   try{localStorage.setItem('cyf_usa',JSON.stringify(data));}catch(e){}
 }
@@ -3248,7 +3344,7 @@ function US_exportData(){const s=localStorage.getItem('cyf_usa');if(!s){alert('N
 function US_importData(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{localStorage.setItem('cyf_usa',ev.target.result);US_loadData();alert('Restored!');}catch{alert('Invalid file.');}};reader.readAsText(file);e.target.value='';}
 function US_loadData(){
   let saved;try{saved=localStorage.getItem('cyf_usa');}catch(e){}
-  US_rExp();US_rEMI();US_rMS();
+  US_rExp();US_rEMI();US_rLE();
   if(!saved){US_vs('fd');US_rc();return;}
   const d=JSON.parse(saved);
   const setV=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v;};
@@ -3273,7 +3369,8 @@ function US_loadData(){
     });
     US_rEMI();
   }
-  if(d.MS){US_MS=d.MS;US_rMS();}
+  if(d.MS){US_LE=d.MS.map(m=>({type:'custom',label:m.label,year:m.year,amount:m.amount||0,deduct:false}));US_rLE();}  // migrate old MS data
+  if(d.LE){US_LE=d.LE;US_rLE();}
   if(d.SC){US_SC=d.SC;US_swSC('A');}
   if(d.DEDS){US_DEDS=d.DEDS;US_rDed(1);US_rDed(2);}
   if(d.RET){US_RET=d.RET.map(p=>({compoundFreq:12,...p}));US_rRetPlans();}
