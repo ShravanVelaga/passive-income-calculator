@@ -983,11 +983,38 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
       <div><p class="sl tip-wrap">What-If Scenario Comparison<span class="tip-icon">ⓘ</span><span class="tip-box">Compare two financial decisions side by side — e.g. "Pay off mortgage early" vs "Invest the extra". Add an extra monthly expense, a one-time lump sum investment, or extra income to each scenario. Wealth difference is shown at 10, 20, and 30 years.</span></p><p class="text-sm mt-1" style="color:var(--muted)">Compare two financial paths side-by-side over 10, 20, and 30 years.</p></div>
       <div class="flex gap-2 np"><button class="stab on" id="us_stA" onclick="US_swSC('A')">Scenario A</button><button class="stab" id="us_stB" onclick="US_swSC('B')">Scenario B</button></div>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
       <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Scenario Name</p><input type="text" id="us_scN" placeholder="e.g. Buy a House" class="si" oninput="US_saveSC()"></div>
       <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Expense ($)</p><input type="text" id="us_scE" value="0" oninput="US_hi(this);US_saveSC()" class="si mono"></div>
       <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">One-Time Investment ($)</p><input type="text" id="us_scL" value="0" oninput="US_hi(this);US_saveSC()" class="si mono"></div>
       <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Extra Monthly Income ($)</p><input type="text" id="us_scI" value="0" oninput="US_hi(this);US_saveSC()" class="si mono"></div>
+    </div>
+    <div class="inset p-4 mb-5">
+      <p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color:var(--rose)">💼 Job Loss Scenario</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Who loses job?</p>
+          <select id="us_scJL" class="si text-sm" onchange="US_saveSC()">
+            <option value="none">— None (no job loss)</option>
+            <option value="s1">Spouse 1 — temporary gap</option>
+            <option value="s2">Spouse 2 — temporary gap</option>
+            <option value="both">Both — temporary gap</option>
+            <option value="s1p">Spouse 1 — stops working permanently</option>
+            <option value="s2p">Spouse 2 — stops working permanently</option>
+            <option value="bothp">Both — stop working permanently</option>
+          </select>
+        </div>
+        <div>
+          <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Duration (years out)</p>
+          <input type="number" id="us_scJLY" value="1" min="0.5" max="10" step="0.5" class="si mono text-sm" oninput="US_saveSC()">
+        </div>
+        <div>
+          <p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Re-entry salary (% of original)</p>
+          <input type="number" id="us_scJLR" value="100" min="0" max="200" step="5" class="si mono text-sm" oninput="US_saveSC()">
+          <p class="text-xs mt-1" style="color:var(--faint)">e.g. 80% = took a 20% pay cut returning</p>
+        </div>
+      </div>
+      <div id="us_scJLNote" class="mt-3 text-xs" style="color:var(--rose)"></div>
     </div>
     <div id="us_scComp"></div>
   </div>
@@ -1594,7 +1621,7 @@ function IN_resetAll(){if(!confirm('Clear all India data?'))return;try{localStor
 //  USA STATE
 // ═══════════════════════════════════════════════════════════════════
 let US_isAdj=false, US_expInflOn=false, US_activeSC='A';
-let US_SC={A:{name:'Scenario A',extraExp:0,lumpsum:0,extraInc:0},B:{name:'Scenario B',extraExp:0,lumpsum:0,extraInc:0}};
+let US_SC={A:{name:'Scenario A',extraExp:0,lumpsum:0,extraInc:0,jobLoss:'none',jobLossYrs:1,jobLossReentry:100},B:{name:'Scenario B',extraExp:0,lumpsum:0,extraInc:0,jobLoss:'none',jobLossYrs:1,jobLossReentry:100}};
 let US_MS=[], US_EMIS=[];
 let US_EXPS=[
   {id:'hous', label:'Housing / Rent',   icon:'🏠',val:0,sYr:null,eYr:null,infl:true},
@@ -2263,7 +2290,7 @@ function US_totalHomeEquityAt(yr){
 }
 
 // ── US simulation engine ──
-function US_sim(years,xE=0,lump=0,xI=0){
+function US_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=0,jobLossReentry=100){
   const b1=gv('us_b1'),b2=gv('us_b2'),g1=gn('us_g1')/100,g2=gn('us_g2')/100;
   const fdP=gi('us_fdRng')/100,sipP=gi('us_sipRng')/100;
   const sipRt=gn('us_sipRet')/100,fdRt=gn('us_fdRt')/100;
@@ -2278,8 +2305,17 @@ function US_sim(years,xE=0,lump=0,xI=0){
   let cFD=lump, cSIP=0;
   let totalFDContrib=0, totalSIPContrib=0;
   let s1=b1,s2=b2;
+  // Track base salaries separately from job-loss-adjusted salaries
+  let base1=b1,base2=b2;
   for(let yr=1;yr<=years;yr++){
-    s1*=(1+g1); s2*=(1+g2);
+    base1*=(1+g1); base2*=(1+g2);
+    // Apply job loss: temporary gap or permanent stop
+    const isPerm=jobLoss.endsWith('p');
+    const inLoss=isPerm || yr<=jobLossYrs; // permanent = always in loss
+    const affects1=jobLoss==='s1'||jobLoss==='both'||jobLoss==='s1p'||jobLoss==='bothp';
+    const affects2=jobLoss==='s2'||jobLoss==='both'||jobLoss==='s2p'||jobLoss==='bothp';
+    s1 = affects1 ? (inLoss ? 0 : base1*(jobLossReentry/100)) : base1;
+    s2 = affects2 ? (inLoss ? 0 : base2*(jobLossReentry/100)) : base2;
     const {s1G,s2G}=US_getAssets(s1,s2);
     const d1=US_totDed(1,s1),d2=US_totDed(2,s2);
     // Bond/CD/HYSA interest on current balance — taxable as ordinary income each year
@@ -2626,6 +2662,9 @@ function US_swSC(s){
   document.getElementById('us_scE').value=c.extraExp?c.extraExp.toLocaleString('en-US'):'0';
   document.getElementById('us_scL').value=c.lumpsum?c.lumpsum.toLocaleString('en-US'):'0';
   document.getElementById('us_scI').value=c.extraInc?c.extraInc.toLocaleString('en-US'):'0';
+  document.getElementById('us_scJL').value=c.jobLoss||'none';
+  document.getElementById('us_scJLY').value=c.jobLossYrs||1;
+  document.getElementById('us_scJLR').value=c.jobLossReentry||100;
   US_rSC();
 }
 function US_saveSC(){
@@ -2634,12 +2673,31 @@ function US_saveSC(){
   US_SC[s].extraExp=parseFloat(document.getElementById('us_scE').value.replace(/,/g,''))||0;
   US_SC[s].lumpsum=parseFloat(document.getElementById('us_scL').value.replace(/,/g,''))||0;
   US_SC[s].extraInc=parseFloat(document.getElementById('us_scI').value.replace(/,/g,''))||0;
+  US_SC[s].jobLoss=document.getElementById('us_scJL').value;
+  US_SC[s].jobLossYrs=parseFloat(document.getElementById('us_scJLY').value)||1;
+  US_SC[s].jobLossReentry=parseFloat(document.getElementById('us_scJLR').value)||100;
+  // Update note
+  const jl=US_SC[s].jobLoss, jly=US_SC[s].jobLossYrs, jlr=US_SC[s].jobLossReentry;
+  const noteEl=document.getElementById('us_scJLNote');
+  const isPerm=jl.endsWith('p');
+  // Show/hide duration and re-entry fields based on permanent vs temporary
+  ['us_scJLY','us_scJLR'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.closest('div').style.opacity=isPerm?'0.3':'1';
+    el.closest('div').style.pointerEvents=isPerm?'none':'';
+  });
+  if(noteEl&&jl!=='none'){
+    const who=jl.startsWith('s1')?'Spouse 1':jl.startsWith('s2')?'Spouse 2':'Both spouses';
+    noteEl.textContent=isPerm
+      ? `⚠ ${who} stops working permanently from Year 1 onwards`
+      : `⚠ ${who} out of work for ${jly} yr${jly!==1?'s':''} starting Year 1, then return at ${jlr}% of original salary`;
+  } else if(noteEl) noteEl.textContent='';
   US_rSC(); US_sv();
 }
 function US_rSC(){
   const rows=[10,20,30].map(yr=>{
-    const a=US_sim(yr,US_SC.A.extraExp,US_SC.A.lumpsum,US_SC.A.extraInc).total;
-    const b=US_sim(yr,US_SC.B.extraExp,US_SC.B.lumpsum,US_SC.B.extraInc).total;
+    const a=US_sim(yr,US_SC.A.extraExp,US_SC.A.lumpsum,US_SC.A.extraInc,US_SC.A.jobLoss||'none',US_SC.A.jobLossYrs||0,US_SC.A.jobLossReentry||100).total;
+    const b=US_sim(yr,US_SC.B.extraExp,US_SC.B.lumpsum,US_SC.B.extraInc,US_SC.B.jobLoss||'none',US_SC.B.jobLossYrs||0,US_SC.B.jobLossReentry||100).total;
     const d=b-a;
     return`<tr style="border-bottom:1px solid var(--border)"><td class="py-3 mono text-sm font-semibold" style="color:var(--muted)">${yr} Yrs</td>
       <td class="py-3 mono text-sm font-bold" style="color:var(--indigo)">${US_fmtM(a)}</td>
@@ -2647,10 +2705,17 @@ function US_rSC(){
       <td class="py-3"><span class="mono text-sm font-bold" style="color:${d>=0?'var(--green)':'var(--rose)'}">${d>=0?'+':'−'}${US_fmtM(Math.abs(d))}</span>
       <span class="text-xs ml-1" style="color:var(--faint)">→ ${d>=0?US_SC.B.name:US_SC.A.name} wins</span></td></tr>`;
   }).join('');
+  // Build job loss impact note for each scenario
+  const jlNote=(sc)=>{
+    const jl=sc.jobLoss||'none'; if(jl==='none') return '';
+    const isPermPill=jl.endsWith('p'); const who=jl.startsWith('s1')?'Spouse 1':jl.startsWith('s2')?'Spouse 2':'Both';
+    const r=sc.jobLossReentry||100;
+    return isPermPill ? `<span class="pill ml-1" style="background:var(--rose-lt,#fee2e2);color:var(--rose)">💼 ${who} retired permanently</span>` : `<span class="pill ml-1" style="background:var(--rose-lt,#fee2e2);color:var(--rose)">💼 ${who} out ${sc.jobLossYrs}yr${sc.jobLossYrs!==1?'s':''}${r!==100?' · '+r+'% re-entry':''}</span>`;
+  };
   document.getElementById('us_scComp').innerHTML=`<table class="w-full text-left"><thead style="border-bottom:2px solid var(--border)"><tr>
     <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Horizon</th>
-    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--indigo)">${US_SC.A.name}</th>
-    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--purple)">${US_SC.B.name}</th>
+    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--indigo)">${US_SC.A.name}${jlNote(US_SC.A)}</th>
+    <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--purple)">${US_SC.B.name}${jlNote(US_SC.B)}</th>
     <th class="pb-2 text-xs font-semibold uppercase" style="color:var(--faint)">Difference</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
