@@ -428,7 +428,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
   <!-- EMI / Loan card -->
   <div class="card p-6 accent-orange">
     <div class="flex justify-between items-center mb-3">
-      <p class="sl tip-wrap">EMI &amp; Loan Payments<span class="tip-icon">ⓘ</span><span class="tip-box">Add home loans, car loans, or any EMI here. Payments reduce your monthly surplus for their duration and automatically drop off in the forecast once paid off — boosting your surplus after that year.</span></p>
+      <p class="sl tip-wrap">Loan &amp; Mortgage Payments<span class="tip-icon">ⓘ</span><span class="tip-box">Add home loans, car loans, or any EMI here. Payments reduce your monthly surplus for their duration and automatically drop off in the forecast once paid off — boosting your surplus after that year.</span></p>
       <button onclick="IN_addEMI()" class="text-sm font-semibold px-4 py-2 rounded-lg border np" style="border-color:var(--border);color:var(--muted)">+ Add Loan</button>
     </div>
     <p class="text-sm mb-4" style="color:var(--muted)">EMI payments reduce surplus for their duration and drop off when paid off.</p>
@@ -1178,7 +1178,7 @@ let IN_isAdj=false, IN_expInflOn=false, IN_activeSC='A';
 let IN_SC = { A:{name:'Scenario A',extraExp:0,lumpsum:0,extraInc:0,jobLoss:'none',jobLossYrs:1,jobLossReentry:100}, B:{name:'Scenario B',extraExp:0,lumpsum:0,extraInc:0,jobLoss:'none',jobLossYrs:1,jobLossReentry:100} };
 let IN_MS=[], IN_EMIS=[];
 let IN_EXPS=[
-  {id:'rent',   label:'Rent / EMI',     icon:'🏠',val:0,sYr:null,eYr:null,infl:true},
+  {id:'rent',   label:'Housing / Rent',  icon:'🏠',val:0,sYr:null,eYr:null,infl:true},
   {id:'food',   label:'Food & Dining',  icon:'🍽', val:0,sYr:null,eYr:null,infl:true},
   {id:'travel', label:'Travel & Fuel',  icon:'🚗',val:0,sYr:null,eYr:null,infl:true},
   {id:'health', label:'Health & Med',   icon:'💊',val:0,sYr:null,eYr:null,infl:true},
@@ -1354,7 +1354,7 @@ function IN_rExp(){
 function IN_addExp(){ IN_EXPS.push({id:'c'+Date.now(),label:'New Category',icon:'📌',val:0,sYr:null,eYr:null,infl:true}); IN_rExp(); IN_sv(); }
 
 // ── India EMI ──
-function IN_addEMI(){IN_EMIS.push({id:'e'+Date.now(),label:'Home Loan',emi:0,startCalYear:new Date().getFullYear(),yrs:20,isHome:false,homeVal:0,loanAmt:0,mortRate:8.5,appRate:4});IN_rEMI();IN_sumExp();IN_rc();IN_sv();}
+function IN_addEMI(){IN_EMIS.push({id:'e'+Date.now(),label:'Mortgage',emi:0,startCalYear:new Date().getFullYear(),yrs:20,isHome:false,homeVal:0,loanAmt:0,mortRate:8.5,appRate:4});IN_rEMI();IN_sumExp();IN_rc();IN_sv();}
 // ── India EMI helpers ──
 function IN_emiCalYear(){ return new Date().getFullYear(); }
 function IN_emiYearsAlreadyPaid(e){
