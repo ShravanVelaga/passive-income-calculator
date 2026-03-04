@@ -1657,9 +1657,9 @@ function IN_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=1,jobLossReentr
     totalFDContrib+=mFD*12; totalSIPContrib+=mSIP*12;
     cFD=cFD+fdNetInterest+mFD*12;
     cSIP=(cSIP+mSIP*12)*(1+sipRt);
-    // Apply life event deductions at this year (deduct proportionally from FD+SIP)
+    // Apply life event deductions: drain debt (FD) first, then equity (SIP)
     if(!skipLE){const leDed=IN_LE.filter(e=>e.deduct&&e.year===yr).reduce((s,e)=>s+(e.amount||0),0);
-    if(leDed>0){const tot=cFD+cSIP;if(tot>0){const r=Math.min(1,leDed/tot);cFD=Math.max(0,cFD-cFD*r);cSIP=Math.max(0,cSIP-cSIP*r);}}}
+    if(leDed>0){const fromFD=Math.min(cFD,leDed);cFD=Math.max(0,cFD-fromFD);const remaining=leDed-fromFD;cSIP=Math.max(0,cSIP-remaining);}}
     // EPF/NPS: total deduction % on each salary, compounded monthly at retRt
     const retContrib1=(aff1&&inLoss)?0:d1;
     const retContrib2=(aff2&&inLoss)?0:d2;
@@ -1748,15 +1748,15 @@ function IN_rFC(){
           ${fdPct>0?`<tr style="border-bottom:1px dashed var(--border)">
             <td class="py-2 pl-2 text-xs" style="color:var(--muted)">🏦 FD / Savings <span style="color:var(--faint)">(${fdPct}% surplus)</span></td>
             <td class="py-2 mono text-xs text-right" style="color:var(--muted)">${IN_fmt(fdPrincipal+fdContrib)}<br><span style="color:var(--faint);font-size:10px">${IN_fmt(fdPrincipal)} start + ${IN_fmt(fdContrib)} added</span></td>
-            <td class="py-2 mono text-xs text-right font-semibold" style="color:${fdGain>=0?'var(--green)':'var(--rose)'}">+${IN_fmtCr(Math.max(0,fdGain))}${leCumDed>0?'<br><span style="font-size:10px;color:var(--rose)">net of life events</span>':''}</td>
-            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--indigo)">${IN_fmtCr(cFD)}</td>
+            <td class="py-2 mono text-xs text-right font-semibold" style="color:var(--green)">+${IN_fmtCr(Math.max(0,fdGain))}<br><span style="font-size:10px;color:var(--faint)">earned (before spending)</span></td>
+            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--indigo)">${IN_fmtCr(cFD)}${leCumDed>0?'<br><span style="font-size:10px;color:var(--rose)">after cash-out</span>':''}</td>
             <td class="py-2 mono text-xs text-right" style="color:var(--faint)">${fdRtPct}%/yr</td>
           </tr>`:''}
           ${sipPct>0?`<tr style="border-bottom:1px dashed var(--border)">
             <td class="py-2 pl-2 text-xs" style="color:var(--muted)">📈 SIP / Equity <span style="color:var(--faint)">(${sipPct}% surplus)</span></td>
             <td class="py-2 mono text-xs text-right" style="color:var(--muted)">${IN_fmt(sipContrib)}<br><span style="color:var(--faint);font-size:10px">₹0 start + ${IN_fmt(sipContrib)} added</span></td>
-            <td class="py-2 mono text-xs text-right font-semibold" style="color:${sipGain>=0?'var(--green)':'var(--rose)'}">+${IN_fmtCr(Math.max(0,sipGain))}${leCumDed>0?'<br><span style="font-size:10px;color:var(--rose)">net of life events</span>':''}</td>
-            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--purple)">${IN_fmtCr(cSIP)}</td>
+            <td class="py-2 mono text-xs text-right font-semibold" style="color:var(--green)">+${IN_fmtCr(Math.max(0,sipGain))}<br><span style="font-size:10px;color:var(--faint)">earned (before spending)</span></td>
+            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--purple)">${IN_fmtCr(cSIP)}${leCumDed>0?'<br><span style="font-size:10px;color:var(--rose)">after cash-out</span>':''}</td>
             <td class="py-2 mono text-xs text-right" style="color:var(--faint)">${sipRtPct}%/yr</td>
           </tr>`:''}
           ${retRows}
@@ -1768,7 +1768,7 @@ function IN_rFC(){
             <td class="py-2 mono text-xs text-right" style="color:var(--faint)">${(assetRate*100).toFixed(1)}%/yr yield</td>
           </tr>`:''}
           ${homeRows}
-          ${(()=>{if(!leWindow.length)return'';const totalDed=leCumDed;return'<tr style="border-top:1.5px solid var(--rose);background:var(--rose-lt)"><td colspan="5" class="py-1.5 pl-2 text-xs font-semibold" style="color:var(--rose)">💸 Life Events — Yr '+(prevYr+1)+' to '+yr+'</td></tr>'+leWindow.map(e=>{const t=IN_LE_TYPES.find(x=>x.val===e.type)||{icon:"📌"};return'<tr style="border-bottom:1px dashed var(--border);background:var(--rose-lt)"><td class="py-1.5 pl-4 text-xs" style="color:var(--rose)">'+t.icon+' '+e.label+' <span style="color:var(--faint)">(Yr '+e.year+')</span></td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">—</td><td class="py-1.5 mono text-xs text-right font-semibold" style="color:var(--rose)">−'+IN_fmtCr(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--rose)">−'+IN_fmtCr(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">one-time</td></tr>';}).join('')+(leWindow.length>1?'<tr style="background:var(--rose-lt)"><td class="py-1 pl-2 text-xs font-bold" style="color:var(--rose)">Subtotal this period</td><td colspan="2"></td><td class="py-1 mono text-xs text-right font-black" style="color:var(--rose)">−'+IN_fmtCr(totalDed)+'</td><td></td></tr>':'');})()}
+          ${(()=>{if(!leWindow.length)return'';const totalDed=leCumDed;return'<tr style="border-top:1.5px solid var(--rose);background:var(--rose-lt)"><td colspan="5" class="py-1.5 pl-2 text-xs font-semibold" style="color:var(--rose)">💸 Spent this period — Yr '+(prevYr+1)+' to '+yr+'</td></tr>'+leWindow.map(e=>{const t=IN_LE_TYPES.find(x=>x.val===e.type)||{icon:"📌"};return'<tr style="border-bottom:1px dashed var(--border);background:var(--rose-lt)"><td class="py-1.5 pl-4 text-xs" style="color:var(--rose)">'+t.icon+' '+e.label+' <span style="color:var(--faint);font-size:10px">(Yr '+e.year+' · liquidated from FD first, then SIP)</span></td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">—</td><td class="py-1.5 mono text-xs text-right font-semibold" style="color:var(--rose)">−'+IN_fmtCr(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--rose)">−'+IN_fmtCr(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">cash out</td></tr>';}).join('')+(leWindow.length>1?'<tr style="background:var(--rose-lt)"><td class="py-1 pl-2 text-xs font-bold" style="color:var(--rose)">Subtotal this period</td><td colspan="2"></td><td class="py-1 mono text-xs text-right font-black" style="color:var(--rose)">−'+IN_fmtCr(totalDed)+'</td><td></td></tr>':'');})()}
         </tbody>
         <tfoot>
           <tr style="border-top:2px solid var(--border);background:var(--bg)">
@@ -2876,9 +2876,9 @@ function US_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=0,jobLossReentr
     totalFDContrib+=mFD*12; totalSIPContrib+=mSIP*12;
     cFD=cFD+fdNetInterest+mFD*12;
     cSIP=(cSIP+mSIP*12)*(1+sipRt);
-    // Apply life event deductions at this year (proportional from HYSA+index fund)
+    // Apply life event deductions: drain debt (HYSA/Brokerage) first, then equity (Index Fund)
     if(!skipLE){const leDed=US_LE.filter(e=>e.deduct&&e.year===yr).reduce((s,e)=>s+(e.amount||0),0);
-    if(leDed>0){const tot=cFD+cSIP;if(tot>0){const r=Math.min(1,leDed/tot);cFD=Math.max(0,cFD-cFD*r);cSIP=Math.max(0,cSIP-cSIP*r);}}}
+    if(leDed>0){const fromFD=Math.min(cFD,leDed);cFD=Math.max(0,cFD-fromFD);const remaining=leDed-fromFD;cSIP=Math.max(0,cSIP-remaining);}}
   }
   const retCorpus=US_retTotalAt(years);
   const assetRate=totP>0?(ty/totP):0;
@@ -3166,21 +3166,21 @@ function US_rFC(){
           ${fdP>0?`<tr style="border-bottom:1px dashed var(--border)">
             <td class="py-1.5 pl-2 text-xs" style="color:var(--muted)">🏦 Brokerage / HYSA <span style="color:var(--faint)">(${fdP}% surplus)</span></td>
             <td class="py-1.5 mono text-xs text-right" style="color:var(--muted)">${US_fmt(fdPrincipal+fdContrib)}<br><span style="color:var(--faint);font-size:10px">${US_fmt(fdPrincipal)} start + ${US_fmt(fdContrib)} added</span></td>
-            <td class="py-1.5 mono text-xs text-right font-semibold" style="color:${fdGain>=0?'var(--green)':'var(--rose)'}">+${US_fmtM(Math.max(0,fdGain))}${leCumDed>0?'<br><span style="font-size:10px;color:var(--rose)">net of life events</span>':''}</td>
-            <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--blue)">${US_fmtM(cFD)}</td>
+            <td class="py-1.5 mono text-xs text-right font-semibold" style="color:var(--green)">+${US_fmtM(Math.max(0,fdGain))}<br><span style="font-size:10px;color:var(--faint)">earned (before spending)</span></td>
+            <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--blue)">${US_fmtM(cFD)}${leCumDed>0?'<br><span style="font-size:10px;color:var(--rose)">after cash-out</span>':''}</td>
             <td class="py-1.5 mono text-xs text-right" style="color:var(--faint)">${fdRtPct}%/yr</td>
           </tr>`:''}
           ${sipP>0?`<tr style="border-bottom:1px dashed var(--border)">
             <td class="py-1.5 pl-2 text-xs" style="color:var(--muted)">📈 Index Fund <span style="color:var(--faint)">(${sipP}% surplus)</span></td>
             <td class="py-1.5 mono text-xs text-right" style="color:var(--muted)">${US_fmt(sipContrib)}<br><span style="color:var(--faint);font-size:10px">$0 start + ${US_fmt(sipContrib)} added</span></td>
-            <td class="py-1.5 mono text-xs text-right font-semibold" style="color:${sipGain>=0?'var(--green)':'var(--rose)'}">+${US_fmtM(Math.max(0,sipGain))}${leCumDed>0?'<br><span style="font-size:10px;color:var(--rose)">net of life events</span>':''}</td>
-            <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--purple)">${US_fmtM(cSIP)}</td>
+            <td class="py-1.5 mono text-xs text-right font-semibold" style="color:var(--green)">+${US_fmtM(Math.max(0,sipGain))}<br><span style="font-size:10px;color:var(--faint)">earned (before spending)</span></td>
+            <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--purple)">${US_fmtM(cSIP)}${leCumDed>0?'<br><span style="font-size:10px;color:var(--rose)">after cash-out</span>':''}</td>
             <td class="py-1.5 mono text-xs text-right" style="color:var(--faint)">${sipRtPct}%/yr</td>
           </tr>`:''}
           ${retRows}
           ${assetRow}
           ${homeRows}
-          ${(()=>{if(!leWindow.length)return'';const totalDed=leCumDed;return'<tr style="border-top:1.5px solid var(--rose);background:var(--rose-lt)"><td colspan="5" class="py-1.5 pl-2 text-xs font-semibold" style="color:var(--rose)">💸 Life Events — Yr '+(prevYrUS+1)+' to '+yr+'</td></tr>'+leWindow.map(e=>{const t=US_LE_TYPES.find(x=>x.val===e.type)||{icon:"📌"};return'<tr style="border-bottom:1px dashed var(--border);background:var(--rose-lt)"><td class="py-1.5 pl-4 text-xs" style="color:var(--rose)">'+t.icon+' '+e.label+' <span style="color:var(--faint)">(Yr '+e.year+')</span></td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">—</td><td class="py-1.5 mono text-xs text-right font-semibold" style="color:var(--rose)">−'+US_fmtM(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--rose)">−'+US_fmtM(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">one-time</td></tr>';}).join('')+(leWindow.length>1?'<tr style="background:var(--rose-lt)"><td class="py-1 pl-2 text-xs font-bold" style="color:var(--rose)">Subtotal this period</td><td colspan="2"></td><td class="py-1 mono text-xs text-right font-black" style="color:var(--rose)">−'+US_fmtM(totalDed)+'</td><td></td></tr>':'');})()}
+          ${(()=>{if(!leWindow.length)return'';const totalDed=leCumDed;return'<tr style="border-top:1.5px solid var(--rose);background:var(--rose-lt)"><td colspan="5" class="py-1.5 pl-2 text-xs font-semibold" style="color:var(--rose)">💸 Spent this period — Yr '+(prevYrUS+1)+' to '+yr+'</td></tr>'+leWindow.map(e=>{const t=US_LE_TYPES.find(x=>x.val===e.type)||{icon:"📌"};return'<tr style="border-bottom:1px dashed var(--border);background:var(--rose-lt)"><td class="py-1.5 pl-4 text-xs" style="color:var(--rose)">'+t.icon+' '+e.label+' <span style="color:var(--faint);font-size:10px">(Yr '+e.year+' · liquidated from HYSA first, then Index Fund)</span></td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">—</td><td class="py-1.5 mono text-xs text-right font-semibold" style="color:var(--rose)">−'+US_fmtM(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--rose)">−'+US_fmtM(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">cash out</td></tr>';}).join('')+(leWindow.length>1?'<tr style="background:var(--rose-lt)"><td class="py-1 pl-2 text-xs font-bold" style="color:var(--rose)">Subtotal this period</td><td colspan="2"></td><td class="py-1 mono text-xs text-right font-black" style="color:var(--rose)">−'+US_fmtM(totalDed)+'</td><td></td></tr>':'');})()}
         </tbody>
         <tfoot>
           <tr style="border-top:2px solid var(--border);background:var(--bg)">
