@@ -1570,17 +1570,22 @@ function IN_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=1,jobLossReentr
     if(aff2) sal2=inLoss?0:b2base*(1+g2)*yr*(jobLossReentry/100);
     s1=aff1?sal1:s1*(1+g1); s2=aff2?sal2:s2*(1+g2);
     const {s1G,s2G}=IN_getAssets(s1,s2);
-    // Reinvestment bucket (FD/SIP) returns are NOT added to taxable income —
-    // the bucket choice shouldn't change surplus or tax. Only salary + Investment
-    // Matrix yields affect taxable income.
-    const t1=IN_calcTax(s1G,true),t2=IN_calcTax(s2G,true);
+    // FD matures annually: interest split equally between spouses, taxed at marginal rate,
+    // net after-tax interest rolled back into FD (Option A)
+    const fdInterest=cFD*fdRt;
+    const fdIntHalf=fdInterest/2;
+    const t1Base=IN_calcTax(s1G,true), t2Base=IN_calcTax(s2G,true);
+    const t1=IN_calcTax(s1G+fdIntHalf,true), t2=IN_calcTax(s2G+fdIntHalf,true);
+    const fdTax=(t1-t1Base)+(t2-t2Base);
+    const fdNetInterest=fdInterest-fdTax;
     const d1=IN_DEDS[1].reduce((a,d)=>a+s1*(d.pct/100),0);
     const d2=IN_DEDS[2].reduce((a,d)=>a+s2*(d.pct/100),0);
     const expMo=IN_totExpMo(yr);
     const surplus=(s1+s2+ty-t1-t2-d1-d2-(expMo*12))/12+(xI-xE);
     const mFD=Math.max(0,surplus)*fdP, mSIP=Math.max(0,surplus)*sipP;
     totalFDContrib+=mFD*12; totalSIPContrib+=mSIP*12;
-    cFD=(cFD+mFD*12)*(1+fdRt); cSIP=(cSIP+mSIP*12)*(1+sipRt);
+    cFD=cFD+fdNetInterest+mFD*12;
+    cSIP=(cSIP+mSIP*12)*(1+sipRt);
     // EPF/NPS: total deduction % on each salary, compounded monthly at retRt
     const retContrib1=(aff1&&inLoss)?0:d1;
     const retContrib2=(aff2&&inLoss)?0:d2;
@@ -1705,7 +1710,7 @@ function IN_rFC(){
           ${pills?`<div class="flex flex-wrap gap-1 mt-1">${pills}</div>`:''}
         </div>
         <div class="text-right shrink-0">
-          <span class="mono text-base font-bold block" style="color:var(--teal-dk)">${crFmt}</span>
+          <span class="mono text-base font-bold block" style="color:var(--teal-dk)">${crFmt}${IN_isAdj?` <span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);vertical-align:middle">adj</span>`:''}</span>
           <span class="mono text-xs" style="color:var(--green)">▸ click to break down</span>
         </div>
         <span class="fc-arr text-xs shrink-0" style="color:var(--faint);width:12px">▸</span>
@@ -1750,7 +1755,7 @@ function IN_rFC_short(){
         ${sipP>0?`<td class="py-1.5 mono text-xs text-right" style="color:var(--purple)">${IN_fmtCr(cSIP_mo)}</td>`:''}
         ${totP>0?`<td class="py-1.5 mono text-xs text-right" style="color:var(--teal-dk)">${IN_fmtCr(totP)}</td>`:''}
         ${retCurr>0?`<td class="py-1.5 mono text-xs text-right" style="color:var(--teal)">${IN_fmtCr(retMo)}</td>`:''}
-        <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--teal-dk)">${IN_fmtCr(dispMo)}</td>
+        <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--teal-dk)">${IN_fmtCr(dispMo)}${IN_isAdj?`<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);margin-left:4px;font-family:'DM Sans',sans-serif;vertical-align:middle">adj</span>`:''}</td>
       </tr>`;
     }
     const yrTotal=IN_isAdj?simCurr.total/Math.pow(1+infRate,yr):simCurr.total;
@@ -1774,7 +1779,7 @@ function IN_rFC_short(){
           </div>
         </div>
         <div class="shrink-0 text-right" style="min-width:110px">
-          <p class="mono text-xl font-black" style="color:var(--teal-dk)">${IN_fmtCr(yrTotal)}</p>
+          <p class="mono text-xl font-black" style="color:var(--teal-dk)">${IN_fmtCr(yrTotal)}${IN_isAdj?` <span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);vertical-align:middle">adj</span>`:''}</p>
           <span class="sh-hint text-xs" style="color:var(--faint)">expand months</span>
         </div>
         <span class="sh-arr text-sm shrink-0" style="color:var(--faint)">▸</span>
@@ -1787,7 +1792,7 @@ function IN_rFC_short(){
             ${sipP>0?`<th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--purple)">SIP / Equity</th>`:''}
             ${totP>0?`<th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--teal-dk)">Investments</th>`:''}
             ${retCurr>0?`<th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--teal)">EPF / NPS</th>`:''}
-            <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--teal-dk)">Total Wealth</th>
+            <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--teal-dk)">Total Wealth${IN_isAdj?' <span style="font-size:9px;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);font-weight:700;text-transform:uppercase;vertical-align:middle">Infl. Adj</span>':''}</th>
           </tr></thead>
           <tbody>${yrRows}</tbody>
         </table>
@@ -2724,22 +2729,30 @@ function US_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=0,jobLossReentr
     s2 = affects2 ? (inLoss ? 0 : base2*(jobLossReentry/100)) : base2;
     const {s1G,s2G}=US_getAssets(s1,s2);
     const d1=US_totDed(1,s1),d2=US_totDed(2,s2);
-    // Reinvestment bucket (HYSA/Index) returns are NOT added to taxable income —
-    // bucket choice shouldn't change surplus or tax. Only salary + Investment Matrix yields do.
-    let ft,st;
+    // HYSA/CD matures annually: interest taxed at marginal rate, net rolled back in (Option A)
+    const fdInterest=cFD*fdRt;
+    let ftBase,stBase,ft,st;
     if(filing==='mfj'){
-      const ct=Math.max(0,s1G+s2G-d1-d2-stdDed);
-      ft=US_calcFedTax(ct,filing); st=US_calcStateTax(ct,filing);
+      const ctBase=Math.max(0,s1G+s2G-d1-d2-stdDed);
+      ftBase=US_calcFedTax(ctBase,filing); stBase=US_calcStateTax(ctBase,filing);
+      const ctWith=Math.max(0,s1G+s2G+fdInterest-d1-d2-stdDed);
+      ft=US_calcFedTax(ctWith,filing); st=US_calcStateTax(ctWith,filing);
     } else {
-      ft=US_calcFedTax(Math.max(0,s1G-d1-stdDed),filing)+US_calcFedTax(Math.max(0,s2G-d2-stdDed),filing);
-      st=US_calcStateTax(Math.max(0,s1G-d1-stdDed),filing)+US_calcStateTax(Math.max(0,s2G-d2-stdDed),filing);
+      const half=fdInterest/2;
+      ftBase=US_calcFedTax(Math.max(0,s1G-d1-stdDed),filing)+US_calcFedTax(Math.max(0,s2G-d2-stdDed),filing);
+      stBase=US_calcStateTax(Math.max(0,s1G-d1-stdDed),filing)+US_calcStateTax(Math.max(0,s2G-d2-stdDed),filing);
+      ft=US_calcFedTax(Math.max(0,s1G+half-d1-stdDed),filing)+US_calcFedTax(Math.max(0,s2G+half-d2-stdDed),filing);
+      st=US_calcStateTax(Math.max(0,s1G+half-d1-stdDed),filing)+US_calcStateTax(Math.max(0,s2G+half-d2-stdDed),filing);
     }
+    const fdTax=(ft-ftBase)+(st-stBase);
+    const fdNetInterest=fdInterest-fdTax;
     const fi1=US_calcFICA(s1,ss1Ex),fi2=US_calcFICA(s2,ss2Ex);
     const expMo=US_totExpMo(yr);
     const surplus=(s1+s2+ty-d1-d2-ft-st-fi1-fi2-(expMo*12))/12+(xI-xE);
     const mFD=Math.max(0,surplus)*fdP, mSIP=Math.max(0,surplus)*sipP;
     totalFDContrib+=mFD*12; totalSIPContrib+=mSIP*12;
-    cFD=(cFD+mFD*12)*(1+fdRt); cSIP=(cSIP+mSIP*12)*(1+sipRt);
+    cFD=cFD+fdNetInterest+mFD*12;
+    cSIP=(cSIP+mSIP*12)*(1+sipRt);
   }
   const retCorpus=US_retTotalAt(years);
   const assetRate=totP>0?(ty/totP):0;
@@ -2793,14 +2806,23 @@ function US_rFC_short(){
     const s1=b1*Math.pow(1+g1,yr), s2=b2*Math.pow(1+g2,yr);
     const {s1G,s2G}=US_getAssets(s1,s2);
     const d1=US_totDed(1,s1),d2=US_totDed(2,s2);
-    let ft,st;
+    // HYSA/CD: interest taxed at marginal rate, net rolled back in (Option A)
+    const fdInterest=cFD*fdRt;
+    let ftBase,stBase,ft,st;
     if(filing==='mfj'){
-      const ct=Math.max(0,s1G+s2G-d1-d2-stdDed);
-      ft=US_calcFedTax(ct,filing); st=US_calcStateTax(ct,filing);
+      const ctBase=Math.max(0,s1G+s2G-d1-d2-stdDed);
+      ftBase=US_calcFedTax(ctBase,filing); stBase=US_calcStateTax(ctBase,filing);
+      const ctWith=Math.max(0,s1G+s2G+fdInterest-d1-d2-stdDed);
+      ft=US_calcFedTax(ctWith,filing); st=US_calcStateTax(ctWith,filing);
     } else {
-      ft=US_calcFedTax(Math.max(0,s1G-d1-stdDed),filing)+US_calcFedTax(Math.max(0,s2G-d2-stdDed),filing);
-      st=US_calcStateTax(Math.max(0,s1G-d1-stdDed),filing)+US_calcStateTax(Math.max(0,s2G-d2-stdDed),filing);
+      const half=fdInterest/2;
+      ftBase=US_calcFedTax(Math.max(0,s1G-d1-stdDed),filing)+US_calcFedTax(Math.max(0,s2G-d2-stdDed),filing);
+      stBase=US_calcStateTax(Math.max(0,s1G-d1-stdDed),filing)+US_calcStateTax(Math.max(0,s2G-d2-stdDed),filing);
+      ft=US_calcFedTax(Math.max(0,s1G+half-d1-stdDed),filing)+US_calcFedTax(Math.max(0,s2G+half-d2-stdDed),filing);
+      st=US_calcStateTax(Math.max(0,s1G+half-d1-stdDed),filing)+US_calcStateTax(Math.max(0,s2G+half-d2-stdDed),filing);
     }
+    const fdTax=(ft-ftBase)+(st-stBase);
+    const fdNetInterest=fdInterest-fdTax;
     const fi1=US_calcFICA(s1,ss1Ex),fi2=US_calcFICA(s2,ss2Ex);
     const expMo=US_totExpMo(yr);
     const xI=US_SC?((US_SC[US_activeSC]?.extraInc||0)):0;
@@ -2814,15 +2836,13 @@ function US_rFC_short(){
     const simYr=US_sim(yr);
     const retCorpusYr=simYr.retCorpus;
     const homeEquityYr=simYr.homeEquity;
-    // investment portfolio — flat principal + yield to surplus
     const invPortYr=totP;
 
-    // Monthly compounding for HYSA/Index
-    const fdYield_monthly=fdRt/12;
+    // FD: annual maturity with net after-tax interest + contributions; SIP: monthly compounding
     const sipYield_monthly=sipRt/12;
-    let cFD_yr=cFD, cSIP_yr=cSIP;
+    let cFD_yr=cFD+fdNetInterest+mFD*12;
+    let cSIP_yr=cSIP;
     for(let mo=0;mo<12;mo++){
-      cFD_yr=(cFD_yr+mFD)*(1+fdYield_monthly);
       cSIP_yr=(cSIP_yr+mSIP)*(1+sipYield_monthly);
     }
 
@@ -2839,10 +2859,12 @@ function US_rFC_short(){
     const emiMo=US_EMIS.reduce((s,e)=>{const es=US_emiSYr(e),ee=es+(e.yrs||30)-1;return yr>=es&&yr<=ee?s+(e.emi||0):s;},0);
 
     let moRows='';
-    let cFD_mo=cFD, cSIP_mo=cSIP;
+    // FD grows linearly within year (matures at year end); SIP compounds monthly
+    const cFD_prev=cFD, cFD_next=cFD_yr;
+    let cSIP_mo=cSIP;
     const moNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     for(let mo=1;mo<=12;mo++){
-      cFD_mo=(cFD_mo+mFD)*(1+fdYield_monthly);
+      const cFD_mo=cFD_prev+(cFD_next-cFD_prev)*(mo/12);
       cSIP_mo=(cSIP_mo+mSIP)*(1+sipYield_monthly);
       const retMo=retPrev+retStep*mo;
       const homeMo=homePrev+homeStep*mo;
@@ -2867,7 +2889,7 @@ function US_rFC_short(){
         <td class="py-1.5 mono text-xs text-right" style="color:var(--purple)">${US_fmtM(cSIP_mo)}</td>
         <td class="py-1.5 mono text-xs text-right" style="color:var(--teal)">${US_fmtM(retMo)}</td>
         <td class="py-1.5 mono text-xs text-right" style="color:var(--orange)">${homeMo>0?US_fmtM(homeMo):'—'}</td>
-        <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--blue-dk)">${US_fmtM(totalMo)}</td>
+        <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--blue-dk)">${US_fmtM(US_isAdj?totalMo/Math.pow(1+infRate,yr-1+mo/12):totalMo)}${US_isAdj?`<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);margin-left:4px;font-family:'DM Sans',sans-serif;vertical-align:middle">adj</span>`:''}</td>
       </tr>`;
     }
 
@@ -2901,7 +2923,7 @@ function US_rFC_short(){
           </div>
         </div>
         <div class="shrink-0 text-right" style="min-width:110px">
-          <p class="mono text-xl font-black" style="color:var(--blue-dk)">${US_fmtM(dispYr)}</p>
+          <p class="mono text-xl font-black" style="color:var(--blue-dk)">${US_fmtM(dispYr)}${US_isAdj?` <span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);vertical-align:middle">adj</span>`:''}</p>
           <span class="fca-hint text-xs" style="color:var(--faint)">expand months</span>
         </div>
         <span class="fca text-sm shrink-0" style="color:var(--faint)">▸</span>
@@ -2918,7 +2940,7 @@ function US_rFC_short(){
             <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--purple)">Index Fund</th>
             <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--teal)">Retirement</th>
             <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--orange)">Home Equity</th>
-            <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--blue-dk)">Total Wealth</th>
+            <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--blue-dk)">Total Wealth${US_isAdj?' <span style="font-size:9px;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);font-weight:700;text-transform:uppercase;vertical-align:middle">Infl. Adj</span>':''}</th>
           </tr></thead>
           <tbody>${moRows}</tbody>
         </table>
@@ -3055,7 +3077,7 @@ function US_rFC(){
           ${pills?`<div class="flex flex-wrap gap-1 mt-1">${pills}</div>`:''}
         </div>
         <div class="text-right shrink-0">
-          <span class="mono text-base font-bold block" style="color:var(--blue-dk)">${mFmt}</span>
+          <span class="mono text-base font-bold block" style="color:var(--blue-dk)">${mFmt}${US_isAdj?` <span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);vertical-align:middle">adj</span>`:''}</span>
           <span class="mono text-xs" style="color:var(--green)">▸ click to break down</span>
         </div>
         <span class="fc-arr text-xs shrink-0" style="color:var(--faint);width:12px">▸</span>
