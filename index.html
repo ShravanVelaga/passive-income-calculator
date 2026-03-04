@@ -534,20 +534,6 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
     <div id="in_fcTbl"></div>
     <p class="text-xs mt-3 text-center" style="color:var(--faint)" id="in_adjNote">Nominal · includes salary growth, time-bound expenses &amp; EMIs</p>
   </div>
-  <div class="card p-6">
-    <div class="flex justify-between items-center mb-4">
-      <div>
-        <p class="sl">🗓 Life Events</p>
-        <p class="text-sm mt-0.5" style="color:var(--muted)">Add one-time events — they appear on your forecast and optionally reduce your wealth.</p>
-      </div>
-      <button onclick="IN_addLE()" class="text-xs font-semibold px-4 py-2 rounded-lg border np" style="border-color:var(--teal);color:var(--teal)">+ Add Event</button>
-    </div>
-    <div id="in_leList" class="space-y-3"></div>
-    <div id="in_leNone" class="text-center py-6" style="color:var(--faint)">
-      <p class="text-3xl mb-2">🗓</p><p class="text-sm font-medium">No life events yet</p>
-      <p class="text-xs mt-1">e.g. "Child's college" · "Home purchase" · "Medical expense"</p>
-    </div>
-  </div>
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
     <div class="card p-6 space-y-4">
       <div><p class="sl tip-wrap">Goal Planner<span class="tip-icon">ⓘ</span><span class="tip-box">Enter a target amount (e.g. ₹1 Cr for a house down payment) and how many years you have. It calculates the monthly SIP needed and tells you if your current surplus is enough to get there.</span></p><p class="text-sm mt-1" style="color:var(--muted)">How much to invest monthly to hit a target corpus?</p></div>
@@ -1529,8 +1515,7 @@ function IN_addLE(){
   IN_rLE(); IN_rFC(); IN_sv();
 }
 function IN_rLE(){
-  const syncBoth=()=>{IN_rLE_render('in_leList','in_leNone');IN_rLE_render('in_leList2','in_leNone2');};
-  syncBoth();
+  IN_rLE_render('in_leList2','in_leNone2');
 }
 function IN_rLE_render(listId,noneId){
   const list=document.getElementById(listId); if(!list)return;
@@ -1709,7 +1694,7 @@ function IN_rFC(){
     const crFmt=IN_fmtCr(disp);
     const bw=Math.min(97,Math.max(3,(sim.total/max30)*100));
     const prevYr=({5:0,10:5,15:10,20:15,25:20,30:25})[yr]||0;
-    const mPills=IN_LE.filter(e=>e.year>prevYr&&e.year<=yr).map(e=>{const t=IN_LE_TYPES.find(x=>x.val===e.type)||{icon:'📌'};const yrSuffix=e.year!==yr?' · Yr '+e.year:'';const amtSuffix=e.amount?' · '+IN_fmtCr(e.amount):'';const dedSuffix=e.deduct?' ↓':'';const bg=e.deduct?'var(--rose-lt)':'var(--amber-lt)';const col=e.deduct?'var(--rose)':'var(--amber)';return'<span class="pill" style="background:'+bg+';color:'+col+';">'+t.icon+' '+e.label+yrSuffix+amtSuffix+dedSuffix+'</span>';}).join(' ');
+    const mPills=IN_LE.filter(e=>e.year>prevYr&&e.year<=yr).map(e=>{const t=IN_LE_TYPES.find(x=>x.val===e.type)||{icon:'📌'};const yrSuffix=e.year!==yr?' · Yr '+e.year:'';const amtSuffix=e.amount?' · '+IN_fmtCr(e.amount):'';const dedSuffix=e.deduct?' ↓':'';const bg=e.deduct?'var(--rose-lt)':'var(--amber-lt)';const col=e.deduct?'var(--rose)':'var(--amber)';return'<span class="pill" style="background:'+bg+';color:'+col+';">'+t.icon+' '+e.label+yrSuffix+amtSuffix+dedSuffix+'</span>';});
     const ePills=[...expEnds].filter(y=>y===yr).map(()=>`<span class="pill" style="background:var(--green-lt);color:var(--green)">✓ Expense ends · surplus ↑</span>`);
     const pills=[...mPills,...ePills].join(' ');
     const uid='infc'+yr;
@@ -2516,7 +2501,6 @@ function US_addLE(){
   US_rLE(); US_rFC(); US_sv();
 }
 function US_rLE(){
-  US_rLE_render('us_leList','us_leNone');
   US_rLE_render('us_leList2','us_leNone2');
 }
 function US_rLE_render(listId,noneId){
@@ -3098,7 +3082,7 @@ function US_rFC(){
     const mFmt=US_fmtM(disp);
     const bw=Math.min(97,Math.max(3,(sim.total/max30)*100));
     const prevYrUS=({5:0,10:5,15:10,20:15,25:20,30:25})[yr]||0;
-    const mPills=US_LE.filter(e=>e.year>prevYrUS&&e.year<=yr).map(e=>{const t=US_LE_TYPES.find(x=>x.val===e.type)||{icon:'📌'};const yrSuffix=e.year!==yr?' · Yr '+e.year:'';const amtSuffix=e.amount?' · '+US_fmtM(e.amount):'';const dedSuffix=e.deduct?' ↓':'';const bg=e.deduct?'var(--rose-lt)':'var(--amber-lt)';const col=e.deduct?'var(--rose)':'var(--amber)';return'<span class="pill" style="background:'+bg+';color:'+col+';">'+t.icon+' '+e.label+yrSuffix+amtSuffix+dedSuffix+'</span>';}).join(' ');
+    const mPills=US_LE.filter(e=>e.year>prevYrUS&&e.year<=yr).map(e=>{const t=US_LE_TYPES.find(x=>x.val===e.type)||{icon:'📌'};const yrSuffix=e.year!==yr?' · Yr '+e.year:'';const amtSuffix=e.amount?' · '+US_fmtM(e.amount):'';const dedSuffix=e.deduct?' ↓':'';const bg=e.deduct?'var(--rose-lt)':'var(--amber-lt)';const col=e.deduct?'var(--rose)':'var(--amber)';return'<span class="pill" style="background:'+bg+';color:'+col+';">'+t.icon+' '+e.label+yrSuffix+amtSuffix+dedSuffix+'</span>';});
     const ePills=[...expEnds].filter(y=>y===yr).map(()=>`<span class="pill" style="background:var(--green-lt);color:var(--green)">✓ Expense ends · surplus ↑</span>`);
     const pills=[...mPills,...ePills].join(' ');
     const uid='fc'+yr;
