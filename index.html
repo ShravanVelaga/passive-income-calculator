@@ -922,28 +922,30 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
 
 <!-- TAB: FORECAST -->
 <div id="us_tp-forecast" class="tp space-y-5">
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-    <div class="card p-6 accent-blue">
-      <div class="flex justify-between items-center mb-4">
-        <p class="sl tip-wrap">Wealth Forecast<span class="tip-icon">ⓘ</span><span class="tip-box">Short Term: month-by-month detail for years 1–10, grouped by year. Long Term: 5-year interval snapshots up to 30 years with full bucket breakdown. Toggle Inflation Adj. for today's dollar equivalent.</span></p>
-        <button id="us_adjBtn" onclick="US_togAdj()" class="ab np">Inflation Adj.</button>
-      </div>
-      <div class="flex gap-2 mb-4 np">
-        <button id="us_fcShortBtn" onclick="US_setFcMode('short')" class="text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all" style="border-color:var(--border);color:var(--muted)">📅 Short Term <span style="color:var(--faint);font-weight:400">(monthly · 10yr)</span></button>
-        <button id="us_fcLongBtn" onclick="US_setFcMode('long')" class="text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all on" style="border-color:var(--blue);color:var(--blue);background:var(--blue-lt)">📈 Long Term <span style="font-weight:400">(5yr steps · 30yr)</span></button>
-      </div>
-      <div id="us_fcTbl"></div>
-      <p class="text-xs mt-3 text-center" style="color:var(--faint)" id="us_adjNote">Nominal · includes salary growth &amp; time-bound expenses</p>
+  <div class="card p-6 accent-blue">
+    <div class="flex justify-between items-center mb-4">
+      <p class="sl tip-wrap">Wealth Forecast<span class="tip-icon">ⓘ</span><span class="tip-box">Short Term: month-by-month detail for years 1–10, grouped by year. Long Term: 5-year interval snapshots up to 30 years with full bucket breakdown. Toggle Inflation Adj. for today's dollar equivalent.</span></p>
+      <button id="us_adjBtn" onclick="US_togAdj()" class="ab np">Inflation Adj.</button>
     </div>
-    <div class="card p-6">
-      <div class="flex justify-between items-center mb-3">
-        <p class="sl">Milestone Markers</p>
-        <button onclick="US_addMS()" class="text-xs font-semibold px-3 py-1.5 rounded-lg border np" style="border-color:var(--border);color:var(--muted)">+ Add</button>
+    <div class="flex gap-2 mb-4 np">
+      <button id="us_fcShortBtn" onclick="US_setFcMode('short')" class="text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all" style="border-color:var(--border);color:var(--muted)">📅 Short Term <span style="color:var(--faint);font-weight:400">(monthly · 10yr)</span></button>
+      <button id="us_fcLongBtn" onclick="US_setFcMode('long')" class="text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all on" style="border-color:var(--blue);color:var(--blue);background:var(--blue-lt)">📈 Long Term <span style="font-weight:400">(5yr steps · 30yr)</span></button>
+    </div>
+    <div id="us_fcTbl"></div>
+    <p class="text-xs mt-3 text-center" style="color:var(--faint)" id="us_adjNote">Nominal · includes salary growth &amp; time-bound expenses</p>
+  </div>
+  <div class="card p-6">
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <p class="sl">🎯 Milestone Markers</p>
+        <p class="text-sm mt-0.5" style="color:var(--muted)">Mark meaningful moments on your wealth timeline — they appear as flags on your forecast.</p>
       </div>
-      <div id="us_msList" class="space-y-3"></div>
-      <div id="us_msNone" class="text-center py-5" style="color:var(--faint)">
-        <p class="text-2xl mb-1">🎯</p><p class="text-sm font-medium">No milestones yet</p><p class="text-xs mt-1" style="max-width:260px;margin:4px auto 0">Mark meaningful moments on your wealth timeline — "Child's college", "Home purchase", "Retirement". They appear as markers on your 30-year forecast.</p>
-      </div>
+      <button onclick="US_addMS()" class="text-xs font-semibold px-4 py-2 rounded-lg border np" style="border-color:var(--amber);color:var(--amber)">+ Add Milestone</button>
+    </div>
+    <div id="us_msList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+    <div id="us_msNone" class="text-center py-6" style="color:var(--faint)">
+      <p class="text-3xl mb-2">🎯</p><p class="text-sm font-medium">No milestones yet</p>
+      <p class="text-xs mt-1" style="color:var(--faint)">e.g. "Child's college" · "Home purchase" · "Retirement"</p>
     </div>
   </div>
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -1316,9 +1318,12 @@ function IN_rMS(){
     const div=document.createElement('div'); div.className='inset p-3 flex items-center gap-3';
     div.innerHTML=`<div style="width:10px;height:10px;border-radius:99px;background:var(--amber);border:2px solid #fff;box-shadow:0 0 0 2px var(--amber);flex-shrink:0"></div>
       <div class="flex-1 grid grid-cols-3 gap-2">
-        <input type="text" value="${m.label}" class="si text-sm" style="padding:5px 8px" oninput="IN_MS[${i}].label=this.value;IN_rFC();IN_sv()">
-        <input type="number" value="${m.year}" min="1" max="30" class="si mono text-sm" style="padding:5px 8px" oninput="IN_MS[${i}].year=parseInt(this.value)||1;IN_rFC();IN_sv()">
-        <input type="text" value="${m.amount?m.amount.toLocaleString('en-IN'):''}" placeholder="₹ Target" class="si mono text-sm" style="padding:5px 8px" oninput="IN_hi(this);IN_MS[${i}].amount=parseFloat(this.value.replace(/,/g,''))||0;IN_rFC();IN_sv()">
+        <input type="text" value="${m.label}" class="si text-sm" style="padding:5px 8px"
+          oninput="IN_MS[${i}].label=this.value;IN_sv();IN_rFC()">
+        <input type="number" value="${m.year}" min="1" max="30" class="si mono text-sm" style="padding:5px 8px"
+          oninput="IN_MS[${i}].year=parseInt(this.value)||1;IN_sv();IN_rFC()">
+        <input type="text" value="${m.amount?m.amount.toLocaleString('en-IN'):''}" placeholder="₹ Target" class="si mono text-sm" style="padding:5px 8px"
+          oninput="IN_hi(this);IN_MS[${i}].amount=parseFloat(this.value.replace(/,/g,''))||0;IN_sv();IN_rFC()">
       </div>
       <button onclick="IN_MS.splice(${i},1);IN_rMS();IN_rFC();IN_sv()" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕</button>`;
     list.appendChild(div);
@@ -1932,12 +1937,14 @@ function US_rEMI(){
         ${calcPayment&&!e.emi?'<p class="text-xs mt-0.5" style="color:var(--green)">↑ auto-calculated</p>':''}</div>
       <div><p class="text-xs font-medium mb-1" style="color:var(--muted)">Start Year</p>
         <input type="number" value="${startCal}" min="1990" max="2060" class="si mono text-sm"
-          oninput="US_EMIS[${i}].startCalYear=parseInt(this.value)||2026;US_rEMI();US_sumExp();US_rc();US_sv()"></div>
+          id="us_emi_syr_${i}"
+          oninput="US_EMIS[${i}].startCalYear=parseInt(this.value)||2026;US_emiUpdStatus(${i});US_sumExp();US_rc();US_sv()"></div>
       <div><p class="text-xs font-medium mb-1" style="color:var(--muted)">Term (years)</p>
         <input type="number" value="${e.yrs||30}" min="1" max="50" class="si mono text-sm"
-          oninput="US_EMIS[${i}].yrs=parseInt(this.value)||1;US_rEMI();US_rc();US_sv()"></div>
+          id="us_emi_yrs_${i}"
+          oninput="US_EMIS[${i}].yrs=parseInt(this.value)||1;US_emiUpdStatus(${i});US_rc();US_sv()"></div>
     </div>
-    ${statusHtml}
+    <div id="us_emi_status_${i}">${statusHtml}</div>
     <div class="flex items-center gap-2 pt-1">
       <label class="flex items-center gap-2 cursor-pointer">
         <input type="checkbox" class="w-4 h-4 cursor-pointer" style="accent-color:var(--blue)" ${isHome?'checked':''}
@@ -1951,16 +1958,16 @@ function US_rEMI(){
           oninput="US_hi(this);US_EMIS[${i}].homeVal=parseFloat(this.value.replace(/,/g,''))||0;US_rc();US_sv()"></div>
       <div><p class="text-xs font-medium mb-1" style="color:var(--blue)">Original Loan Amount ($)</p>
         <input type="text" value="${e.loanAmt?e.loanAmt.toLocaleString('en-US'):''}" placeholder="0" class="si mono text-sm"
-          oninput="US_hi(this);US_EMIS[${i}].loanAmt=parseFloat(this.value.replace(/,/g,''))||0;US_rEMI();US_rc();US_sv()"></div>
+          oninput="US_hi(this);US_EMIS[${i}].loanAmt=parseFloat(this.value.replace(/,/g,''))||0;US_emiUpdStatus(${i});US_rc();US_sv()"></div>
       <div><p class="text-xs font-medium mb-1" style="color:var(--blue)">Annual Interest Rate (%)</p>
         <input type="number" value="${e.mortRate||6.5}" min="0" max="20" step="0.1" class="si mono text-sm"
-          oninput="US_EMIS[${i}].mortRate=parseFloat(this.value)||0;US_rEMI();US_rc();US_sv()"></div>
+          oninput="US_EMIS[${i}].mortRate=parseFloat(this.value)||0;US_emiUpdStatus(${i});US_rc();US_sv()"></div>
       <div><p class="text-xs font-medium mb-1" style="color:var(--blue)">Home Appreciation (%/yr)</p>
         <input type="number" value="${e.appRate||3}" min="0" max="20" step="0.1" class="si mono text-sm"
           oninput="US_EMIS[${i}].appRate=parseFloat(this.value)||0;US_rc();US_sv()"></div>
     </div>`:''}
     <div class="flex justify-between items-center pt-1">
-      <span class="text-xs" style="color:var(--faint)">${startCal} → ${endCal}
+      <span class="text-xs" style="color:var(--faint)" id="us_emi_footer_${i}">${startCal} → ${endCal}
         <span class="pill ml-1" style="background:var(--green-lt);color:var(--green)">✓ Surplus ↑ after ${endCal}</span>
       </span>
       <button onclick="US_EMIS.splice(${i},1);US_rEMI();US_sumExp();US_rc();US_sv()" class="text-sm font-semibold" style="color:var(--rose)">Remove</button>
@@ -1968,6 +1975,26 @@ function US_rEMI(){
     c.appendChild(div);
   });
   setText('us_emiTot',US_fmt(US_EMIS.reduce((s,e)=>s+(e.emi||0),0)));
+}
+
+// ── US EMI targeted status updater (no DOM rebuild = no cursor loss) ──
+function US_emiUpdStatus(i){
+  const e=US_EMIS[i];
+  const startCal=e.startCalYear||2026;
+  const endCal=US_emiEndCalYear(e);
+  const yrsAlready=US_emiYearsAlreadyPaid(e);
+  const yrsRemaining=Math.max(0,(e.yrs||30)-yrsAlready);
+  const mortRate=e.mortRate||6.5;
+  const remBal=e.loanAmt?US_remainingBalance(e.loanAmt,mortRate,e.yrs||30,yrsAlready):0;
+  const startedPast=startCal<2026, startedFuture=startCal>2026;
+  let statusHtml='';
+  if(startedPast) statusHtml=`<div class="grid grid-cols-3 gap-3 px-1 py-2 rounded-lg text-center" style="background:var(--bg)"><div><p class="text-xs" style="color:var(--faint)">Yrs already paid</p><p class="mono text-sm font-bold" style="color:var(--muted)">${yrsAlready} yrs</p></div><div><p class="text-xs" style="color:var(--faint)">Remaining balance</p><p class="mono text-sm font-bold" style="color:var(--orange)">${remBal?'~$'+Math.round(remBal).toLocaleString('en-US'):'—'}</p></div><div><p class="text-xs" style="color:var(--faint)">Yrs remaining</p><p class="mono text-sm font-bold" style="color:var(--blue)">${yrsRemaining} yrs</p></div></div>`;
+  else if(startedFuture) statusHtml=`<p class="text-xs px-1" style="color:var(--indigo)">⏳ Starts in ${startCal-2026} year(s) (${startCal})</p>`;
+  else statusHtml=`<p class="text-xs px-1" style="color:var(--green)">● Active now · started ${startCal}</p>`;
+  const statusEl=document.getElementById('us_emi_status_'+i);
+  const footerEl=document.getElementById('us_emi_footer_'+i);
+  if(statusEl) statusEl.innerHTML=statusHtml;
+  if(footerEl) footerEl.innerHTML=`${startCal} → ${endCal}<span class="pill ml-1" style="background:var(--green-lt);color:var(--green)">✓ Surplus ↑ after ${endCal}</span>`;
 }
 
 // ── US investments ──
@@ -2003,16 +2030,28 @@ function US_rMS(){
   list.innerHTML='';
   US_MS.forEach((m,i)=>{
     const div=document.createElement('div'); div.className='inset p-3 flex items-center gap-3';
-    div.innerHTML=`<div style="width:10px;height:10px;border-radius:99px;background:var(--amber);border:2px solid #fff;box-shadow:0 0 0 2px var(--amber);flex-shrink:0"></div>
-      <div class="flex-1 grid grid-cols-3 gap-2">
-        <input type="text" value="${m.label}" class="si text-sm" style="padding:5px 8px" oninput="US_MS[${i}].label=this.value;US_rFC();US_sv()">
-        <input type="number" value="${m.year}" min="1" max="30" class="si mono text-sm" style="padding:5px 8px" oninput="US_MS[${i}].year=parseInt(this.value)||1;US_rFC();US_sv()">
-        <input type="text" value="${m.amount?m.amount.toLocaleString('en-US'):''}" placeholder="$ Target" class="si mono text-sm" style="padding:5px 8px" oninput="US_hi(this);US_MS[${i}].amount=parseFloat(this.value.replace(/,/g,''))||0;US_rFC();US_sv()">
+    div.className='inset p-4 space-y-2 relative';
+    div.innerHTML=`
+      <div class="flex items-center gap-2 mb-2">
+        <div style="width:10px;height:10px;border-radius:99px;background:var(--amber);border:2px solid #fff;box-shadow:0 0 0 2px var(--amber);flex-shrink:0"></div>
+        <p class="text-xs font-semibold uppercase tracking-widest" style="color:var(--amber)">Milestone ${i+1}</p>
+        <button onclick="US_MS.splice(${i},1);US_rMS();US_rFC();US_sv()" class="ml-auto text-xs font-semibold" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕ Remove</button>
       </div>
-      <button onclick="US_MS.splice(${i},1);US_rMS();US_rFC();US_sv()" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕</button>`;
+      <div><p class="text-xs mb-1" style="color:var(--faint)">Label</p>
+        <input type="text" value="${m.label}" class="si text-sm w-full"
+          oninput="US_MS[${i}].label=this.value;US_sv();US_rFC()"></div>
+      <div class="grid grid-cols-2 gap-2">
+        <div><p class="text-xs mb-1" style="color:var(--faint)">Year (1–30)</p>
+          <input type="number" value="${m.year}" min="1" max="30" class="si mono text-sm w-full"
+            oninput="US_MS[${i}].year=parseInt(this.value)||1;US_sv();US_rFC()"></div>
+        <div><p class="text-xs mb-1" style="color:var(--faint)">$ Target (optional)</p>
+          <input type="text" value="${m.amount?m.amount.toLocaleString('en-US'):''}" placeholder="—" class="si mono text-sm w-full"
+            oninput="US_hi(this);US_MS[${i}].amount=parseFloat(this.value.replace(/,/g,''))||0;US_sv();US_rFC()"></div>
+      </div>`;
     list.appendChild(div);
   });
 }
+function US_msUpdField(i, field, val){ US_MS[i][field]=val; US_sv(); US_rFC(); }
 
 // ── US core recalc ──
 function US_rc(){
