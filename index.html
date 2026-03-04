@@ -1659,7 +1659,8 @@ function IN_rFC(){
     let disp=IN_isAdj?sim.total/Math.pow(1+infRate,yr):sim.total;
     const crFmt=IN_fmtCr(disp);
     const bw=Math.min(97,Math.max(3,(sim.total/max30)*100));
-    const mPills=IN_MS.filter(m=>m.year===yr).map(m=>`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">🎯 ${m.label}${m.amount?' · '+IN_fmt(m.amount):''}</span>`);
+    const prevYr=({5:0,10:5,15:10,20:15,25:20,30:25})[yr]||0;
+    const mPills=IN_MS.filter(m=>m.year>prevYr&&m.year<=yr).map(m=>`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">🎯 ${m.label}${m.year!==yr?` · Yr ${m.year}`:''}${m.amount?' · '+IN_fmt(m.amount):''}</span>`);
     const ePills=[...expEnds].filter(y=>y===yr).map(()=>`<span class="pill" style="background:var(--green-lt);color:var(--green)">✓ Expense ends · surplus ↑</span>`);
     const pills=[...mPills,...ePills].join(' ');
     const uid='infc'+yr;
@@ -1772,7 +1773,7 @@ function IN_rFC_short(){
   const snapshots={};
   for(let yr=0;yr<=10;yr++) snapshots[yr]=IN_sim(yr);
   let html='';
-  const max10=snapshots[10].total||1;
+  const max10=snapshots[10].total||1; // always nominal for consistent bar scaling
   for(let yr=1;yr<=10;yr++){
     const simPrev=snapshots[yr-1], simCurr=snapshots[yr];
     const retPrev=simPrev.retCorpus||0, retCurr=simCurr.retCorpus||0;
@@ -1801,28 +1802,25 @@ function IN_rFC_short(){
     const yrTotal=IN_isAdj?simCurr.total/Math.pow(1+infRate,yr):simCurr.total;
     const prevTotal=IN_isAdj?simPrev.total/Math.pow(1+infRate,Math.max(0,yr-1)):simPrev.total;
     const growth=yrTotal-prevTotal;
-    const bw=Math.min(97,Math.max(2,(yrTotal/max10)*100));
+    // bar always uses nominal total for consistent scaling
+    const bw=Math.min(97,Math.max(2,(simCurr.total/max10)*100));
     const msPills=IN_MS.filter(m=>m.year===yr).map(m=>`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">🎯 ${m.label}</span>`).join(' ');
     html+=`<div style="border-bottom:1px solid var(--border)">
-      <div class="flex items-center gap-3 py-2 px-1" style="cursor:pointer" onclick="const el=document.getElementById('insh${yr}');const open=!el.classList.contains('hidden');el.classList.toggle('hidden');this.querySelector('.sh-arr').textContent=open?'▸':'▾';this.querySelector('.sh-hint').textContent=open?'expand months':'collapse'">
-        <div class="shrink-0 text-center" style="width:52px">
-          <span class="text-xs font-black uppercase tracking-widest" style="color:var(--faint);font-size:9px">Year</span>
-          <p class="mono text-xl font-black leading-none" style="color:var(--text)">${yr}</p>
-        </div>
+      <div class="flex items-center gap-3 py-2 px-1" style="cursor:pointer" onclick="const el=document.getElementById('insh${yr}');const open=!el.classList.contains('hidden');el.classList.toggle('hidden');this.querySelector('.sh-hint').textContent=open?'▸ expand':'▾ collapse'">
+        <div class="mono text-xl font-black shrink-0 text-center" style="width:32px;color:var(--text)">${yr}</div>
         <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <div style="flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden">
-              <div style="height:100%;width:${bw}%;border-radius:99px;background:linear-gradient(to right,var(--teal),var(--indigo));transition:width .4s ease"></div>
-            </div>
-            <span class="text-xs font-semibold shrink-0" style="color:var(--green)">+${IN_fmtCr(growth)}</span>
+          <div style="height:5px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:4px">
+            <div style="height:100%;width:${bw}%;border-radius:99px;background:linear-gradient(to right,var(--teal),var(--indigo));transition:width .4s ease"></div>
           </div>
-          ${msPills?`<div class="flex flex-wrap gap-1">${msPills}</div>`:''}
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-semibold" style="color:var(--green)">+${IN_fmtCr(growth)} this year</span>
+            ${msPills}
+          </div>
         </div>
-        <div class="shrink-0 text-right" style="min-width:100px">
+        <div class="shrink-0 text-right" style="min-width:110px">
           <p class="mono text-base font-black" style="color:var(--teal-dk)">${IN_fmtCr(yrTotal)}${IN_isAdj?` <span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);vertical-align:middle">adj</span>`:''}</p>
-          <span class="sh-hint text-xs" style="color:var(--faint)">expand months</span>
+          <span class="sh-hint text-xs" style="color:var(--faint)">▸ expand</span>
         </div>
-        <span class="sh-arr text-sm shrink-0" style="color:var(--faint)">▸</span>
       </div>
       <div id="insh${yr}" class="hidden overflow-x-auto" style="padding:0 4px 12px 4px">
         <table class="w-full text-left">
@@ -2941,33 +2939,26 @@ function US_rFC_short(){
 
     const prevDispYr=yr>1?(US_isAdj?US_sim(yr-1).total/Math.pow(1+infRate,yr-1):US_sim(yr-1).total):0;
     const yrGrowth=dispYr-prevDispYr;
-    const max10yr=US_sim(10).total||1;
-    const bw=Math.min(97,Math.max(2,(totalYr/max10yr)*100));
+    const max10yr=US_sim(10).total||1; // always nominal for consistent bar scaling
+    const bw=Math.min(97,Math.max(2,(US_sim(yr).total/max10yr)*100));
     html+=`<div style="border-bottom:1px solid var(--border)">
-      <div class="flex items-center gap-3 py-2 px-1" style="cursor:pointer" onclick="const t=document.getElementById('${uid}');const open=!t.classList.contains('hidden');t.classList.toggle('hidden');this.querySelector('.fca').textContent=open?'▸':'▾';this.querySelector('.fca-hint').textContent=open?'expand months':'collapse'">
-        <div class="shrink-0 text-center" style="width:52px">
-          <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--faint)">Year</span>
-          <p class="mono text-xl font-black leading-none" style="color:var(--text)">${yr}</p>
-        </div>
+      <div class="flex items-center gap-3 py-2 px-1" style="cursor:pointer" onclick="const t=document.getElementById('${uid}');const open=!t.classList.contains('hidden');t.classList.toggle('hidden');this.querySelector('.fca-hint').textContent=open?'▸ expand':'▾ collapse'">
+        <div class="mono text-xl font-black shrink-0 text-center" style="width:32px;color:var(--text)">${yr}</div>
         <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <div style="flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden">
-              <div style="height:100%;width:${bw}%;border-radius:99px;background:linear-gradient(to right,var(--blue),var(--purple));transition:width .4s ease"></div>
-            </div>
-            <span class="text-xs font-semibold shrink-0" style="color:var(--green)">+${US_fmtM(yrGrowth)}</span>
+          <div style="height:5px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:4px">
+            <div style="height:100%;width:${bw}%;border-radius:99px;background:linear-gradient(to right,var(--blue),var(--purple));transition:width .4s ease"></div>
           </div>
           <div class="flex items-center gap-2 flex-wrap" style="font-size:10px">
-            <span style="color:var(--blue)">Surplus <strong>${surplusMo>=0?'':'-'}${US_fmt(Math.abs(Math.round(surplusMo)))}/mo</strong></span>
+            <span class="font-semibold" style="color:var(--green)">+${US_fmtM(yrGrowth)} this year</span>
             ${retCorpusYr>0?`<span style="color:var(--faint)">·</span><span style="color:var(--teal)">Ret ${US_fmtM(retCorpusYr)}</span>`:''}
             ${homeEquityYr>0?`<span style="color:var(--faint)">·</span><span style="color:var(--orange)">Eq ${US_fmtM(homeEquityYr)}</span>`:''}
             ${pills?`<span style="color:var(--faint)">·</span>${pills}`:''}
           </div>
         </div>
-        <div class="shrink-0 text-right" style="min-width:100px">
+        <div class="shrink-0 text-right" style="min-width:110px">
           <p class="mono text-base font-black" style="color:var(--blue-dk)">${US_fmtM(dispYr)}${US_isAdj?` <span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);vertical-align:middle">adj</span>`:''}</p>
-          <span class="fca-hint text-xs" style="color:var(--faint)">expand months</span>
+          <span class="fca-hint text-xs" style="color:var(--faint)">▸ expand</span>
         </div>
-        <span class="fca text-sm shrink-0" style="color:var(--faint)">▸</span>
       </div>
       <div id="${uid}" class="hidden" style="padding:0 4px 12px 4px;overflow-x:auto">
         <table class="w-full text-left" style="min-width:780px">
@@ -3008,7 +2999,8 @@ function US_rFC(){
     let disp=US_isAdj?sim.total/Math.pow(1+infRate,yr):sim.total;
     const mFmt=US_fmtM(disp);
     const bw=Math.min(97,Math.max(3,(sim.total/max30)*100));
-    const mPills=US_MS.filter(ms=>ms.year===yr).map(ms=>`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">🎯 ${ms.label}${ms.amount?' · '+US_fmt(ms.amount):''}</span>`);
+    const prevYrUS=({5:0,10:5,15:10,20:15,25:20,30:25})[yr]||0;
+    const mPills=US_MS.filter(ms=>ms.year>prevYrUS&&ms.year<=yr).map(ms=>`<span class="pill" style="background:var(--amber-lt);color:var(--amber)">🎯 ${ms.label}${ms.year!==yr?` · Yr ${ms.year}`:''}${ms.amount?' · '+US_fmt(ms.amount):''}</span>`);
     const ePills=[...expEnds].filter(y=>y===yr).map(()=>`<span class="pill" style="background:var(--green-lt);color:var(--green)">✓ Expense ends · surplus ↑</span>`);
     const pills=[...mPills,...ePills].join(' ');
     const uid='fc'+yr;
