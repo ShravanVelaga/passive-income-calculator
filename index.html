@@ -257,7 +257,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
       <ul style="list-style:none;margin-bottom:24px">
         <li style="font-size:13px;color:var(--muted);padding:4px 0;display:flex;align-items:center;gap:8px"><span style="color:var(--blue);font-family:'DM Mono',monospace;font-weight:700">→</span>Federal + FICA + state taxes</li>
         <li style="font-size:13px;color:var(--muted);padding:4px 0;display:flex;align-items:center;gap:8px"><span style="color:var(--blue);font-family:'DM Mono',monospace;font-weight:700">→</span>401k retirement planning</li>
-        <li style="font-size:13px;color:var(--muted);padding:4px 0;display:flex;align-items:center;gap:8px"><span style="color:var(--blue);font-family:'DM Mono',monospace;font-weight:700">→</span>HYSA · Index Fund · Brokerage</li>
+        <li style="font-size:13px;color:var(--muted);padding:4px 0;display:flex;align-items:center;gap:8px"><span style="color:var(--blue);font-family:'DM Mono',monospace;font-weight:700">→</span>Debt Instruments · SIP (S&P 500 etc.)</li>
         <li style="font-size:13px;color:var(--muted);padding:4px 0;display:flex;align-items:center;gap:8px"><span style="color:var(--blue);font-family:'DM Mono',monospace;font-weight:700">→</span>Home equity tracking</li>
       </ul>
       <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:8px 18px;border-radius:8px;border:1.5px solid var(--blue);color:var(--blue);letter-spacing:.04em;text-transform:uppercase;transition:all .2s;background:transparent" onmouseover="this.style.background='var(--blue)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='var(--blue)'">Enter USA →</span>
@@ -822,7 +822,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
       <p class="text-sm font-semibold opacity-80 uppercase tracking-widest" id="us_sLbl">Monthly Surplus</p>
       <span class="tip-wrap" style="position:relative">
         <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:99px;font-size:10px;font-weight:700;background:rgba(255,255,255,.25);color:#fff;cursor:help">ⓘ</span>
-        <span class="tip-box" style="color:#1C1917">Total take-home after federal tax, state tax, FICA, pre-tax deductions, and expenses. This is what's left to invest each month. The Brokerage and Index Fund boxes show the split based on your reinvestment sliders.</span>
+        <span class="tip-box" style="color:#1C1917">Total take-home after federal tax, state tax, FICA, pre-tax deductions, and expenses. This is what's left to invest each month. The Debt Instruments and SIP boxes show the split based on your reinvestment sliders.</span>
       </span>
     </div>
     <div class="my-4">
@@ -831,11 +831,11 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div class="rounded-xl p-3 text-center" style="background:rgba(255,255,255,.15)">
-        <p class="text-xs font-semibold opacity-75 uppercase tracking-wider mb-1">To Brokerage</p>
+        <p class="text-xs font-semibold opacity-75 uppercase tracking-wider mb-1">To Debt Instruments</p>
         <p class="mono text-base font-bold" id="us_fdV">$0</p>
       </div>
       <div class="rounded-xl p-3 text-center" style="background:rgba(255,255,255,.15)">
-        <p class="text-xs font-semibold opacity-75 uppercase tracking-wider mb-1">To Index Fund</p>
+        <p class="text-xs font-semibold opacity-75 uppercase tracking-wider mb-1">To SIP</p>
         <p class="mono text-base font-bold" id="us_sipV">$0</p>
       </div>
     </div>
@@ -927,7 +927,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
         <select id="us_catSel" class="si" style="max-width:220px">
           <option value="5.0">HYSA / Money Market (5%)</option>
           <option value="7.0">Bonds / CD (4-7%)</option>
-          <option value="10.0">Index Fund S&amp;P500 (10%)</option>
+          <option value="10.0">SIP / S&amp;P 500 (10%)</option>
           <option value="3.0">Rental Property (3%)</option>
           <option value="0.0">Custom Asset</option>
         </select>
@@ -971,19 +971,19 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
 <!-- TAB: FORECAST -->
 <div id="us_tp-forecast" class="tp space-y-5">
   <div class="card p-6 accent-teal">
-    <p class="sl tip-wrap mb-5">Reinvestment Strategy<span class="tip-icon">ⓘ</span><span class="tip-box">This controls where your monthly surplus goes. Split it between Brokerage (HYSA/bonds, safer) and Index Fund (S&P 500 etc, higher long-term return). The sliders always sum to 100% of the surplus allocated to investing.</span></p>
+    <p class="sl tip-wrap mb-5">Reinvestment Strategy<span class="tip-icon">ⓘ</span><span class="tip-box">This controls where your monthly surplus goes. Split it between Debt Instruments (CDs, HYSA, bonds — safer) and SIP (S&P 500 etc. — higher long-term return). The sliders always sum to 100% of the surplus allocated to investing.</span></p>
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-5">
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Index Fund Returns %/yr</p><input type="number" id="us_sipRet" value="10" min="1" max="30" oninput="US_rc();US_sv()" class="si mono"></div>
-      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Brokerage/HYSA Rate %/yr</p><input type="number" id="us_fdRt" value="5" min="1" max="15" oninput="US_rc();US_sv()" class="si mono"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Debt Instruments (CDs, HYSA etc.) Rate %/yr</p><input type="number" id="us_fdRt" value="5" min="1" max="15" oninput="US_rc();US_sv()" class="si mono"></div>
+      <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">SIP (S&P 500 etc.) Returns %/yr</p><input type="number" id="us_sipRet" value="10" min="1" max="30" oninput="US_rc();US_sv()" class="si mono"></div>
       <div><p class="text-sm font-medium mb-1.5" style="color:var(--rose)">Inflation %/yr</p><input type="number" id="us_infR" value="3" min="1" max="15" oninput="US_rc();US_sv()" class="si mono"></div>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
       <div>
-        <div class="flex justify-between mb-2"><p class="text-sm font-medium" style="color:var(--indigo)">Brokerage Split</p><p class="mono text-sm font-bold" style="color:var(--indigo)" id="us_fdLbl">50%</p></div>
+        <div class="flex justify-between mb-2"><p class="text-sm font-medium" style="color:var(--indigo)">Debt Instruments Split</p><p class="mono text-sm font-bold" style="color:var(--indigo)" id="us_fdLbl">50%</p></div>
         <input type="range" id="us_fdRng" min="0" max="100" value="50" oninput="US_vs('fd');US_rc();US_sv()" class="w-full" style="background:linear-gradient(to right,var(--indigo) 50%,var(--border) 50%)">
       </div>
       <div>
-        <div class="flex justify-between mb-2"><p class="text-sm font-medium" style="color:var(--teal)">Index Fund Split</p><p class="mono text-sm font-bold" style="color:var(--teal)" id="us_sipLbl">50%</p></div>
+        <div class="flex justify-between mb-2"><p class="text-sm font-medium" style="color:var(--teal)">SIP Split</p><p class="mono text-sm font-bold" style="color:var(--teal)" id="us_sipLbl">50%</p></div>
         <input type="range" id="us_sipRng" min="0" max="100" value="50" oninput="US_vs('sip');US_rc();US_sv()" class="w-full" style="background:linear-gradient(to right,var(--teal) 50%,var(--border) 50%)">
       </div>
     </div>
@@ -1621,6 +1621,8 @@ function IN_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=1,jobLossReentr
   // get initial retirement corpus from any pre-seeded balance in deductions (simple: assume 0 start)
   let cFD=lump,cSIP=0,s1=b1base,s2=b2base;
   let totalFDContrib=0,totalSIPContrib=0;
+  let cFDpeakBeforeDed=0,cSIPpeakBeforeDed=0;
+  let totalFDDed=0,totalSIPDed=0;
   let homeEquity=0;
   for(let yr=1;yr<=years;yr++){
     // job loss logic
@@ -1651,7 +1653,10 @@ function IN_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=1,jobLossReentr
     cSIP=(cSIP+mSIP*12)*(1+sipRt);
     // Apply life event deductions: drain debt (FD) first, then equity (SIP)
     if(!skipLE){const leDed=IN_LE.filter(e=>e.deduct&&e.year===yr).reduce((s,e)=>s+(e.amount||0),0);
-    if(leDed>0){const fromFD=Math.min(cFD,leDed);cFD=Math.max(0,cFD-fromFD);const remaining=leDed-fromFD;cSIP=Math.max(0,cSIP-remaining);}}
+    if(leDed>0){
+      cFDpeakBeforeDed=cFD; cSIPpeakBeforeDed=cSIP; // capture pre-deduction peak
+      const fromFD=Math.min(cFD,leDed);const fromSIP=Math.min(Math.max(0,cSIP),leDed-fromFD);
+      totalFDDed+=fromFD;totalSIPDed+=fromSIP;cFD=Math.max(0,cFD-fromFD);cSIP=Math.max(0,cSIP-fromSIP);}}
     // EPF/NPS: total deduction % on each salary, compounded monthly at retRt
     const retContrib1=(aff1&&inLoss)?0:d1;
     const retContrib2=(aff2&&inLoss)?0:d2;
@@ -1663,6 +1668,7 @@ function IN_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=1,jobLossReentr
   return{
     total:cFD+cSIP+totP+retCorpus+homeEquity,
     cFD,cSIP,retCorpus,homeEquity,
+    totalFDDed,totalSIPDed,
     fdPrincipal:lump, fdContrib:totalFDContrib,
     sipContrib:totalSIPContrib,
     fdRt,sipRt,totP,assetFV:totP,
@@ -1690,11 +1696,11 @@ function IN_rFC(){
     const ePills=[...expEnds].filter(y=>y===yr).map(()=>`<span class="pill" style="background:var(--green-lt);color:var(--green)">✓ Expense ends · surplus ↑</span>`);
     const pills=[...mPills,...ePills].join(' ');
     const uid='infc'+yr;
-    // True compound growth: run sim without life event deductions to isolate earnings from spending
-    const simClean=IN_sim(yr,0,0,0,'none',1,100,true/*skipLE*/);
-    const fdGain=simClean.cFD-(fdPrincipal+fdContrib);
-    const sipGain=simClean.cSIP-sipContrib;
-    // Life events in this 5-year window only (for deduction section)
+    // True growth = post-deduction balance + what was cashed out - contributions
+    const {totalFDDed,totalSIPDed}=sim;
+    const fdGain=(cFD+totalFDDed)-(fdPrincipal+fdContrib);
+    const sipGain=(cSIP+totalSIPDed)-sipContrib;
+    // Life events in this 5-year window only
     const leWindow=IN_LE.filter(e=>e.deduct&&e.year>prevYr&&e.year<=yr);
     const leCumDed=leWindow.reduce((s,e)=>s+(e.amount||0),0);
     const totalPrincipal=(fdPrincipal+fdContrib)+sipContrib;
@@ -1741,14 +1747,14 @@ function IN_rFC(){
             <td class="py-2 pl-2 text-xs" style="color:var(--muted)">🏦 FD / Savings <span style="color:var(--faint)">(${fdPct}% surplus)</span></td>
             <td class="py-2 mono text-xs text-right" style="color:var(--muted)">${IN_fmt(fdPrincipal+fdContrib)}<br><span style="color:var(--faint);font-size:10px">${IN_fmt(fdPrincipal)} start + ${IN_fmt(fdContrib)} added</span></td>
             <td class="py-2 mono text-xs text-right font-semibold" style="color:var(--green)">+${IN_fmtCr(Math.max(0,fdGain))}<br><span style="font-size:10px;color:var(--faint)">earned (before spending)</span></td>
-            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--indigo)">${IN_fmtCr(cFD)}${leCumDed>0?'<br><span style="font-size:10px;color:var(--rose)">after cash-out</span>':''}</td>
+            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--indigo)">${IN_fmtCr(cFD)}${totalFDDed>0?'<br><span style="font-size:10px;color:var(--rose)">−'+IN_fmtCr(totalFDDed)+' cash-out</span>':''}</td>
             <td class="py-2 mono text-xs text-right" style="color:var(--faint)">${fdRtPct}%/yr</td>
           </tr>`:''}
           ${sipPct>0?`<tr style="border-bottom:1px dashed var(--border)">
             <td class="py-2 pl-2 text-xs" style="color:var(--muted)">📈 SIP / Equity <span style="color:var(--faint)">(${sipPct}% surplus)</span></td>
             <td class="py-2 mono text-xs text-right" style="color:var(--muted)">${IN_fmt(sipContrib)}<br><span style="color:var(--faint);font-size:10px">₹0 start + ${IN_fmt(sipContrib)} added</span></td>
             <td class="py-2 mono text-xs text-right font-semibold" style="color:var(--green)">+${IN_fmtCr(Math.max(0,sipGain))}<br><span style="font-size:10px;color:var(--faint)">earned (before spending)</span></td>
-            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--purple)">${IN_fmtCr(cSIP)}${leCumDed>0?'<br><span style="font-size:10px;color:var(--rose)">after cash-out</span>':''}</td>
+            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--purple)">${IN_fmtCr(cSIP)}${totalSIPDed>0?'<br><span style="font-size:10px;color:var(--rose)">−'+IN_fmtCr(totalSIPDed)+' cash-out (FD exhausted)</span>':''}</td>
             <td class="py-2 mono text-xs text-right" style="color:var(--faint)">${sipRtPct}%/yr</td>
           </tr>`:''}
           ${retRows}
@@ -2825,11 +2831,13 @@ function US_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=0,jobLossReentr
   const ss1Ex=document.getElementById('us_ss1Exempt').checked;
   const ss2Ex=document.getElementById('us_ss2Exempt').checked;
   const {totP,ty}=US_getAssets(b1,b2);
-  // cFD = Brokerage/HYSA bucket: starts at lump (scenario injection) only.
+  // cFD = Debt Instruments (CDs, HYSA etc.) bucket: starts at lump (scenario injection) only.
   // Investment Matrix assets (totP) are separate — their yield flows through ty into surplus.
-  // They are NOT re-seeded into the Brokerage bucket to avoid double-counting.
+  // They are NOT re-seeded into the Debt Instruments bucket to avoid double-counting.
   let cFD=lump, cSIP=0;
   let totalFDContrib=0, totalSIPContrib=0;
+  let cFDpeakBeforeDed=0,cSIPpeakBeforeDed=0;
+  let totalFDDed=0,totalSIPDed=0;
   let s1=b1,s2=b2;
   // Track base salaries separately from job-loss-adjusted salaries
   let base1=b1,base2=b2;
@@ -2868,9 +2876,12 @@ function US_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=0,jobLossReentr
     totalFDContrib+=mFD*12; totalSIPContrib+=mSIP*12;
     cFD=cFD+fdNetInterest+mFD*12;
     cSIP=(cSIP+mSIP*12)*(1+sipRt);
-    // Apply life event deductions: drain debt (HYSA/Brokerage) first, then equity (Index Fund)
+    // Apply life event deductions: drain Debt Instruments first, then SIP (S&P 500 etc.)
     if(!skipLE){const leDed=US_LE.filter(e=>e.deduct&&e.year===yr).reduce((s,e)=>s+(e.amount||0),0);
-    if(leDed>0){const fromFD=Math.min(cFD,leDed);cFD=Math.max(0,cFD-fromFD);const remaining=leDed-fromFD;cSIP=Math.max(0,cSIP-remaining);}}
+    if(leDed>0){
+      cFDpeakBeforeDed=cFD; cSIPpeakBeforeDed=cSIP; // capture pre-deduction peak
+      const fromFD=Math.min(cFD,leDed);const fromSIP=Math.min(Math.max(0,cSIP),leDed-fromFD);
+      totalFDDed+=fromFD;totalSIPDed+=fromSIP;cFD=Math.max(0,cFD-fromFD);cSIP=Math.max(0,cSIP-fromSIP);}}
   }
   const retCorpus=US_retTotalAt(years);
   const assetRate=totP>0?(ty/totP):0;
@@ -2878,6 +2889,7 @@ function US_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=0,jobLossReentr
   return{
     total:cFD+cSIP+retCorpus+totP+homeEquity,
     cFD, cSIP, retCorpus,
+    totalFDDed,totalSIPDed,
     fdPrincipal:lump, fdContrib:totalFDContrib,
     sipContrib:totalSIPContrib,
     fdRt, sipRt, totP, assetFV:totP,
@@ -3048,8 +3060,8 @@ function US_rFC_short(){
             <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--rose)">− Expenses</th>
             <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--orange)">− Loans</th>
             <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--blue)">= Surplus</th>
-            <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--muted)">HYSA</th>
-            <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--purple)">Index Fund</th>
+            <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--muted)">Debt Inst.</th>
+            <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--purple)">SIP</th>
             <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--teal)">Retirement</th>
             <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--orange)">Home Equity</th>
             <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--blue-dk)">Total Wealth${US_isAdj?' <span style="font-size:9px;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);font-weight:700;text-transform:uppercase;vertical-align:middle">Infl. Adj</span>':''}</th>
@@ -3086,10 +3098,10 @@ function US_rFC(){
     const uid='fc'+yr;
 
     // Build itemized rows
-    // True growth: run clean sim (no LE deductions) to separate compound earnings from spending
-    const simCleanUS=US_sim(yr,0,0,0,'none',0,100,true/*skipLE*/);
-    const fdGain=simCleanUS.cFD-(fdPrincipal+fdContrib);
-    const sipGain=simCleanUS.cSIP-sipContrib;
+    // True growth = post-deduction balance + what was cashed out - contributions
+    const {totalFDDed,totalSIPDed}=sim;
+    const fdGain=(cFD+totalFDDed)-(fdPrincipal+fdContrib);
+    const sipGain=(cSIP+totalSIPDed)-sipContrib;
     // Life events in this 5-year window only
     const leWindow=US_LE.filter(e=>e.deduct&&e.year>prevYrUS&&e.year<=yr);
     const leCumDed=leWindow.reduce((s,e)=>s+(e.amount||0),0);
@@ -3156,23 +3168,23 @@ function US_rFC(){
         </tr></thead>
         <tbody>
           ${fdP>0?`<tr style="border-bottom:1px dashed var(--border)">
-            <td class="py-1.5 pl-2 text-xs" style="color:var(--muted)">🏦 Brokerage / HYSA <span style="color:var(--faint)">(${fdP}% surplus)</span></td>
+            <td class="py-1.5 pl-2 text-xs" style="color:var(--muted)">🏦 Debt Instruments (CDs, HYSA etc.) <span style="color:var(--faint)">(${fdP}% surplus)</span></td>
             <td class="py-1.5 mono text-xs text-right" style="color:var(--muted)">${US_fmt(fdPrincipal+fdContrib)}<br><span style="color:var(--faint);font-size:10px">${US_fmt(fdPrincipal)} start + ${US_fmt(fdContrib)} added</span></td>
             <td class="py-1.5 mono text-xs text-right font-semibold" style="color:var(--green)">+${US_fmtM(Math.max(0,fdGain))}<br><span style="font-size:10px;color:var(--faint)">earned (before spending)</span></td>
-            <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--blue)">${US_fmtM(cFD)}${leCumDed>0?'<br><span style="font-size:10px;color:var(--rose)">after cash-out</span>':''}</td>
+            <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--blue)">${US_fmtM(cFD)}${totalFDDed>0?'<br><span style="font-size:10px;color:var(--rose)">−'+US_fmtM(totalFDDed)+' cash-out</span>':''}</td>
             <td class="py-1.5 mono text-xs text-right" style="color:var(--faint)">${fdRtPct}%/yr</td>
           </tr>`:''}
           ${sipP>0?`<tr style="border-bottom:1px dashed var(--border)">
-            <td class="py-1.5 pl-2 text-xs" style="color:var(--muted)">📈 Index Fund <span style="color:var(--faint)">(${sipP}% surplus)</span></td>
+            <td class="py-1.5 pl-2 text-xs" style="color:var(--muted)">📈 SIP (S&P 500 etc.) <span style="color:var(--faint)">(${sipP}% surplus)</span></td>
             <td class="py-1.5 mono text-xs text-right" style="color:var(--muted)">${US_fmt(sipContrib)}<br><span style="color:var(--faint);font-size:10px">$0 start + ${US_fmt(sipContrib)} added</span></td>
             <td class="py-1.5 mono text-xs text-right font-semibold" style="color:var(--green)">+${US_fmtM(Math.max(0,sipGain))}<br><span style="font-size:10px;color:var(--faint)">earned (before spending)</span></td>
-            <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--purple)">${US_fmtM(cSIP)}${leCumDed>0?'<br><span style="font-size:10px;color:var(--rose)">after cash-out</span>':''}</td>
+            <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--purple)">${US_fmtM(cSIP)}${totalSIPDed>0?'<br><span style="font-size:10px;color:var(--rose)">−'+US_fmtM(totalSIPDed)+' cash-out (Debt Instruments exhausted)</span>':''}</td>
             <td class="py-1.5 mono text-xs text-right" style="color:var(--faint)">${sipRtPct}%/yr</td>
           </tr>`:''}
           ${retRows}
           ${assetRow}
           ${homeRows}
-          ${(()=>{if(!leWindow.length)return'';const totalDed=leCumDed;return'<tr style="border-top:1.5px solid var(--rose);background:var(--rose-lt)"><td colspan="5" class="py-1.5 pl-2 text-xs font-semibold" style="color:var(--rose)">💸 Spent this period — Yr '+(prevYrUS+1)+' to '+yr+'</td></tr>'+leWindow.map(e=>{const t=US_LE_TYPES.find(x=>x.val===e.type)||{icon:"📌"};return'<tr style="border-bottom:1px dashed var(--border);background:var(--rose-lt)"><td class="py-1.5 pl-4 text-xs" style="color:var(--rose)">'+t.icon+' '+e.label+' <span style="color:var(--faint);font-size:10px">(Yr '+e.year+' · liquidated from HYSA first, then Index Fund)</span></td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">—</td><td class="py-1.5 mono text-xs text-right font-semibold" style="color:var(--rose)">−'+US_fmtM(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--rose)">−'+US_fmtM(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">cash out</td></tr>';}).join('')+(leWindow.length>1?'<tr style="background:var(--rose-lt)"><td class="py-1 pl-2 text-xs font-bold" style="color:var(--rose)">Subtotal this period</td><td colspan="2"></td><td class="py-1 mono text-xs text-right font-black" style="color:var(--rose)">−'+US_fmtM(totalDed)+'</td><td></td></tr>':'');})()}
+          ${(()=>{if(!leWindow.length)return'';const totalDed=leCumDed;return'<tr style="border-top:1.5px solid var(--rose);background:var(--rose-lt)"><td colspan="5" class="py-1.5 pl-2 text-xs font-semibold" style="color:var(--rose)">💸 Spent this period — Yr '+(prevYrUS+1)+' to '+yr+'</td></tr>'+leWindow.map(e=>{const t=US_LE_TYPES.find(x=>x.val===e.type)||{icon:"📌"};return'<tr style="border-bottom:1px dashed var(--border);background:var(--rose-lt)"><td class="py-1.5 pl-4 text-xs" style="color:var(--rose)">'+t.icon+' '+e.label+' <span style="color:var(--faint);font-size:10px">(Yr '+e.year+' · liquidated from Debt Instruments first, then SIP)</span></td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">—</td><td class="py-1.5 mono text-xs text-right font-semibold" style="color:var(--rose)">−'+US_fmtM(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--rose)">−'+US_fmtM(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">cash out</td></tr>';}).join('')+(leWindow.length>1?'<tr style="background:var(--rose-lt)"><td class="py-1 pl-2 text-xs font-bold" style="color:var(--rose)">Subtotal this period</td><td colspan="2"></td><td class="py-1 mono text-xs text-right font-black" style="color:var(--rose)">−'+US_fmtM(totalDed)+'</td><td></td></tr>':'');})()}
         </tbody>
         <tfoot>
           <tr style="border-top:2px solid var(--border);background:var(--bg)">
