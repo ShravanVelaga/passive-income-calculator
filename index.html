@@ -366,6 +366,32 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
       </div>
     </div>
   </div>
+  <!-- Income Breakdown Panel -->
+  <div class="card p-0 overflow-hidden" id="in_bdPanel" style="border:1px solid var(--border)">
+    <button onclick="IN_togBD()" class="w-full flex items-center justify-between px-4 py-3 np" style="background:var(--bg-2);border-bottom:1px solid var(--border)" id="in_bdBtn">
+      <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--muted)">▶ Income Breakdown</span>
+      <span class="text-xs font-semibold" style="color:var(--faint)" id="in_bdHint">click to expand</span>
+    </button>
+    <div id="in_bdContent" class="hidden">
+      <div class="grid grid-cols-1 sm:grid-cols-2 divide-x" style="border-color:var(--border)">
+        <!-- Spouse 1 -->
+        <div class="p-4 space-y-1">
+          <p class="text-xs font-black uppercase tracking-widest mb-3" style="color:var(--indigo)">Spouse 1</p>
+          <div id="in_bd1"></div>
+        </div>
+        <!-- Spouse 2 -->
+        <div class="p-4 space-y-1">
+          <p class="text-xs font-black uppercase tracking-widest mb-3" style="color:var(--teal)">Spouse 2</p>
+          <div id="in_bd2"></div>
+        </div>
+      </div>
+      <!-- Combined footer -->
+      <div class="px-4 py-3" style="border-top:1px solid var(--border);background:var(--bg-2)">
+        <p class="text-xs font-black uppercase tracking-widest mb-2" style="color:var(--muted)">Combined</p>
+        <div id="in_bdCombined"></div>
+      </div>
+    </div>
+  </div>
   <div class="hero-s p-6 flex flex-col justify-between text-white" id="in_sCard">
     <div class="flex items-center gap-2">
       <p class="text-sm font-semibold opacity-80 uppercase tracking-widest" id="in_sLbl">Monthly Surplus</p>
@@ -1560,6 +1586,89 @@ function IN_rLE_render(listId,noneId){
 }
 
 // ── India core recalc ──
+function IN_togBD(){
+  const content=document.getElementById('in_bdContent');
+  const hint=document.getElementById('in_bdHint');
+  const btn=document.getElementById('in_bdBtn').querySelector('span');
+  const open=content.classList.toggle('hidden');
+  hint.textContent=open?'click to expand':'click to collapse';
+  btn.textContent=open?'▶ Income Breakdown':'▼ Income Breakdown';
+}
+
+function IN_bdRow(label,amount,sub,color,isTaxFree){
+  const tfBadge=isTaxFree?'<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:var(--teal-lt);color:var(--teal);font-weight:700;margin-left:4px">TAX FREE</span>':'';
+  const subHtml=sub?'<span style="font-size:10px;color:var(--faint);margin-left:4px">'+sub+'</span>':'';
+  return`<div class="flex justify-between items-baseline py-1" style="border-bottom:1px dashed var(--border)">
+    <span class="text-xs" style="color:var(--muted)">${label}${tfBadge}${subHtml}</span>
+    <span class="mono text-xs font-semibold" style="color:${color||'var(--muted)'}">${IN_fmt(amount)}</span>
+  </div>`;
+}
+
+function IN_bdSep(){
+  return'<div style="border-top:1.5px solid var(--border);margin:6px 0"></div>';
+}
+
+function IN_updBD(b1,b2,s1G,s2G,t1,t2,d1,d2){
+  // Collect per-asset rows
+  const assets1=[], assets2=[];
+  document.querySelectorAll('.in_ar').forEach(r=>{
+    const name=r.querySelector('.in_nm').value||'Asset';
+    const p=parseFloat(r.querySelector('.in_pv').value.replace(/,/g,''))||0;
+    const y=parseFloat(r.querySelector('.in_yv').value)||0;
+    const o=r.querySelector('.in_ov').value;
+    const tf=r.querySelector('.in_tv').checked;
+    const ya=(p*y)/100;
+    if(!p||!y) return;
+    const entry={name,p,y,ya,tf};
+    if(o==='1') assets1.push(entry); else assets2.push(entry);
+  });
+
+  function spouseHTML(base, assets, gross, tax, ded, color){
+    let html='';
+    // Salary row
+    html+=IN_bdRow('Base Salary', base, null, color);
+    // Asset rows
+    assets.forEach(a=>{
+      html+=IN_bdRow(a.name, a.ya, '₹'+IN_fmtShort(a.p)+' @ '+a.y+'%', a.tf?'var(--teal)':'var(--muted)', a.tf);
+    });
+    html+=IN_bdSep();
+    html+=IN_bdRow('Gross (taxable)', gross, null, 'var(--muted)');
+    html+=IN_bdRow('Income Tax', tax, null, 'var(--rose)');
+    if(ded>0) html+=IN_bdRow('Deductions', ded, null, 'var(--amber)');
+    html+=IN_bdSep();
+    html+=`<div class="flex justify-between items-baseline pt-1">
+      <span class="text-xs font-black">Net In-Hand</span>
+      <span class="mono text-sm font-black" style="color:var(--green)">${IN_fmt(gross-tax-ded)}</span>
+    </div>`;
+    return html;
+  }
+
+  document.getElementById('in_bd1').innerHTML=spouseHTML(b1, assets1, s1G, t1, d1, 'var(--indigo)');
+  document.getElementById('in_bd2').innerHTML=spouseHTML(b2, assets2, s2G, t2, d2, 'var(--teal)');
+
+  // Combined
+  const totalGross=s1G+s2G;
+  const totalTax=t1+t2;
+  const totalDed=d1+d2;
+  const totalNet=totalGross-totalTax-totalDed;
+  let cHtml='';
+  cHtml+=`<div class="grid grid-cols-2 sm:grid-cols-4 gap-3">`;
+  cHtml+=`<div class="inset p-2 text-center"><p class="text-xs mb-1" style="color:var(--faint)">Total Gross</p><p class="mono text-xs font-bold" style="color:var(--muted)">${IN_fmt(totalGross)}</p></div>`;
+  cHtml+=`<div class="inset p-2 text-center"><p class="text-xs mb-1" style="color:var(--faint)">Total Tax</p><p class="mono text-xs font-bold" style="color:var(--rose)">−${IN_fmt(totalTax)}</p></div>`;
+  cHtml+=`<div class="inset p-2 text-center"><p class="text-xs mb-1" style="color:var(--faint)">Net Combined</p><p class="mono text-xs font-bold" style="color:var(--green)">${IN_fmt(totalNet)}/yr</p></div>`;
+  cHtml+=`<div class="inset p-2 text-center"><p class="text-xs mb-1" style="color:var(--faint)">Monthly</p><p class="mono text-xs font-bold" style="color:var(--green)">${IN_fmt(totalNet/12)}/mo</p></div>`;
+  cHtml+=`</div>`;
+  document.getElementById('in_bdCombined').innerHTML=cHtml;
+}
+
+// Helper: short format for principal in sub-labels (e.g. ₹20L, ₹1Cr)
+function IN_fmtShort(n){
+  if(n>=10000000) return (n/10000000).toFixed(n%10000000===0?0:1)+'Cr';
+  if(n>=100000) return (n/100000).toFixed(n%100000===0?0:1)+'L';
+  if(n>=1000) return (n/1000).toFixed(n%1000===0?0:1)+'K';
+  return n.toString();
+}
+
 function IN_rc(){
   const b1=gv('in_b1'),b2=gv('in_b2');
   const fdP=gi('in_fdRng')/100, sipP=gi('in_sipRng')/100, sipRt=gn('in_sipRet')/100;
@@ -1574,6 +1683,7 @@ function IN_rc(){
   setText('in_s2g',IN_fmt(s2G)); setText('in_s2t',IN_fmt(t2));
   setText('in_s2d',d2>0?'−'+IN_fmt(d2):'₹0'); setText('in_s2n',IN_fmt(s2G-t2-d2));
   setText('in_s2r',s2G>0?((t2/s2G)*100).toFixed(1)+'%':'0%');
+  IN_updBD(b1,b2,s1G,s2G,t1,t2,d1,d2);
 
   const expMo=IN_totExpMo(1); // yr=1 = current year
   const annSurplus=b1+b2+ty-t1-t2-d1-d2-(expMo*12);
