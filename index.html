@@ -1673,8 +1673,8 @@ function IN_rc(){
   const b1=gv('in_b1'),b2=gv('in_b2');
   const fdP=gi('in_fdRng')/100, sipP=gi('in_sipRng')/100, sipRt=gn('in_sipRet')/100;
   const {totP,s1G,s2G,ty}=IN_getAssets(b1,b2);
-  const t1=IN_calcTax(s1G,b1>0), t2=IN_calcTax(s2G,b2>0);
   const d1=IN_totDed(1,b1), d2=IN_totDed(2,b2);
+  const t1=IN_calcTax(Math.max(0,s1G-d1),b1>0), t2=IN_calcTax(Math.max(0,s2G-d2),b2>0);
   IN_updDedAmts();
 
   setText('in_s1g',IN_fmt(s1G)); setText('in_s1t',IN_fmt(t1));
@@ -1759,12 +1759,12 @@ function IN_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=1,jobLossReentr
     // net after-tax interest rolled back into FD (Option A)
     const fdInterest=cFD*fdRt;
     const fdIntHalf=fdInterest/2;
-    const t1Base=IN_calcTax(s1G,true), t2Base=IN_calcTax(s2G,true);
-    const t1=IN_calcTax(s1G+fdIntHalf,true), t2=IN_calcTax(s2G+fdIntHalf,true);
-    const fdTax=(t1-t1Base)+(t2-t2Base);
-    const fdNetInterest=fdInterest-fdTax;
     const d1=IN_DEDS[1].reduce((a,d)=>a+s1*(d.pct/100),0);
     const d2=IN_DEDS[2].reduce((a,d)=>a+s2*(d.pct/100),0);
+    const t1Base=IN_calcTax(Math.max(0,s1G-d1),true), t2Base=IN_calcTax(Math.max(0,s2G-d2),true);
+    const t1=IN_calcTax(Math.max(0,s1G-d1+fdIntHalf),true), t2=IN_calcTax(Math.max(0,s2G-d2+fdIntHalf),true);
+    const fdTax=(t1-t1Base)+(t2-t2Base);
+    const fdNetInterest=fdInterest-fdTax;
     const expMo=IN_totExpMo(yr);
     const surplus=(s1+s2+ty-t1-t2-d1-d2-(expMo*12))/12+(xI-xE);
     const mFD=Math.max(0,surplus)*fdP, mSIP=Math.max(0,surplus)*sipP;
@@ -2062,7 +2062,8 @@ function IN_rSC(){
 function IN_rIns(){
   const b1=gv('in_b1'),b2=gv('in_b2');
   const{s1G,s2G,ty,totP}=IN_getAssets(b1,b2);
-  const t1=IN_calcTax(s1G,b1>0),t2=IN_calcTax(s2G,b2>0);
+  const d1ins=IN_totDed(1,b1),d2ins=IN_totDed(2,b2);
+  const t1=IN_calcTax(Math.max(0,s1G-d1ins),b1>0),t2=IN_calcTax(Math.max(0,s2G-d2ins),b2>0);
   const expMo=IN_totExpMo(1);
   const surplus=b1+b2+ty-t1-t2-(expMo*12);
   const ins=[];
