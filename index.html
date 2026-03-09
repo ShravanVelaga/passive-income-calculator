@@ -1739,6 +1739,7 @@ function IN_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=1,jobLossReentr
   const retRt=0.085;
   let retCorpus=0;
   // get initial retirement corpus from any pre-seeded balance in deductions (simple: assume 0 start)
+  // s1/s2 track salary: yr=1 uses base, yr=2 uses base*(1+g), etc.
   let cFD=lump,cSIP=0,s1=b1base,s2=b2base;
   let totalFDContrib=0,totalSIPContrib=0;
   let cFDpeakBeforeDed=0,cSIPpeakBeforeDed=0;
@@ -1750,10 +1751,10 @@ function IN_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=1,jobLossReentr
     const inLoss=isPerm||(yr<=jobLossYrs);
     const aff1=jobLoss==='s1'||jobLoss==='s1p'||jobLoss==='both'||jobLoss==='bothp';
     const aff2=jobLoss==='s2'||jobLoss==='s2p'||jobLoss==='both'||jobLoss==='bothp';
-    let sal1=s1*(1+g1), sal2=s2*(1+g2);
-    if(aff1) sal1=inLoss?0:b1base*(1+g1)*yr*(jobLossReentry/100);
-    if(aff2) sal2=inLoss?0:b2base*(1+g2)*yr*(jobLossReentry/100);
-    s1=aff1?sal1:s1*(1+g1); s2=aff2?sal2:s2*(1+g2);
+    // Year 1 uses base salary; growth applies from year 2 onward
+    if(yr>1){ s1=s1*(1+g1); s2=s2*(1+g2); }
+    if(aff1) s1=inLoss?0:b1base*Math.pow(1+g1,yr-1)*(jobLossReentry/100);
+    if(aff2) s2=inLoss?0:b2base*Math.pow(1+g2,yr-1)*(jobLossReentry/100);
     const {s1G,s2G}=IN_getAssets(s1,s2);
     // FD matures annually: interest split equally between spouses, taxed at marginal rate,
     // net after-tax interest rolled back into FD (Option A)
