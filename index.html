@@ -1924,6 +1924,9 @@ function IN_rFC(){
     // Life events in this 5-year window only
     const leWindow=IN_LE.filter(e=>e.deduct&&e.year>prevYr&&e.year<=yr);
     const leCumDed=leWindow.reduce((s,e)=>s+(e.amount||0),0);
+    // Window-scoped cash-out: only show deductions from THIS 5-yr band, not cumulative
+    const windowFDDed=Math.min(totalFDDed,leCumDed);
+    const windowSIPDed=Math.max(0,leCumDed-windowFDDed);
     const totalPrincipal=(fdPrincipal+fdContrib)+sipContrib;
     const totalGain=Math.max(0,disp-totalPrincipal);
     const totalDedsAnn=IN_DEDS[1].reduce((s,d)=>s+gv('in_b1')*(d.pct/100),0)+IN_DEDS[2].reduce((s,d)=>s+gv('in_b2')*(d.pct/100),0);
@@ -1968,14 +1971,14 @@ function IN_rFC(){
             <td class="py-2 pl-2 text-xs" style="color:var(--muted)">🏦 FD / Savings <span style="color:var(--faint)">(${fdPct}% surplus)</span></td>
             <td class="py-2 mono text-xs text-right" style="color:var(--muted)">${IN_fmt(fdPrincipal+fdContrib)}<br><span style="color:var(--faint);font-size:10px">${IN_fmt(fdPrincipal)} opening · ${IN_fmt(fdContrib)} deposited</span></td>
             <td class="py-2 mono text-xs text-right font-semibold" style="color:var(--green)">+${IN_fmtCr(Math.max(0,fdGain))}<br><span style="font-size:10px;color:var(--faint)">gross gain · pre-withdrawal</span></td>
-            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--indigo)">${IN_fmtCr(cFD)}${totalFDDed>0?'<br><span style="font-size:10px;color:var(--rose)">−'+IN_fmtCr(totalFDDed)+' cash-out</span>':''}</td>
+            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--indigo)">${IN_fmtCr(cFD)}${windowFDDed>0?'<br><span style="font-size:10px;color:var(--rose)">−'+IN_fmtCr(windowFDDed)+' cash-out</span>':''}</td>
             <td class="py-2 mono text-xs text-right" style="color:var(--faint)">${fdRtPct}%/yr</td>
           </tr>`:''}
           ${sipPct>0?`<tr style="border-bottom:1px dashed var(--border)">
             <td class="py-2 pl-2 text-xs" style="color:var(--muted)">📈 SIP (Nifty 50, Sensex etc.) <span style="color:var(--faint)">(${sipPct}% surplus)</span></td>
             <td class="py-2 mono text-xs text-right" style="color:var(--muted)">${IN_fmt(sipContrib)}<br><span style="color:var(--faint);font-size:10px">₹0 opening · ${IN_fmt(sipContrib)} deposited</span></td>
             <td class="py-2 mono text-xs text-right font-semibold" style="color:var(--green)">+${IN_fmtCr(Math.max(0,sipGain))}<br><span style="font-size:10px;color:var(--faint)">gross gain · pre-withdrawal</span></td>
-            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--purple)">${IN_fmtCr(cSIP)}${totalSIPDed>0?'<br><span style="font-size:10px;color:var(--rose)">−'+IN_fmtCr(totalSIPDed)+' cash-out (FD exhausted)</span>':''}</td>
+            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--purple)">${IN_fmtCr(cSIP)}${windowSIPDed>0?'<br><span style="font-size:10px;color:var(--rose)">−'+IN_fmtCr(windowSIPDed)+' cash-out (FD exhausted)</span>':''}</td>
             <td class="py-2 mono text-xs text-right" style="color:var(--faint)">${sipRtPct}%/yr</td>
           </tr>`:''}
           ${retRows}
