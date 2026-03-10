@@ -517,7 +517,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
       <table class="w-full at">
         <thead><tr>
           <th class="text-left">Asset</th><th class="text-left">Principal (₹)</th>
-          <th class="text-center">ROI %</th><th class="text-center">Appr %/yr</th><th class="text-left">Owner</th>
+          <th class="text-center">ROI %</th><th class="text-left">Owner</th>
           <th class="text-center">Tax-Free</th><th class="np"></th>
         </tr></thead>
         <tbody id="in_aBody"></tbody>
@@ -567,42 +567,15 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
   </div>
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
     <div class="card p-6 space-y-4">
-      <div><p class="sl tip-wrap">Goal Planner<span class="tip-icon">ⓘ</span><span class="tip-box">Enter a target corpus and timeline. Shows two views: (1) Required SIP from scratch — if you had no savings today, what monthly amount would get you there? (2) Time to goal with your current wealth — given your existing portfolio + monthly surplus, how long until you hit the target?</span></p><p class="text-sm mt-1" style="color:var(--muted)">Target corpus · two ways to look at it</p></div>
+      <div><p class="sl tip-wrap">Goal Planner<span class="tip-icon">ⓘ</span><span class="tip-box">Enter a target amount (e.g. ₹1 Cr for a house down payment) and how many years you have. It calculates the monthly SIP needed and tells you if your current surplus is enough to get there.</span></p><p class="text-sm mt-1" style="color:var(--muted)">How much to invest monthly to hit a target corpus?</p></div>
       <div class="grid grid-cols-2 gap-3">
         <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">Target Corpus (₹)</p><input type="text" id="in_gC" value="0" oninput="IN_hi(this);IN_rcD();IN_sv()" class="si mono"></div>
         <div><p class="text-sm font-medium mb-1.5" style="color:var(--muted)">In (years)</p><input type="number" id="in_gY" value="20" min="1" max="40" oninput="IN_rc();IN_sv()" class="si mono"></div>
       </div>
-      <!-- View A: SIP from scratch -->
-      <div class="inset p-4">
-        <p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color:var(--faint)">① Starting from scratch</p>
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <p class="text-xs mb-1" style="color:var(--muted)">Required Monthly SIP</p>
-            <p class="mono text-xl font-bold" style="color:var(--amber)" id="in_gSIP">₹0</p>
-          </div>
-          <div class="text-right">
-            <p class="text-xs mb-1" style="color:var(--muted)">Your SIP allocation</p>
-            <p class="mono text-xl font-bold" style="color:var(--teal)" id="in_gSIPCurr">₹0</p>
-          </div>
-        </div>
-        <p class="text-sm mt-3 font-medium" id="in_gFeas"></p>
-      </div>
-      <!-- View B: Time to goal with current wealth -->
-      <div class="inset p-4">
-        <p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color:var(--faint)">② With your current wealth + surplus</p>
-        <div class="grid grid-cols-3 gap-2 mb-3" id="in_gWealthGrid">
-          <div class="text-center"><p class="text-xs mb-1" style="color:var(--faint)">Portfolio today</p><p class="mono text-xs font-bold" style="color:var(--muted)" id="in_gPortfolio">₹0</p></div>
-          <div class="text-center"><p class="text-xs mb-1" style="color:var(--faint)">Monthly surplus</p><p class="mono text-xs font-bold" style="color:var(--muted)" id="in_gSurplus">₹0</p></div>
-          <div class="text-center"><p class="text-xs mb-1" style="color:var(--faint)">SIP rate</p><p class="mono text-xs font-bold" style="color:var(--muted)" id="in_gRate">12%</p></div>
-        </div>
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <p class="text-xs mb-1" style="color:var(--muted)">Estimated time to goal</p>
-            <p class="mono text-xl font-bold" id="in_gTime">—</p>
-          </div>
-          <div class="text-right" id="in_gTimeDetail"></div>
-        </div>
-        <p class="text-sm mt-2 font-medium" id="in_gNote"></p>
+      <div class="inset p-4 text-center">
+        <p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color:var(--faint)">Required Monthly SIP</p>
+        <p class="mono text-2xl font-bold" style="color:var(--amber)" id="in_gSIP">₹0</p>
+        <p class="text-sm mt-2 font-medium" id="in_gFeas"></p>
       </div>
     </div>
     <div class="card p-6 space-y-4">
@@ -1522,12 +1495,11 @@ function IN_emiUpdStatus(i){
 
 // ── India investments ──
 function IN_addAssetRow(){ const sel=document.getElementById('in_catSel'); IN_addARow(sel.options[sel.selectedIndex].text.split('(')[0].replace(/—.*/,'').trim(),0,parseFloat(sel.value)); IN_sv(); }
-function IN_addARow(name='Asset',p=0,y=0,o='1',tf=false,appr=0){
+function IN_addARow(name='Asset',p=0,y=0,o='1',tf=false){
   const tr=document.createElement('tr'); tr.className='in_ar';
   tr.innerHTML=`<td><input type="text" value="${name}" class="in_nm bg-transparent text-sm outline-none w-24 italic" style="color:var(--muted)" onchange="IN_sv()"></td>
     <td><input type="text" value="${p.toLocaleString('en-IN')}" class="in_pv bg-transparent border-b mono text-sm font-medium w-28 outline-none" style="border-color:var(--border)" oninput="IN_hi(this);IN_rcD();IN_sv()"></td>
     <td class="text-center"><input type="number" value="${y}" class="in_yv bg-transparent border-b mono text-sm font-medium w-12 outline-none text-center" style="border-color:var(--border);color:var(--teal)" oninput="IN_chkROI(this);IN_rc();IN_sv()"></td>
-    <td class="text-center"><input type="number" value="${appr}" min="0" max="30" step="0.5" class="in_av bg-transparent border-b mono text-sm font-medium w-12 outline-none text-center" style="border-color:var(--border);color:var(--amber)" placeholder="0" oninput="IN_rc();IN_sv()"></td>
     <td><select class="in_ov si text-sm" style="width:auto;padding:5px 8px" onchange="IN_rc();IN_sv()"><option value="1" ${o==='1'?'selected':''}>Spouse 1</option><option value="2" ${o==='2'?'selected':''}>Spouse 2</option></select></td>
     <td class="text-center"><input type="checkbox" class="in_tv w-4 h-4 cursor-pointer" style="accent-color:var(--teal)" ${tf?'checked':''} onchange="IN_rc();IN_sv()"></td>
     <td class="text-right np"><button onclick="this.closest('tr').remove();IN_rc();IN_sv()" style="color:var(--faint)" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--faint)'">✕</button></td>`;
@@ -1701,8 +1673,8 @@ function IN_rc(){
   const b1=gv('in_b1'),b2=gv('in_b2');
   const fdP=gi('in_fdRng')/100, sipP=gi('in_sipRng')/100, sipRt=gn('in_sipRet')/100;
   const {totP,s1G,s2G,ty}=IN_getAssets(b1,b2);
+  const t1=IN_calcTax(s1G,b1>0), t2=IN_calcTax(s2G,b2>0);
   const d1=IN_totDed(1,b1), d2=IN_totDed(2,b2);
-  const t1=IN_calcTax(Math.max(0,s1G-d1),b1>0), t2=IN_calcTax(Math.max(0,s2G-d2),b2>0);
   IN_updDedAmts();
 
   setText('in_s1g',IN_fmt(s1G)); setText('in_s1t',IN_fmt(t1));
@@ -1742,73 +1714,10 @@ function IN_rc(){
   setText('in_totP',IN_fmt(totP)); setText('in_bROI',totP>0?((ty/totP)*100).toFixed(2)+'%':'—');
 
   const gc=gv('in_gC'),gy=gi('in_gY');
-  // Goal Planner: current portfolio = existing investments + FD lump (sim starting point)
-  const gPortfolio = totP; // existing investment matrix total
-  setText('in_gSIPCurr', IN_fmt(mSIP));
-  setText('in_gPortfolio', IN_fmtCr(gPortfolio));
-  setText('in_gSurplus', IN_fmt(Math.max(0,mo)));
-  setText('in_gRate', gn('in_sipRet')+'%');
-  if(gc>0){
-    const r=sipRt/12, n=gy*12;
-    // ① SIP from scratch
-    const req=r===0?gc/n:gc*r/(Math.pow(1+r,n)-1);
-    setText('in_gSIP',IN_fmt(req));
-    const ok=!deficit&&req<=mSIP;
-    document.getElementById('in_gFeas').textContent=ok?'✓ Your SIP allocation covers this':'⚠ Gap: '+IN_fmt(Math.max(0,req-mSIP))+'/mo more needed';
+  if(gc>0){const r=sipRt/12,n=gy*12; const req=r===0?gc/n:gc*r/(Math.pow(1+r,n)-1); setText('in_gSIP',IN_fmt(req));
+    const ok=!deficit&&req<=mSIP; document.getElementById('in_gFeas').textContent=ok?'✓ Achievable with current surplus':'⚠ Needs '+IN_fmt(Math.max(0,req-mSIP))+' more/month';
     document.getElementById('in_gFeas').style.color=ok?'var(--green)':'var(--rose)';
-    // ② Time to goal with current wealth: iterate month by month
-    // Uses full surplus (FD+SIP) compounding at blended rate
-    const blendedRt = (fdP*gn('in_fdRt')/100 + sipP*sipRt) / (fdP+sipP||1);
-    const rMo = blendedRt/12;
-    const moSurplus = Math.max(0,mo); // total monthly surplus contributed
-    let corpus = gPortfolio;
-    let months = 0;
-    const maxMonths = 50*12;
-    if(corpus >= gc){
-      // Already there
-      setText('in_gTime','Already achieved 🎉');
-      document.getElementById('in_gTime').style.color='var(--green)';
-      document.getElementById('in_gNote').textContent='Your existing portfolio already exceeds the target.';
-      document.getElementById('in_gNote').style.color='var(--green)';
-      document.getElementById('in_gTimeDetail').innerHTML='';
-    } else if(moSurplus<=0){
-      setText('in_gTime','—');
-      document.getElementById('in_gTime').style.color='var(--faint)';
-      document.getElementById('in_gNote').textContent='No surplus available to contribute.';
-      document.getElementById('in_gNote').style.color='var(--rose)';
-      document.getElementById('in_gTimeDetail').innerHTML='';
-    } else {
-      while(corpus < gc && months < maxMonths){
-        corpus = (corpus + moSurplus) * (1 + rMo);
-        months++;
-      }
-      const yrs=Math.floor(months/12), mos=months%12;
-      const reached = months < maxMonths;
-      const timeStr = reached ? (yrs>0?(yrs+' yr'+(yrs>1?'s':'')+(mos>0?' '+mos+' mo':'')):(mos+' months')) : '50+ years';
-      setText('in_gTime', timeStr);
-      document.getElementById('in_gTime').style.color = reached ? (months<=gy*12?'var(--green)':'var(--amber)') : 'var(--rose)';
-      // Compare to target timeline
-      const targetMo = gy*12;
-      const diff = months - targetMo;
-      let noteText='', noteColor='var(--muted)';
-      if(!reached){ noteText='Goal unreachable within 50 years at current rate.'; noteColor='var(--rose)'; }
-      else if(diff<=0){ noteText='✓ '+(Math.abs(diff)>0?'Ahead by '+Math.abs(Math.floor(diff/12))+' yr'+(Math.abs(diff)>=24?'s':'')+(Math.abs(diff)%12>0?' '+Math.abs(diff)%12+' mo':''):('On track for '+gy+' yr target')); noteColor='var(--green)'; }
-      else { noteText='⚠ '+Math.floor(diff/12)+' yr'+(diff>=24?'s':'')+(diff%12>0?' '+diff%12+' mo':'') +' beyond your '+gy+'-yr target'; noteColor='var(--amber)'; }
-      document.getElementById('in_gNote').textContent=noteText;
-      document.getElementById('in_gNote').style.color=noteColor;
-      // Detail: show corpus at target year
-      let corpusAtTarget=gPortfolio;
-      for(let m=0;m<targetMo;m++) corpusAtTarget=(corpusAtTarget+moSurplus)*(1+rMo);
-      document.getElementById('in_gTimeDetail').innerHTML=`<p class="text-xs mb-1" style="color:var(--faint)">At yr ${gy} you'll have</p><p class="mono text-sm font-bold" style="color:var(--indigo)">${IN_fmtCr(corpusAtTarget)}</p>`;
-    }
-  } else {
-    setText('in_gSIP','₹0');
-    setText('in_gTime','—');
-    document.getElementById('in_gFeas').textContent='';
-    document.getElementById('in_gNote').textContent='';
-    document.getElementById('in_gTimeDetail').innerHTML='';
-    document.getElementById('in_gTime').style.color='var(--faint)';
-  }
+  } else {setText('in_gSIP','₹0'); document.getElementById('in_gFeas').textContent='';}
 
   const dc=gv('in_ddC'),dw=gv('in_ddW'),dr=gn('in_ddRt')/100,di=gn('in_ddI')/100;
   if(dc>0&&dw>0){let corpus=dc,yr=0; while(corpus>0&&yr<100){corpus=(corpus-dw*Math.pow(1+di,yr))*(1+dr);yr++;} setText('in_ddRes',yr>=100?'100+ years':yr+' years'); setText('in_ddNote',yr>=100?'Corpus outlasts a 100-year horizon 🎉':'Depleted ~'+yr+' years after retirement');}
@@ -1825,93 +1734,38 @@ function IN_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=1,jobLossReentr
   const b1base=gv('in_b1'),b2base=gv('in_b2'),g1=gn('in_g1')/100,g2=gn('in_g2')/100;
   const fdP=gi('in_fdRng')/100,sipP=gi('in_sipRng')/100;
   const sipRt=gn('in_sipRet')/100,fdRt=gn('in_fdRt')/100;
-  const {totP:totPbase,ty:tyBase}=IN_getAssets(b1base,b2base);
-  // Build per-asset tracking for growing principal (after-tax yield reinvestment)
-  const simAssets=[];
-  document.querySelectorAll('.in_ar').forEach(r=>{
-    const p=parseFloat(r.querySelector('.in_pv').value.replace(/,/g,''))||0;
-    const roi=parseFloat(r.querySelector('.in_yv').value)||0;
-    const appr=parseFloat(r.querySelector('.in_av')?.value||0)||0;
-    const tf=r.querySelector('.in_tv').checked;
-    const owner=r.querySelector('.in_ov').value;
-    if(p>0&&roi>0) simAssets.push({p, roi:roi/100, apprPct:appr/100, tf, owner, curP:p});
-  });
+  const {totP,ty}=IN_getAssets(b1base,b2base);
   // EPF/NPS corpus: sum deductions % × salary compounded at 8.5% (EPF) for each spouse
   const retRt=0.085;
   let retCorpus=0;
   // get initial retirement corpus from any pre-seeded balance in deductions (simple: assume 0 start)
-  // s1/s2 track salary: yr=1 uses base, yr=2 uses base*(1+g), etc.
   let cFD=lump,cSIP=0,s1=b1base,s2=b2base;
   let totalFDContrib=0,totalSIPContrib=0;
   let cFDpeakBeforeDed=0,cSIPpeakBeforeDed=0;
   let totalFDDed=0,totalSIPDed=0;
   let homeEquity=0;
-  // These are updated each year in the loop; used in return after loop
-  let lastTy=tyBase, lastTotP=totPbase, lastAssetRate=totPbase>0?tyBase/totPbase:0;
-  // apprAssets: subset of simAssets with appreciation > 0 (for property value tracking)
-  const apprAssets=simAssets.filter(a=>a.apprPct>0).map(a=>({
-    name:'Asset', origP:a.p, apprPct:a.apprPct, roiPct:a.roi, tf:a.tf, owner:a.owner, curP:a.p
-  }));
-  // Also label from DOM
-  const apprRows=[...document.querySelectorAll('.in_ar')].filter(r=>(parseFloat(r.querySelector('.in_av')?.value||0)||0)>0);
-  apprAssets.forEach((a,i)=>{ if(apprRows[i]) a.name=apprRows[i].querySelector('.in_nm').value||'Asset'; });
-  let propValue=apprAssets.reduce((s,a)=>s+a.origP,0); // total current property value (appreciated)
   for(let yr=1;yr<=years;yr++){
     // job loss logic
     const isPerm=jobLoss.endsWith('p');
     const inLoss=isPerm||(yr<=jobLossYrs);
     const aff1=jobLoss==='s1'||jobLoss==='s1p'||jobLoss==='both'||jobLoss==='bothp';
     const aff2=jobLoss==='s2'||jobLoss==='s2p'||jobLoss==='both'||jobLoss==='bothp';
-    // Year 1 uses base salary; growth applies from year 2 onward
-    if(yr>1){ s1=s1*(1+g1); s2=s2*(1+g2); }
-    if(aff1) s1=inLoss?0:b1base*Math.pow(1+g1,yr-1)*(jobLossReentry/100);
-    if(aff2) s2=inLoss?0:b2base*Math.pow(1+g2,yr-1)*(jobLossReentry/100);
-    // ── Per-asset: appreciate principal (appr%) this year ──
-    // Appreciation happens before yield calculation
-    simAssets.forEach(a=>{ if(a.apprPct>0) a.curP=a.curP*(1+a.apprPct); });
-    // Sync apprAssets curP
-    apprAssets.forEach((a,i)=>{ a.curP=simAssets.filter(sa=>sa.apprPct>0)[i]?.curP||a.curP; });
-    propValue=apprAssets.reduce((s,a)=>s+a.curP,0);
-    // Compute this year's gross yield per asset (on current appreciated principal)
-    // and build s1G/s2G from salary + taxable asset yields
-    let s1G=s1, s2G=s2;
-    let totYield=0;
-    simAssets.forEach(a=>{
-      const yld=a.curP*a.roi;
-      totYield+=yld;
-      if(!a.tf){ if(a.owner==='1') s1G+=yld; else s2G+=yld; }
-    });
-    const totP=simAssets.reduce((s,a)=>s+a.curP,0);
-    const ty=totYield;
-    lastTy=ty; lastTotP=totP; lastAssetRate=totP>0?ty/totP:0;
+    let sal1=s1*(1+g1), sal2=s2*(1+g2);
+    if(aff1) sal1=inLoss?0:b1base*(1+g1)*yr*(jobLossReentry/100);
+    if(aff2) sal2=inLoss?0:b2base*(1+g2)*yr*(jobLossReentry/100);
+    s1=aff1?sal1:s1*(1+g1); s2=aff2?sal2:s2*(1+g2);
+    const {s1G,s2G}=IN_getAssets(s1,s2);
     // FD matures annually: interest split equally between spouses, taxed at marginal rate,
     // net after-tax interest rolled back into FD (Option A)
     const fdInterest=cFD*fdRt;
     const fdIntHalf=fdInterest/2;
-    const d1=IN_DEDS[1].reduce((a,d)=>a+s1*(d.pct/100),0);
-    const d2=IN_DEDS[2].reduce((a,d)=>a+s2*(d.pct/100),0);
-    const t1Base=IN_calcTax(Math.max(0,s1G-d1),true), t2Base=IN_calcTax(Math.max(0,s2G-d2),true);
-    const t1=IN_calcTax(Math.max(0,s1G-d1+fdIntHalf),true), t2=IN_calcTax(Math.max(0,s2G-d2+fdIntHalf),true);
+    const t1Base=IN_calcTax(s1G,true), t2Base=IN_calcTax(s2G,true);
+    const t1=IN_calcTax(s1G+fdIntHalf,true), t2=IN_calcTax(s2G+fdIntHalf,true);
     const fdTax=(t1-t1Base)+(t2-t2Base);
     const fdNetInterest=fdInterest-fdTax;
+    const d1=IN_DEDS[1].reduce((a,d)=>a+s1*(d.pct/100),0);
+    const d2=IN_DEDS[2].reduce((a,d)=>a+s2*(d.pct/100),0);
     const expMo=IN_totExpMo(yr);
-    // After-tax yield on each asset: reinvest net yield back into principal
-    // Tax on asset yield = (t1+t2) already covers it via s1G/s2G computation above.
-    // To reinvest net yield: compute marginal tax rate for each spouse, apply to their assets.
-    const effRate1 = s1G>0 ? (t1/(s1G)) : 0;
-    const effRate2 = s2G>0 ? (t2/(s2G)) : 0;
-    simAssets.forEach(a=>{
-      const yld=a.curP*a.roi;
-      if(a.tf){
-        // Tax-free: full yield reinvests into principal
-        a.curP+=yld;
-      } else {
-        // Taxable: net yield (after marginal tax) reinvests into principal
-        const effRate=a.owner==='1'?effRate1:effRate2;
-        const netYld=yld*(1-effRate);
-        a.curP+=netYld;
-      }
-    });
     const surplus=(s1+s2+ty-t1-t2-d1-d2-(expMo*12))/12+(xI-xE);
     const mFD=Math.max(0,surplus)*fdP, mSIP=Math.max(0,surplus)*sipP;
     totalFDContrib+=mFD*12; totalSIPContrib+=mSIP*12;
@@ -1931,16 +1785,14 @@ function IN_sim(years,xE=0,lump=0,xI=0,jobLoss='none',jobLossYrs=1,jobLossReentr
     homeEquity=IN_EMIS.filter(e=>e.isHome&&e.homeVal).reduce((s,e)=>s+IN_homeEquityAt(e,yr).equity,0);
   }
   const assetRate=totP>0?(ty/totP):0;
-  const finalTotP=simAssets.reduce((s,a)=>s+a.curP,0);
   return{
-    total:cFD+cSIP+finalTotP+retCorpus+homeEquity, // liquid only — property excluded
-    propValue, apprAssets,
+    total:cFD+cSIP+totP+retCorpus+homeEquity,
     cFD,cSIP,retCorpus,homeEquity,
     totalFDDed,totalSIPDed,
     fdPrincipal:lump, fdContrib:totalFDContrib,
     sipContrib:totalSIPContrib,
-    fdRt,sipRt,totP:lastTotP,assetFV:lastTotP,
-    assetYield:lastTy, assetFinalP:finalTotP, assetRate:lastAssetRate
+    fdRt,sipRt,totP,assetFV:totP,
+    assetYield:ty, assetRate
   };
 }
 
@@ -1955,7 +1807,7 @@ function IN_rFC(){
   let html='';
   [5,10,15,20,25,30].forEach(yr=>{
     const sim=IN_sim(yr);
-    const {cFD,cSIP,retCorpus,homeEquity,fdPrincipal,fdContrib,sipContrib,totP:totPbase,assetYield,assetRate}=sim;
+    const {cFD,cSIP,retCorpus,homeEquity,fdPrincipal,fdContrib,sipContrib,totP,assetYield,assetRate}=sim;
     let disp=IN_isAdj?sim.total/Math.pow(1+infRate,yr):sim.total;
     const crFmt=IN_fmtCr(disp);
     const bw=Math.min(97,Math.max(3,(sim.total/max30)*100));
@@ -1971,7 +1823,7 @@ function IN_rFC(){
     // Life events in this 5-year window only
     const leWindow=IN_LE.filter(e=>e.deduct&&e.year>prevYr&&e.year<=yr);
     const leCumDed=leWindow.reduce((s,e)=>s+(e.amount||0),0);
-    const totalPrincipal=(fdPrincipal+fdContrib)+sipContrib;  // note: investment matrix grows separately
+    const totalPrincipal=(fdPrincipal+fdContrib)+sipContrib;
     const totalGain=Math.max(0,disp-totalPrincipal);
     const totalDedsAnn=IN_DEDS[1].reduce((s,d)=>s+gv('in_b1')*(d.pct/100),0)+IN_DEDS[2].reduce((s,d)=>s+gv('in_b2')*(d.pct/100),0);
     const retRows=totalDedsAnn>0?`<tr style="border-bottom:1px dashed var(--border)">
@@ -2026,31 +1878,13 @@ function IN_rFC(){
             <td class="py-2 mono text-xs text-right" style="color:var(--faint)">${sipRtPct}%/yr</td>
           </tr>`:''}
           ${retRows}
-          ${totPbase>0?`<tr style="border-bottom:1px dashed var(--border)">
+          ${totP>0?`<tr style="border-bottom:1px dashed var(--border)">
             <td class="py-2 pl-2 text-xs" style="color:var(--muted)">📊 Existing Investments <span style="color:var(--faint)">(FDs, bonds, assets)</span></td>
-            <td class="py-2 mono text-xs text-right" style="color:var(--muted)">${IN_fmt(totPbase)}<br><span style="color:var(--faint);font-size:10px">original principal</span></td>
-            <td class="py-2 mono text-xs text-right font-semibold" style="color:var(--green)">+${IN_fmtCr(Math.max(0,sim.assetFinalP-totPbase))}<br><span style="color:var(--faint);font-size:10px">after-tax growth</span></td>
-            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--teal)">${IN_fmtCr(sim.assetFinalP)}</td>
+            <td class="py-2 mono text-xs text-right" style="color:var(--muted)">${IN_fmt(totP)}<br><span style="color:var(--faint);font-size:10px">principal held · yield redirected to surplus</span></td>
+            <td class="py-2 mono text-xs text-right" style="color:var(--faint)">—<br><span style="font-size:10px">${IN_fmt(assetYield)}/yr → surplus</span></td>
+            <td class="py-2 mono text-xs text-right font-bold" style="color:var(--teal)">${IN_fmt(totP)}</td>
             <td class="py-2 mono text-xs text-right" style="color:var(--faint)">${(assetRate*100).toFixed(1)}%/yr yield</td>
           </tr>`:''}
-          ${(()=>{const aa=sim.apprAssets||[];if(!aa.length)return'';
-            return aa.map(a=>{
-              const apprGain=a.curP-a.origP;
-              const yieldAtYr=a.curP*a.roiPct;
-              return`<tr style="border-bottom:1px dashed var(--border);background:rgba(245,158,11,.04)">
-                <td class="py-2 pl-2 text-xs" style="color:var(--amber)">🏘 ${a.name} <span style="color:var(--faint)">(${(a.apprPct*100).toFixed(1)}%/yr appreciation${a.tf?' · tax-free':''})</span></td>
-                <td class="py-2 mono text-xs text-right" style="color:var(--muted)">${IN_fmt(a.origP)}<br><span style="color:var(--faint);font-size:10px">original principal</span></td>
-                <td class="py-2 mono text-xs text-right font-semibold" style="color:var(--amber)">+${IN_fmtCr(apprGain)}<br><span style="color:var(--faint);font-size:10px">property appreciation</span></td>
-                <td class="py-2 mono text-xs text-right font-bold" style="color:var(--amber)">${IN_fmtCr(a.curP)}<br><span style="color:var(--faint);font-size:10px">property value · excl. net worth</span></td>
-                <td class="py-2 mono text-xs text-right" style="color:var(--faint)">${IN_fmt(yieldAtYr)}/yr yield</td>
-              </tr>`;
-            }).join('')+`<tr style="border-bottom:1px dashed var(--border);background:rgba(245,158,11,.04)">
-              <td class="py-2 pl-4 text-xs italic" style="color:var(--faint)">↳ Property value not included in Net Worth above</td>
-              <td></td><td></td>
-              <td class="py-2 mono text-xs text-right font-semibold" style="color:var(--amber)">${IN_fmtCr(sim.propValue)}</td>
-              <td></td>
-            </tr>`;
-          })()}
           ${homeRows}
           ${(()=>{if(!leWindow.length)return'';const totalDed=leCumDed;return'<tr style="border-top:1.5px solid var(--rose);background:var(--rose-lt)"><td colspan="5" class="py-1.5 pl-2 text-xs font-semibold" style="color:var(--rose)">💸 Spent this period — Yr '+(prevYr+1)+' to '+yr+'</td></tr>'+leWindow.map(e=>{const t=IN_LE_TYPES.find(x=>x.val===e.type)||{icon:"📌"};return'<tr style="border-bottom:1px dashed var(--border);background:var(--rose-lt)"><td class="py-1.5 pl-4 text-xs" style="color:var(--rose)">'+t.icon+' '+e.label+' <span style="color:var(--faint);font-size:10px">(Yr '+e.year+' · liquidated from FD first, then SIP)</span></td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">—</td><td class="py-1.5 mono text-xs text-right font-semibold" style="color:var(--rose)">−'+IN_fmtCr(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--rose)">−'+IN_fmtCr(e.amount||0)+'</td><td class="py-1.5 mono text-xs text-right" style="color:var(--rose)">cash out</td></tr>';}).join('')+(leWindow.length>1?'<tr style="background:var(--rose-lt)"><td class="py-1 pl-2 text-xs font-bold" style="color:var(--rose)">Subtotal this period</td><td colspan="2"></td><td class="py-1 mono text-xs text-right font-black" style="color:var(--rose)">−'+IN_fmtCr(totalDed)+'</td><td></td></tr>':'');})()}
         </tbody>
@@ -2091,7 +1925,7 @@ function IN_rFC_short(){
   const fdP=gi('in_fdRng')/100, sipP=gi('in_sipRng')/100;
   const fdRt=gn('in_fdRt')/100, sipRt=gn('in_sipRet')/100;
   const b1=gv('in_b1'),b2=gv('in_b2'),g1=gn('in_g1')/100,g2=gn('in_g2')/100;
-  const {totP}=IN_getAssets(b1,b2); // base; sim tracks growth
+  const {totP,ty}=IN_getAssets(b1,b2);
   const totalDedsAnn=IN_DEDS[1].reduce((s,d)=>s+b1*(d.pct/100),0)+IN_DEDS[2].reduce((s,d)=>s+b2*(d.pct/100),0);
   // pre-compute year snapshots for smooth interpolation
   const snapshots={};
@@ -2110,12 +1944,7 @@ function IN_rFC_short(){
       cFD_mo+=monthlyFDGrowth; cSIP_mo+=monthlySIPGrowth;
       const retMo=retPrev+(retCurr-retPrev)*(mo/12);
       const heqMo=heqPrev+(heqCurr-heqPrev)*(mo/12);
-      const assetPrev=snapshots[yr-1].assetFinalP||totP, assetCurr=snapshots[yr].assetFinalP||totP;
-      const assetMo=assetPrev+(assetCurr-assetPrev)*(mo/12);
-      const dispMo=IN_isAdj?(cFD_mo+cSIP_mo+assetMo+retMo+heqMo)/Math.pow(1+infRate,yr-1+mo/12):(cFD_mo+cSIP_mo+assetMo+retMo+heqMo);
-      // property value: interpolate between yr snapshots
-      const pvPrev=snapshots[yr-1].propValue||0, pvCurr=snapshots[yr].propValue||0;
-      const propMo=pvPrev+(pvCurr-pvPrev)*(mo/12);
+      const dispMo=IN_isAdj?(cFD_mo+cSIP_mo+totP+retMo+heqMo)/Math.pow(1+infRate,yr-1+mo/12):(cFD_mo+cSIP_mo+totP+retMo+heqMo);
       const cal=new Date().getFullYear()+(yr-1);
       const moName=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][mo-1];
       const isQ=mo===3||mo===6||mo===9||mo===12;
@@ -2123,9 +1952,8 @@ function IN_rFC_short(){
         <td class="py-1.5 text-xs font-medium" style="color:${isQ?'var(--muted)':'var(--faint)'}">${moName} ${cal}</td>
         ${fdP>0?`<td class="py-1.5 mono text-xs text-right" style="color:var(--indigo)">${IN_fmtCr(cFD_mo)}</td>`:''}
         ${sipP>0?`<td class="py-1.5 mono text-xs text-right" style="color:var(--purple)">${IN_fmtCr(cSIP_mo)}</td>`:''}
-        ${totP>0?`<td class="py-1.5 mono text-xs text-right" style="color:var(--teal-dk)">${IN_fmtCr(assetMo)}</td>`:''}
+        ${totP>0?`<td class="py-1.5 mono text-xs text-right" style="color:var(--teal-dk)">${IN_fmtCr(totP)}</td>`:''}
         ${retCurr>0?`<td class="py-1.5 mono text-xs text-right" style="color:var(--teal)">${IN_fmtCr(retMo)}</td>`:''}
-        ${pvCurrYr>0?`<td class="py-1.5 mono text-xs text-right" style="color:var(--amber)">${IN_fmtCr(propMo)}</td>`:''}
         <td class="py-1.5 mono text-xs text-right font-bold" style="color:var(--teal-dk)">${IN_fmtCr(dispMo)}${IN_isAdj?`<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);margin-left:4px;font-family:'DM Sans',sans-serif;vertical-align:middle">adj</span>`:''}</td>
       </tr>`;
     }
@@ -2135,7 +1963,6 @@ function IN_rFC_short(){
     // bar always uses nominal total for consistent scaling
     const bw=Math.min(97,Math.max(2,(simCurr.total/max10)*100));
     const msPills=IN_LE.filter(e=>e.year===yr).map(e=>{const t=IN_LE_TYPES.find(x=>x.val===e.type)||{icon:'📌'};const amtSuffix=e.amount?' · '+IN_fmtCr(e.amount):'';const dedSuffix=e.deduct?' ↓':'';const bg=e.deduct?'var(--rose-lt)':'var(--amber-lt)';const col=e.deduct?'var(--rose)':'var(--amber)';return'<span class="pill" style="background:'+bg+';color:'+col+';">'+t.icon+' '+e.label+amtSuffix+dedSuffix+'</span>';}).join(' ');
-    const pvCurrYr=simCurr.propValue||0;
     html+=`<div style="border-bottom:1px solid var(--border)">
       <div class="flex items-center gap-3 py-2 px-1" style="cursor:pointer" onclick="const el=document.getElementById('insh${yr}');const open=!el.classList.contains('hidden');el.classList.toggle('hidden');this.querySelector('.sh-hint').textContent=open?'▸ expand':'▾ collapse'">
         <div class="mono text-xl font-black shrink-0 text-center" style="width:32px;color:var(--text)">${yr}</div>
@@ -2161,7 +1988,6 @@ function IN_rFC_short(){
             ${sipP>0?`<th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--purple)">SIP (Nifty 50)</th>`:''}
             ${totP>0?`<th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--teal-dk)">Investments</th>`:''}
             ${retCurr>0?`<th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--teal)">EPF / NPS</th>`:''}
-            ${pvCurrYr>0?`<th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--amber)">Property Value</th>`:''}
             <th class="pb-2 text-xs font-semibold uppercase tracking-wide text-right" style="color:var(--teal-dk)">Net Worth${IN_isAdj?' <span style="font-size:9px;padding:1px 5px;border-radius:4px;background:var(--amber-lt);color:var(--amber);font-weight:700;text-transform:uppercase;vertical-align:middle">Infl. Adj</span>':''}</th>
           </tr></thead>
           <tbody>${yrRows}</tbody>
@@ -2236,8 +2062,7 @@ function IN_rSC(){
 function IN_rIns(){
   const b1=gv('in_b1'),b2=gv('in_b2');
   const{s1G,s2G,ty,totP}=IN_getAssets(b1,b2);
-  const d1ins=IN_totDed(1,b1),d2ins=IN_totDed(2,b2);
-  const t1=IN_calcTax(Math.max(0,s1G-d1ins),b1>0),t2=IN_calcTax(Math.max(0,s2G-d2ins),b2>0);
+  const t1=IN_calcTax(s1G,b1>0),t2=IN_calcTax(s2G,b2>0);
   const expMo=IN_totExpMo(1);
   const surplus=b1+b2+ty-t1-t2-(expMo*12);
   const ins=[];
@@ -2326,7 +2151,7 @@ function IN_rIns(){
 function IN_sv(){
   const g=id=>document.getElementById(id)?.value||'';
   const data={b1:g('in_b1'),b2:g('in_b2'),g1:g('in_g1'),g2:g('in_g2'),fdRng:g('in_fdRng'),sipRng:g('in_sipRng'),sipRet:g('in_sipRet'),fdRt:g('in_fdRt'),infR:g('in_infR'),isAdj:IN_isAdj,expInflOn:IN_expInflOn,fcMode:IN_fcMode,gC:g('in_gC'),gY:g('in_gY'),ddC:g('in_ddC'),ddW:g('in_ddW'),ddRt:g('in_ddRt'),ddI:g('in_ddI'),EXPS:IN_EXPS,EMIS:IN_EMIS,LE:IN_LE,SC:IN_SC,DEDS:IN_DEDS,assets:[]};
-  document.querySelectorAll('.in_ar').forEach(r=>data.assets.push({n:r.querySelector('.in_nm').value,p:r.querySelector('.in_pv').value,y:r.querySelector('.in_yv').value,o:r.querySelector('.in_ov').value,tf:r.querySelector('.in_tv').checked,appr:parseFloat(r.querySelector('.in_av')?.value||0)||0}));
+  document.querySelectorAll('.in_ar').forEach(r=>data.assets.push({n:r.querySelector('.in_nm').value,p:r.querySelector('.in_pv').value,y:r.querySelector('.in_yv').value,o:r.querySelector('.in_ov').value,tf:r.querySelector('.in_tv').checked}));
   try{localStorage.setItem('cyf_india',JSON.stringify(data));}catch(e){}
 }
 function IN_exportData(){const s=localStorage.getItem('cyf_india');if(!s){alert('No data yet.');return;} const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([s],{type:'application/json'})); a.download='cyf-india-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();}
@@ -2366,7 +2191,7 @@ function IN_loadData(){
   }
   if(d.DEDS){IN_DEDS=d.DEDS;IN_rDed(1);IN_rDed(2);}
   document.getElementById('in_aBody').innerHTML='';
-  (d.assets||[]).forEach(a=>IN_addARow(a.n,parseFloat((a.p||'0').replace(/,/g,'')),parseFloat(a.y),a.o,a.tf,parseFloat(a.appr)||0));
+  (d.assets||[]).forEach(a=>IN_addARow(a.n,parseFloat((a.p||'0').replace(/,/g,'')),parseFloat(a.y),a.o,a.tf));
   IN_vs('fd'); IN_rc();
 }
 function IN_resetAll(){if(!confirm('Clear all India data?'))return;try{localStorage.removeItem('cyf_india');}catch(e){} location.reload();}
